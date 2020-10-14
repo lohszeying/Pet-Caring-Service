@@ -1,0 +1,19 @@
+{
+  "name": "cs2102_2021_s1_team32",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CS2102-2021-S1-Team32/CS2102_2021_S1_Team32.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CS2102-2021-S1-Team32/CS2102_2021_S1_Team32/issues"
+  },
+  "homepage": "https://github.com/CS2102-2021-S1-Team32/CS2102_2021_S1_Team32#readme"
+}
