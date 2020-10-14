@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/CS2102-2021-S1-Team32/CS2102_2021_S1_Team32#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "pg": "^8.4.1"
   }
 }
