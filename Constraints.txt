@@ -1,23 +1,21 @@
-Accounts can be identified by a UID attribute (primary key constraint), and their password and enabled status must be recorded.
-
+Accounts can be identified by an username attribute (primary key constraint).
 
 Accounts must be either User or PCS Admin, but not both (i.e. Account ISA has no overlapping constraint, and has a covering constraint).
 Account cannot be deleted.
 Account can only be enabled or disabled with the Account enabled attribute.
 
-
 PCS Admin accounts cannot be created by the public.
 
-
-Users can either be a pet owner or caretaker or both (i.e. User ISA has overlapping constraint and covering constraint).
+Users can either be a Pet Owner or Caretaker or both (i.e. User ISA has overlapping constraint and covering constraint).
 Users must have their name and area recorded.
 Users can only be created by the public.
 Users can change their name.
 
 
-Pets can be identified by a PID attribute (primary key constraint), and their name must be recorded.
-Pet has a foreign key constraint to the owner’s UID.
-Pet has a dependency constraint to the owner.
+Pet can be identified by a composite key of Pet’s name attribute and their Pet Owner’s username attribute.
+Pet has a foreign key constraint to the Pet Owner’s username attribute.
+Pet has a dependency constraint to the Pet Owner.
+
 Pets cannot be deleted.
 Pets can be enabled or disabled.
 Pets’ name can be changed.
@@ -27,54 +25,47 @@ Each Pet has a type. (e.g. cat, dog etc.)
 Type of Pet can be identified by a name attribute (primary key constraint).
 Type of Pet name can only be deleted or changed if there are no foreign entities referencing it.
 
-
-Reviews can be identified by a rid attribute (primary key constraint).
-Reviews must have a rating recorded.
-
-
 Days can be identified by a date attribute (primary key constraint).
-
 
 Pet Owners can create Pets.
 Pet Owners can view their pet’s information.
 Pet Owners can edit their own name.
 Pet Owners can search for Caretakers.
-Pet Owners can view reviews of Caretakers.
+Pet Owners can view reviews and ratings of Caretakers.
 Pet Owners can bid for Caretakers’ services for each of their Pets, and the successful bidder can be chosen by either Caretaker or the system. 
 
+An Availability is identified by Caretaker and date.
 
-A Bid can have a start date and end date for the period the pet is needed to be taken care of.
-Each Successful Bid should have a transfer method and payment type recorded.
-Each Successful Bid can have a Review for the corresponding Caretaker at the end.  
+A bid is identified by a composite key of Availability and Pet.
+A Bid can be successful or not successful. 
+Each successful Bid should have a price, transfer method and payment type recorded.
+Each successful Bid can have a review and rating for the corresponding Caretaker at the end. 
 
+Caretakers must be either a Full-time Caretaker or Part-time Caretaker, but not both.(i.e. Care takers ISA has no overlapping constraint, and has a covering constraint).
+Caretakers can set their availability which the Pet Owner can bid for.
 
-Caretakers must be either a full-time caretaker or part-time caretaker, but not both.(i.e. Care takers ISA has no overlapping constraint, and has a covering constraint).
-Caretakers can make advertisements which can be identified using their unique ids (primary key constraint).
-Caretakers can view their own reviews given by Pet Owners.
-Caretakers should not take care of pets they cannot care for, but can take care of more than one pet at any given time.
+Caretakers can view their own reviews and ratings given by Pet Owners.
+Caretakers should not take care of Pets they cannot care for, but can take care of more than one Pet at any given time.
 
+Full-time Caretaker must work a minimum of 2*150 consecutive days a year, including weekends
+Full-time Caretaker is always treated as available to take care of pets.
+Full-time Caretaker cannot take emergency leave.
+Full-time Caretaker can only take care of at most 5 pets at any given time.
+Full-time Caretaker will always accept a job when a job is available.
 
-Full-time caretaker must work a minimum of 2*150 consecutive days a year, including weekends
-Full-time caretaker is always treated as available to take care of pets.
-Full-time caretaker cannot take emergency leave.
-Full-time caretaker can only take care of at most 5 pets at any given time.
-Full-time caretaker will always accept a job when a job is available.
+Part-time Caretaker must specify their availability for the current year and next year.
+Part-time Caretaker can only take care of at most 5 pets at any given time.
+Part-time Caretaker must have a rating of at least 4 out of 5 to take care of more than 2 Pets at any given time.
+Part-time Caretakers can set their own base daily price. 
 
-
-Part-time caretaker must specify their availability for the current year and next year.
-Part-time caretaker can only take care of at most 5 pets at any given time.
-Part-time caretaker must have a rating of at least 4 out of 5 to take care of more than 2 pets at any given time.
-Part-time caretakers can set their own base daily price. 
-
-
-PCS Administrator must specify minimum base daily price for full-time caretaker.
-Base daily price differs according to the type of pet that is being taken care of.
-As caretaker’s rating increased, base daily price increased.
+PCS Administrator must specify minimum base daily price for full-time Caretaker.
+Base daily price differs according to the type of Pet that is being taken care of.
+As Caretaker’s rating increased, base daily price increased.
 Caretaker’s base daily price will never be below the minimum base daily price.
-Once a pet owner has successfully bidded for the caretaker for a price, the price will not change for the duration of the caretaking even if the caretaker’s base daily price increases.
+Once a Pet Owner has successfully bidded for the Caretaker for a price, the price will not change for the duration of the caretaking even if the Caretaker’s base daily price increases.
 Pet-day depends on how many Pets are taken care of in a given month for how many days.
-Full-time caretaker must work for a minimum of 60 pet-days.
+Full-time Caretaker must work for a minimum of 60 pet-days.
 Each pet-day is $50.
-Once a full-time caretaker hit $3000 per month with 60 pet-days, each pet-day is $40.
-In summary, a full-time caretaker will receive a minimum of $3000 per month with 60 pet days, plus extra pet-day at $40 per day, and base daily price multiplied by number of pets daily.
-Part-time caretakers will receive 75% of their stated price as their salary.
+Once a full-time Caretaker hit $3000 per month with 60 pet-days, each pet-day is $40.
+In summary, a full-time Caretaker will receive a minimum of $3000 per month with 60 pet days, plus extra pet-day at $40 per day, and base daily price multiplied by number of pets daily.
+Part-time Caretakers will receive 75% of their stated price as their salary.
