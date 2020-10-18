@@ -101,7 +101,7 @@ BEGIN
     FROM generate_series(timestamp '2020-01-01', timestamp '2020-12-31', interval '1 day') AS t(day), CareTaker AS C 
     WHERE C.username = NEW.username
     ;
-    RETURN NUll;
+    RETURN NEW;
 END;
 $$
 LANGUAGE plpgsql;
@@ -110,6 +110,7 @@ CREATE TRIGGER FillAvailability AFTER INSERT ON CareTaker
     FOR EACH ROW 
     WHEN (NEW.is_fulltime = TRUE)
     EXECUTE PROCEDURE FillUpAvailability();
+
 
 CREATE FUNCTION 
 ABLETOCAREFOR(pet_name VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) 
@@ -123,6 +124,7 @@ $$BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
 
 CREATE TABLE Bids
 (
@@ -146,6 +148,27 @@ CREATE TABLE Bids
     CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username) = TRUE)
 );
 
+CREATE OR REPLACE FUNCTION OVERLAPPING() RETURNS TRIGGER 
+LANGUAGE plpgsql
+AS $$
+DECLARE overlap INTEGER;
+BEGIN
+    overlap := (SELECT COUNT(*) 
+    FROM Bids B
+    WHERE (B.successful = TRUE OR NEW.successful = TRUE) AND B.pet_name = NEW.pet_name AND B.owner_username = NEW.owner_username 
+    AND (NEW.start_date, NEW.end_date + interval '1 day') OVERLAPS (B.start_date, B.end_date + interval '1 day')
+    );
+    IF overlap > 0 THEN
+    RAISE EXCEPTION 'NO OVERLAPPING DATES!';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+
+
+CREATE TRIGGER Checkoverlap BEFORE INSERT OR UPDATE ON Bids
+FOR EACH ROW EXECUTE PROCEDURE OVERLAPPING();
 
 DO $$
 BEGIN
@@ -154,7 +177,6 @@ insert into Users (username, name, password) values(r, 'John', cast (r as VARCHA
 end loop;
 END;
 $$; 
-
 
 DO $$
 DECLARE count INTEGER;
@@ -220,3 +242,4 @@ BEGIN
     END LOOP;
     END;
 $$;
+
