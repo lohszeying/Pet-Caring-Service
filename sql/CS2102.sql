@@ -1,3 +1,17 @@
+DROP TABLE IF EXISTS Bids;
+DROP FUNCTION IF EXISTS ABLETOCAREFOR;
+DROP TABLE IF EXISTS CareTakerAvailability;
+DROP TABLE IF EXISTS CareTakerPricing;
+DROP TABLE IF EXISTS PetSpecialRequirements;
+DROP TABLE IF EXISTS Pet;
+DROP TABLE IF EXISTS PetTypes;
+DROP TABLE IF EXISTS PetOWner;
+DROP TABLE IF EXISTS CareTaker;
+DROP TABLE IF EXISTS PCSAdmin;
+DROP TABLE IF EXISTS Users;
+DROP TABLE IF EXISTS SpecialRequirements;
+DROP TYPE IF EXISTS transfer_methods;
+DROP TYPE IF EXISTS payment_types;
 CREATE TABLE PCSAdmin
 (
     username VARCHAR(64) PRIMARY KEY,
@@ -17,6 +31,7 @@ CREATE TABLE Users
 CREATE TABLE PetOwner
 (
     username VARCHAR(64) PRIMARY KEY,
+    credit_card_number NUMERIC(20) DEFAULT NULL,
     FOREIGN KEY (username) REFERENCES Users (username)
 );
 
@@ -42,7 +57,7 @@ CREATE TABLE Pet
     owner_username VARCHAR(64),
     name           VARCHAR(64),
     enabled        BOOLEAN DEFAULT TRUE,
-    pet_type       VARCHAR(64),
+    pet_type       VARCHAR(64) NOT NULL,
     PRIMARY KEY (owner_username, name),
     FOREIGN KEY (owner_username) REFERENCES PetOwner (username) ON DELETE CASCADE,
     FOREIGN KEY (pet_type) REFERENCES PetTypes (name) ON DELETE CASCADE
@@ -71,13 +86,43 @@ CREATE TABLE CareTakerPricing
 CREATE TABLE CareTakerAvailability
 (
     username VARCHAR(64),
-    date     DATE NOT NULL DEFAULT CURRENT_DATE,
+    date     DATE NOT NULL,
     PRIMARY KEY (username, date),
     FOREIGN KEY (username) REFERENCES CareTaker (username)
 );
 
 CREATE TYPE transfer_methods AS ENUM ('OWNER_DELIVER', 'CARETAKER_PICKUP', 'PCS_BUILDING');
 CREATE TYPE payment_types AS ENUM ('CREDIT_CARD', 'CASH');
+
+CREATE OR REPLACE FUNCTION FillUpAvailability() RETURNS TRIGGER AS $$ 
+BEGIN
+    INSERT INTO CareTakerAvailability(username, date) 
+    SELECT C.username, t.day::date
+    FROM generate_series(timestamp '2020-01-01', timestamp '2020-12-31', interval '1 day') AS t(day), CareTaker AS C 
+    WHERE C.username = NEW.username
+    ;
+    RETURN NUll;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER FillAvailability AFTER INSERT ON CareTaker
+    FOR EACH ROW 
+    WHEN (NEW.is_fulltime = TRUE)
+    EXECUTE PROCEDURE FillUpAvailability();
+
+CREATE FUNCTION 
+ABLETOCAREFOR(pet_name VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) 
+RETURNS BOOLEAN AS 
+$$BEGIN
+    RETURN EXISTS (
+        SELECT 1 
+        FROM pet P, CareTakerPricing C
+        WHERE pet_name = P.name AND owner_name = P.owner_username AND P.pet_type = C.pet_type AND caretaker_username = C.username
+    );
+END;
+$$
+LANGUAGE plpgsql;
 
 CREATE TABLE Bids
 (
@@ -89,9 +134,89 @@ CREATE TABLE Bids
     payment_type    payment_types    DEFAULT NULL,
     owner_username  VARCHAR(64),
     pet_name        VARCHAR(64),
-    cta_username    VARCHAR(64),
-    cta_date        DATE NOT NULL    DEFAULT CURRENT_DATE,
-    PRIMARY KEY (owner_username, pet_name, cta_username, cta_date),
+    caretaker_username    VARCHAR(64),
+    start_date      DATE  NOT NULL,
+    end_date DATE NOT NULL,
+
+    PRIMARY KEY (owner_username, pet_name, caretaker_username, start_date, end_date),
     FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, name),
-    FOREIGN KEY (cta_username, cta_date) REFERENCES CareTakerAvailability (username, date)
+    FOREIGN KEY (caretaker_username, start_date) REFERENCES CareTakerAvailability (username, date),
+    FOREIGN KEY (caretaker_username, end_date) REFERENCES CareTakerAvailability(username, date),
+    CHECK (start_date <= end_date),
+    CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username) = TRUE)
 );
+
+
+DO $$
+BEGIN
+for r in 1..1000 loop
+insert into Users (username, name, password) values(r, 'John', cast (r as VARCHAR));
+end loop;
+END;
+$$; 
+
+
+DO $$
+DECLARE count INTEGER;
+    
+BEGIN
+    count := 1;
+    WHILE count<= 100 LOOP
+   INSERT INTO PetOWner (username) VALUES(count);
+   count := count + 1;
+   END LOOP;
+END;
+$$;
+
+DO $$
+DECLARE count INTEGER;
+    
+BEGIN
+    count := 400;
+    WHILE count<= 800 LOOP
+   INSERT INTO CareTaker (username, is_fulltime) VALUES(count, mod(count,2) =0);
+   count := count + 1;
+   END LOOP;
+END;
+$$;
+
+DO $$
+DECLARE count INTEGER;
+    
+BEGIN
+    count := 0;
+    WHILE count<= 10 LOOP
+   INSERT INTO PetTypes (name) VALUES(concat('Type ', count));
+   count := count + 1;
+   END LOOP;
+END;
+$$;
+
+
+DO $$
+DECLARE count INTEGER;
+DECLARE pet INTEGER;
+BEGIN
+    count := 1;
+    WHILE count<= 50 LOOP
+    pet:=1;
+    WHILE pet <=20 LOOP
+   INSERT INTO Pet (owner_username,name, pet_type) VALUES(count, pet, concat('Type ', mod(pet, 10)) );
+   pet := pet + 1;
+   END LOOP;
+   count := count + 1;
+   END LOOP;
+END;
+$$;
+
+DO $$
+DECLARE count INTEGER;
+BEGIN 
+    count := 400;
+    WHILE count < 800 LOOP
+    INSERT INTO CareTakerPricing(username, pet_type, price) VALUES (count, concat('Type ',mod(count, 10)), count/23);
+    INSERT INTO CareTakerPricing(username, pet_type, price) VALUES (count, concat('Type ',mod(count+2, 10)), count/23);
+    count := count +1;
+    END LOOP;
+    END;
+$$;
