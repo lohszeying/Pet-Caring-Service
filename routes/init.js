@@ -49,8 +49,8 @@ function basic(req, res, page, other) {
 	var info = {
 		page: page,
 		user: req.user.username,
-		name: req.user.name,
-		area: req.user.area,
+		name: req.body.name,
+		area: req.body.area,
 		enabled   : req.user.enabled,
 	};
 	if(other) {
@@ -171,11 +171,11 @@ function retrieve(req, res, next) {
 // POST 
 function update_info(req, res, next) {
 	var username  = req.user.username;
-	var name = req.user.name;
-	var area = req.user.area;
+	var name = req.body.name;
+	var area = req.body.area;
 	//var firstname = req.body.firstname;
 	//var lastname  = req.body.lastname;
-	pool.query(sql_query.query.update_information, [username, name, area], (err, data) => {
+	pool.query(sql_query.query.update_information, [username,name,area], (err, data) => {
 		if(err) {
 			console.error("Error in update info");
 			res.redirect('/dashboard?info=fail');
