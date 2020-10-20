@@ -19,8 +19,8 @@ function initRouter(app) {
 	
 	/* PROTECTED GET */
 	app.get('/dashboard', passport.authMiddleware(), dashboard);
-	app.get('/games'    , passport.authMiddleware(), games    );
-	app.get('/plays'    , passport.authMiddleware(), plays    );
+	/*app.get('/games'    , passport.authMiddleware(), games    );
+	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
@@ -28,8 +28,8 @@ function initRouter(app) {
 	/* PROTECTED POST */
 	app.post('/update_info', passport.authMiddleware(), update_info);
 	app.post('/update_pass', passport.authMiddleware(), update_pass);
-	app.post('/add_game'   , passport.authMiddleware(), add_game   );
-	app.post('/add_play'   , passport.authMiddleware(), add_play   );
+	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
+	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -49,9 +49,9 @@ function basic(req, res, page, other) {
 	var info = {
 		page: page,
 		user: req.user.username,
-		firstname: req.user.firstname,
-		lastname : req.user.lastname,
-		status   : req.user.status,
+		name: req.user.name,
+		area: req.user.area,
+		enabled   : req.user.enabled,
 	};
 	if(other) {
 		for(var fld in other) {
@@ -117,7 +117,7 @@ function search(req, res, next) {
 function dashboard(req, res, next) {
 	basic(req, res, 'dashboard', { info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'), pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
 }
-function games(req, res, next) {
+/*function games(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
 	pool.query(sql_query.query.avg_rating, [req.user.username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
@@ -136,8 +136,8 @@ function games(req, res, next) {
 			basic(req, res, 'games', { ctx: ctx, avg: avg, tbl: tbl, game_msg: msg(req, 'add', 'Game added successfully', 'Game does not exist'), auth: true });
 		});
 	});
-}
-function plays(req, res, next) {
+}*/
+/*function plays(req, res, next) {
 	var win = 0, avg = 0, ctx = 0, tbl;
 	pool.query(sql_query.query.count_wins, [req.user.username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
@@ -158,7 +158,7 @@ function plays(req, res, next) {
 			basic(req, res, 'plays', { win: win, ctx: ctx, avg: avg, tbl: tbl, play_msg: msg(req, 'add', 'Play added successfully', 'Invalid parameter in play'), auth: true });
 		});
 	});
-}
+}*/
 
 function register(req, res, next) {
 	res.render('register', { page: 'register', auth: false });
@@ -171,9 +171,11 @@ function retrieve(req, res, next) {
 // POST 
 function update_info(req, res, next) {
 	var username  = req.user.username;
-	var firstname = req.body.firstname;
-	var lastname  = req.body.lastname;
-	pool.query(sql_query.query.update_info, [username, firstname, lastname], (err, data) => {
+	var name = req.body.name;
+	var area = req.body.area;
+	//var firstname = req.body.firstname;
+	//var lastname  = req.body.lastname;
+	pool.query(sql_query.query.update_information, [username,name,area], (err, data) => {
 		if(err) {
 			console.error("Error in update info");
 			res.redirect('/dashboard?info=fail');
@@ -195,7 +197,7 @@ function update_pass(req, res, next) {
 	});
 }
 
-function add_game(req, res, next) {
+/*function add_game(req, res, next) {
 	var username = req.user.username;
 	var gamename = req.body.gamename;
 
@@ -207,8 +209,8 @@ function add_game(req, res, next) {
 			res.redirect('/games?add=pass');
 		}
 	});
-}
-function add_play(req, res, next) {
+}*/
+/*function add_play(req, res, next) {
 	var username = req.user.username;
 	var player1  = req.body.player1;
 	var player2  = req.body.player2;
@@ -225,14 +227,14 @@ function add_play(req, res, next) {
 			res.redirect('/plays?add=pass');
 		}
 	});
-}
+} */
 
 function reg_user(req, res, next) {
 	var username  = req.body.username;
 	var password  = bcrypt.hashSync(req.body.password, salt);
-	var firstname = req.body.firstname;
-	var lastname  = req.body.lastname;
-	pool.query(sql_query.query.add_user, [username,password,firstname,lastname], (err, data) => {
+	var name = req.body.name;
+	var area  = req.body.area;
+	pool.query(sql_query.query.add_user, [username,password,name,area], (err, data) => {
 		if(err) {
 			console.error("Error in adding user", err);
 			res.redirect('/register?reg=fail');
@@ -240,9 +242,10 @@ function reg_user(req, res, next) {
 			req.login({
 				username    : username,
 				passwordHash: password,
-				firstname   : firstname,
-				lastname    : lastname,
-				status      : 'Bronze'
+				name   : name,
+				area    : area,
+				enabled      : true
+
 			}, function(err) {
 				if(err) {
 					return res.redirect('/register?reg=fail');
