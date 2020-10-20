@@ -49,8 +49,8 @@ function basic(req, res, page, other) {
 	var info = {
 		page: page,
 		user: req.user.username,
-		name: req.body.name,
-		area: req.body.area,
+		name: req.user.name,
+		area: req.user.area,
 		enabled   : req.user.enabled,
 	};
 	if(other) {
