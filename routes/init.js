@@ -121,13 +121,12 @@ function dashboard(req, res, next) {
 	basic(req, res, 'dashboard', { info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'), pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
 }
 
+//CARETAKER FUNCTION
 function caretaker(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
 	var ctx2 = 0, tbl2;
 	var pet_ctx = 0, pet_tbl;
 	var caretaker_tbl;
-	var textFulltime = "Full time";
-	var textParttime = "Part time";
 
 	pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
@@ -174,23 +173,6 @@ function caretaker(req, res, next) {
 		});
 	});
 }
-
-/*function getpettypes(req, res, next) {
-	console.log("am i here");
-	var pet_ctx = 0, pet_tbl;
-
-	pool.query(sql_query.query.all_pet_types, [1], (err, data) => {
-		if (err || !data.rows || data.rows.length == 0) {
-			pet_ctx = 0;
-			pet_tbl = [];
-		} else {
-			pet_ctx = data.rows.length;
-			pet_tbl = data.rows;
-		}
-
-		basic(req, res, 'caretaker/pettype', { pet_ctx: pet_ctx, pet_tbl: pet_tbl, auth: true });
-	});
-} */
 
 /*function games(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
@@ -283,6 +265,7 @@ function add_caretaker(req, res, next) {
 	});
 }
 
+//Maybe PCS Admin can use this
 function add_pettypes(req, res, next) {
 	var name = req.body.type;
 
