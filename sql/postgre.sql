@@ -113,7 +113,7 @@ CREATE TRIGGER FillAvailability AFTER INSERT ON CareTaker
     EXECUTE PROCEDURE FillUpAvailability();
 
 
-CREATE FUNCTION 
+CREATE OR REPLACE FUNCTION 
 ABLETOCAREFOR(pet_name VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) 
 RETURNS BOOLEAN AS 
 $$BEGIN
@@ -146,11 +146,23 @@ CREATE TABLE Bids
     FOREIGN KEY (caretaker_username, start_date) REFERENCES CareTakerAvailability (username, date),
     FOREIGN KEY (caretaker_username, end_date) REFERENCES CareTakerAvailability(username, date),
     CHECK (start_date <= end_date),
-    CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username) = TRUE)
+    CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username)),
+    CHECK (successful OR (rating IS NULL AND price IS NULL AND transfer_method IS NULL AND payment_type IS NULL))
 );
 
 
-
+CREATE OR REPLACE FUNCTION GET_RATING(username VARCHAR) 
+RETURNS NUMERIC(3,2)
+LANGUAGE plpgsql AS
+$$ BEGIN
+    RETURN (SELECT CASE 
+    WHEN COUNT(*) = 0 THEN 3.00
+    ELSE AVG(rating)::numeric(3,2)
+    END
+    FROM Bids
+    WHERE caretaker_username = username AND successful AND rating IS NOT NULL);
+END;
+$$;
 
 
 
