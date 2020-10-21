@@ -284,33 +284,36 @@ function add_caretaker_type_of_pet(req, res, next) {
 		}
 		pool.query(sql_query.query.find_pettypes, [type], (err_pettype, data_pettype) => {
 			if (data_pettype.rowCount == 0) {
-				console.log("add pet type");
-				add_pettypes(req, res, next);
-			}
-			pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
-				if (data_caretakerpricing.rowCount == 0) {
-					//No pet type, add
-					pool.query(sql_query.query.add_caretaker_type_of_pet, [username, type, price], (err4, data4) => {
-						if (err4) {
-							console.error("Error in adding pet type + price, ERROR: " + err);
-							res.redirect('/caretaker?add-pet_typeprice=fail');
-						} else {
-							res.redirect('/caretaker?add-pet_typeprice=pass');
-						}
-					})
-				} else {
-					//Same pet type, update price
-					pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
-						if (err5) {
-							console.error("Error in updating pet type + price, ERROR: " + err);
-							res.redirect('/caretaker?add-pet_typeprice=fail');
-						} else {
-							res.redirect('/caretaker?add-pet_typeprice=pass');
-						}
-					})
+				//console.log("add pet type");
+				//add_pettypes(req, res, next);
+				res.redirect('/caretaker?add-pet_typeprice=fail');
+			} else {
+				pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
+					if (data_caretakerpricing.rowCount == 0) {
+						//No pet type within CareTakerPricing table, add
+						pool.query(sql_query.query.add_caretaker_type_of_pet, [username, type, price], (err4, data4) => {
+							if (err4) {
+								console.error("Error in adding pet type + price, ERROR: " + err);
+								res.redirect('/caretaker?add-pet_typeprice=fail');
+							} else {
+								res.redirect('/caretaker?add-pet_typeprice=pass');
+							}
+						})
+					} else {
+						//Same pet type, update price
+						pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
+							if (err5) {
+								console.error("Error in updating pet type + price, ERROR: " + err);
+								res.redirect('/caretaker?add-pet_typeprice=fail');
+							} else {
+								res.redirect('/caretaker?add-pet_typeprice=pass');
+							}
+						})
 
-				}
-			})
+					}
+				})
+
+			}
 
 
 
