@@ -47,6 +47,7 @@ CREATE TABLE PetTypes
     name VARCHAR(64) PRIMARY KEY
 );
 
+
 CREATE TABLE SpecialRequirements
 (
     description VARCHAR PRIMARY KEY
@@ -148,6 +149,11 @@ CREATE TABLE Bids
     CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username) = TRUE)
 );
 
+
+
+
+
+
 CREATE OR REPLACE FUNCTION OVERLAPPING() RETURNS TRIGGER 
 LANGUAGE plpgsql
 AS $$
@@ -202,17 +208,27 @@ BEGIN
 END;
 $$;
 
-DO $$
-DECLARE count INTEGER;
     
+CREATE OR REPLACE FUNCTION list_of_pet_types() 
+    RETURNS varchar[] AS 
+    $$
+    BEGIN
+    return array['dog', 'cat', 'hamster', 'bird', 'big bird', 'small bird', 'tiger', 'lion', 'elephant'];
+    END;
+    $$
+LANGUAGE plpgsql;
+
+do $$
+declare types varchar[];
+declare var varchar;
 BEGIN
-    count := 0;
-    WHILE count<= 10 LOOP
-   INSERT INTO PetTypes (name) VALUES(concat('Type ', count));
-   count := count + 1;
-   END LOOP;
+types := list_of_pet_types();
+FOREACH var in ARRAY types LOOP
+    INSERT INTO PetTypes (name) VALUES(var);
+END LOOP;
 END;
 $$;
+
 
 
 DO $$
@@ -223,7 +239,8 @@ BEGIN
     WHILE count<= 50 LOOP
     pet:=1;
     WHILE pet <=20 LOOP
-   INSERT INTO Pet (owner_username,name, pet_type) VALUES(count, pet, concat('Type ', mod(pet, 10)) );
+   INSERT INTO Pet (owner_username,name, pet_type) 
+   VALUES(count, pet,  (list_of_pets())[mod(pet, array_length(list_of_pet_types(),1))+1] );
    pet := pet + 1;
    END LOOP;
    count := count + 1;
@@ -236,8 +253,8 @@ DECLARE count INTEGER;
 BEGIN 
     count := 400;
     WHILE count < 800 LOOP
-    INSERT INTO CareTakerPricing(username, pet_type, price) VALUES (count, concat('Type ',mod(count, 10)), count/23);
-    INSERT INTO CareTakerPricing(username, pet_type, price) VALUES (count, concat('Type ',mod(count+2, 10)), count/23);
+    INSERT INTO CareTakerPricing(username, pet_type, price) 
+    VALUES (count, (list_of_pets())[mod(count, array_length(list_of_pet_types(),1))+1], count/23);
     count := count +1;
     END LOOP;
     END;
