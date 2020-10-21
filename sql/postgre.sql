@@ -240,7 +240,7 @@ BEGIN
     pet:=1;
     WHILE pet <=20 LOOP
    INSERT INTO Pet (owner_username,name, pet_type) 
-   VALUES(count, pet,  (list_of_pets())[mod(pet, array_length(list_of_pet_types(),1))+1] );
+   VALUES(count, pet,  (list_of_pet_types())[mod(pet, array_length(list_of_pet_types(),1))+1] );
    pet := pet + 1;
    END LOOP;
    count := count + 1;
@@ -254,7 +254,7 @@ BEGIN
     count := 400;
     WHILE count < 800 LOOP
     INSERT INTO CareTakerPricing(username, pet_type, price) 
-    VALUES (count, (list_of_pets())[mod(count, array_length(list_of_pet_types(),1))+1], count/23);
+    VALUES (count, (list_of_pet_types())[mod(count, array_length(list_of_pet_types(),1))+1], count/23);
     count := count +1;
     END LOOP;
     END;

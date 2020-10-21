@@ -124,6 +124,7 @@ function dashboard(req, res, next) {
 function caretaker(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
 	var ctx2 = 0, tbl2;
+	var pet_ctx = 0, pet_tbl;
 
 	pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
@@ -143,13 +144,43 @@ function caretaker(req, res, next) {
 				tbl2 = data.rows;
 			}
 
-			basic(req, res, 'caretaker', { ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2,
-				date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-				petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
-				auth: true });
+			pool.query(sql_query.query.all_pet_types, (err, data) => {
+				if (err || !data.rows || data.rows.length == 0) {
+					pet_ctx = 0;
+					pet_tbl = [];
+				} else {
+					pet_ctx = data.rows.length;
+					pet_tbl = data.rows;
+				}
+
+				basic(req, res, 'caretaker',
+					{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+						date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+						petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
+						auth: true });
+			})
+
+
 		});
 	});
 }
+
+/*function getpettypes(req, res, next) {
+	console.log("am i here");
+	var pet_ctx = 0, pet_tbl;
+
+	pool.query(sql_query.query.all_pet_types, [1], (err, data) => {
+		if (err || !data.rows || data.rows.length == 0) {
+			pet_ctx = 0;
+			pet_tbl = [];
+		} else {
+			pet_ctx = data.rows.length;
+			pet_tbl = data.rows;
+		}
+
+		basic(req, res, 'caretaker/pettype', { pet_ctx: pet_ctx, pet_tbl: pet_tbl, auth: true });
+	});
+} */
 
 /*function games(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
