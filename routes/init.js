@@ -21,6 +21,7 @@ function initRouter(app) {
 	app.get('/dashboard', passport.authMiddleware(), dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
+	app.get('/caretaker', passport.authMiddleware(), caretaker);
 	
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
@@ -30,6 +31,8 @@ function initRouter(app) {
 	app.post('/update_pass', passport.authMiddleware(), update_pass);
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
+	app.post('/add_availability', passport.authMiddleware(), add_availability);
+	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -117,6 +120,37 @@ function search(req, res, next) {
 function dashboard(req, res, next) {
 	basic(req, res, 'dashboard', { info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'), pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
 }
+
+function caretaker(req, res, next) {
+	var ctx = 0, avg = 0, tbl;
+	var ctx2 = 0, tbl2;
+
+	pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
+		if(err || !data.rows || data.rows.length == 0) {
+			ctx = 0;
+			tbl = [];
+		} else {
+			ctx = data.rows.length;
+			tbl = data.rows;
+		}
+
+		pool.query(sql_query.query.all_caretaker_pettypeprice, [req.user.username], (err, data) => {
+			if(err || !data.rows || data.rows.length == 0) {
+				ctx2 = 0;
+				tbl2 = [];
+			} else {
+				ctx2 = data.rows.length;
+				tbl2 = data.rows;
+			}
+
+			basic(req, res, 'caretaker', { ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2,
+				date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+				petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
+				auth: true });
+		});
+	});
+}
+
 /*function games(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
 	pool.query(sql_query.query.avg_rating, [req.user.username], (err, data) => {
@@ -195,6 +229,96 @@ function update_pass(req, res, next) {
 			res.redirect('/dashboard?pass=pass');
 		}
 	});
+}
+
+function add_caretaker(req, res, next) {
+	var username = req.user.username;
+
+	pool.query(sql_query.query.add_caretaker, [username], (err, data) => {
+		if (err) {
+			console.error("Error in adding caretaker, ERROR: " + err);
+			res.redirect('/caretaker?add-caretaker=fail');
+		}
+	});
+}
+
+function add_pettypes(req, res, next) {
+	var name = req.body.type;
+
+	pool.query(sql_query.query.add_caretaker_pet_types, [name], (err, data) => {
+		if (err) {
+			console.error("Error in adding caretaker, ERROR: " + err);
+			res.redirect('/caretaker?add-pettypes=fail');
+		}
+	});
+}
+
+function add_availability(req, res, next) {
+	var username = req.user.username;
+	var date = req.body.date;
+
+	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
+		if (data.rowCount == 0) {
+			add_caretaker(req, res, next);
+		}
+		pool.query(sql_query.query.add_availability, [username, date], (err, data) => {
+			if (err) {
+				console.error("Error in adding availability, ERROR: " + err);
+				res.redirect('/caretaker?add-availability=fail');
+			} else {
+				res.redirect('/caretaker?add-availability=pass');
+			}
+		})
+
+	});
+}
+
+function add_caretaker_type_of_pet(req, res, next) {
+	var username = req.user.username;
+	var type = req.body.type;
+	var price = req.body.price;
+
+	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
+		if (data.rowCount == 0) {
+			add_caretaker(req, res, next);
+		}
+		pool.query(sql_query.query.find_pettypes, [type], (err_pettype, data_pettype) => {
+			if (data_pettype.rowCount == 0) {
+				console.log("add pet type");
+				add_pettypes(req, res, next);
+			}
+			pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
+				if (data_caretakerpricing.rowCount == 0) {
+					//No pet type, add
+					pool.query(sql_query.query.add_caretaker_type_of_pet, [username, type, price], (err4, data4) => {
+						if (err4) {
+							console.error("Error in adding pet type + price, ERROR: " + err);
+							res.redirect('/caretaker?add-pet_typeprice=fail');
+						} else {
+							res.redirect('/caretaker?add-pet_typeprice=pass');
+						}
+					})
+				} else {
+					//Same pet type, update price
+					pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
+						if (err5) {
+							console.error("Error in updating pet type + price, ERROR: " + err);
+							res.redirect('/caretaker?add-pet_typeprice=fail');
+						} else {
+							res.redirect('/caretaker?add-pet_typeprice=pass');
+						}
+					})
+
+				}
+			})
+
+
+
+		})
+
+	});
+
+
 }
 
 /*function add_game(req, res, next) {

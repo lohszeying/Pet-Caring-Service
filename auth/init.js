@@ -16,13 +16,13 @@ const pool = new Pool({
 
 function findUser (username, callback) {
 	pool.query(sql_query.query.user, [username], (err, data) => {
-	    console.log("test");
 		if(err) {
 			console.error("Cannot find user");
 			return callback(null);
 		}
 
-		console.log(data.rows);
+		//Print whatever that is in that row
+		//console.log(data.rows);
 
 		if(data.rows.length == 0) {
 			console.error("User does not exists?");
