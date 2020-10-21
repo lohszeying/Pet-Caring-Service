@@ -6,10 +6,15 @@
 			<span><%= name %> (<%= area %>)</span>
 		</a>
 	</li>
-	<li class="nav-item">
+	<!-- <li class="nav-item">
 		<a class="nav-link <%= page==="games" ? "active" : "" %>" href="<%= page==="games" ? "#" : "/games" %>">
 			<i class="fas fa-fw fa-dice"></i>
 			<span>Games</span></a>
+	</li> -->
+	<li class="nav-item">
+		<a class="nav-link <%= page==="caretaker" ? "active" : "" %>" href="<%= page==="caretaker" ? "#" : "/caretaker" %>">
+			<i class="fas fa-fw fa-trophy"></i>
+			<span>Take care of other pets</span></a>
 	</li>
 	<li class="nav-item">
 		<a class="nav-link <%= page==="plays" ? "active" : "" %>" href="<%= page==="plays" ? "#" : "/plays" %>">
