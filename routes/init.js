@@ -33,6 +33,7 @@ function initRouter(app) {
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
+	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
 	
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -118,7 +119,11 @@ function search(req, res, next) {
 	});
 }
 function dashboard(req, res, next) {
-	basic(req, res, 'dashboard', { info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'), pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
+	basic(req, res, 'dashboard', {
+		cannot_go_to_caretaker_page_msg: msg(req, 'add-caretaker', '', 'You are not a caretaker. You can only view caretaker page if you are a caretaker. You can enable it below.'),
+		caretaker_add_msg: msg(req, 'caretaker', 'You are now a caretaker', 'Error in updating caretaker status. You are already a caretaker.'),
+		info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'),
+		pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
 }
 
 //CARETAKER FUNCTION
@@ -127,51 +132,62 @@ function caretaker(req, res, next) {
 	var ctx2 = 0, tbl2;
 	var pet_ctx = 0, pet_tbl;
 	var caretaker_tbl;
+	
+	pool.query(sql_query.query.find_caretaker, [req.user.username], (err, data) => {
+		if (err || !data.rows || data.rows.length == 0) {
+			//Not a caretaker
+			console.error("NOT A CARETAKER");
 
-	pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
-		if(err || !data.rows || data.rows.length == 0) {
-			ctx = 0;
-			tbl = [];
+			res.redirect('/dashboard?add-caretaker=fail');
 		} else {
-			ctx = data.rows.length;
-			tbl = data.rows;
-		}
-
-		pool.query(sql_query.query.all_caretaker_pettypeprice, [req.user.username], (err, data) => {
-			if(err || !data.rows || data.rows.length == 0) {
-				ctx2 = 0;
-				tbl2 = [];
-			} else {
-				ctx2 = data.rows.length;
-				tbl2 = data.rows;
-			}
-
-			pool.query(sql_query.query.all_pet_types, (err, data) => {
-				if (err || !data.rows || data.rows.length == 0) {
-					pet_ctx = 0;
-					pet_tbl = [];
+			pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
+				if(err || !data.rows || data.rows.length == 0) {
+					ctx = 0;
+					tbl = [];
 				} else {
-					pet_ctx = data.rows.length;
-					pet_tbl = data.rows;
+					ctx = data.rows.length;
+					tbl = data.rows;
 				}
 
-				pool.query(sql_query.query.caretaker_fulltime_parttime, [req.user.username], (err, data) => {
-					if (err || !data.rows || data.rows.length == 0) {
-						caretaker_tbl = [];
+				pool.query(sql_query.query.all_caretaker_pettypeprice, [req.user.username], (err, data) => {
+					if(err || !data.rows || data.rows.length == 0) {
+						ctx2 = 0;
+						tbl2 = [];
 					} else {
-						caretaker_tbl = data.rows;
+						ctx2 = data.rows.length;
+						tbl2 = data.rows;
 					}
 
-					basic(req, res, 'caretaker',
-						{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-							caretaker_tbl: caretaker_tbl,
-							date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-							petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
-							auth: true });
-				})
-			})
-		});
+					pool.query(sql_query.query.all_pet_types, (err, data) => {
+						if (err || !data.rows || data.rows.length == 0) {
+							pet_ctx = 0;
+							pet_tbl = [];
+						} else {
+							pet_ctx = data.rows.length;
+							pet_tbl = data.rows;
+						}
+
+						pool.query(sql_query.query.caretaker_fulltime_parttime, [req.user.username], (err, data) => {
+							if (err || !data.rows || data.rows.length == 0) {
+								caretaker_tbl = [];
+							} else {
+								caretaker_tbl = data.rows;
+							}
+
+							basic(req, res, 'caretaker',
+								{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+									caretaker_tbl: caretaker_tbl,
+									date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+									petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
+									auth: true });
+						})
+					})
+				});
+			});
+		}
 	});
+
+
 }
 
 /*function games(req, res, next) {
@@ -238,6 +254,19 @@ function update_info(req, res, next) {
 			res.redirect('/dashboard?info=fail');
 		} else {
 			res.redirect('/dashboard?info=pass');
+		}
+	});
+}
+function update_caretaker_status(req, res, next) {
+	var username = req.user.username;
+	var yes = req.body.username;
+
+	pool.query(sql_query.query.add_caretaker, [yes], (err, data) => {
+		if(err) {
+			console.error("Error in updating caretaker status");
+			res.redirect('/dashboard?caretaker=fail');
+		} else {
+			res.redirect('/dashboard?caretaker=pass');
 		}
 	});
 }
