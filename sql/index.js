@@ -14,6 +14,7 @@ sql.query = {
 	all_plays: 'SELECT gamename AS game, user1, user2, winner FROM game_plays WHERE user1=$1 OR user2=$1',
 	all_availability: 'SELECT * FROM CareTakerAvailability WHERE username=$1',
 	all_caretaker_pettypeprice: 'SELECT * FROM CareTakerPricing WHERE username=$1',
+	all_pet_types: 'SELECT * FROM PetTypes',
 
 	// Insertion
 	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
