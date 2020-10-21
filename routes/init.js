@@ -125,6 +125,9 @@ function caretaker(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
 	var ctx2 = 0, tbl2;
 	var pet_ctx = 0, pet_tbl;
+	var caretaker_tbl;
+	var textFulltime = "Full time";
+	var textParttime = "Part time";
 
 	pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
@@ -153,14 +156,21 @@ function caretaker(req, res, next) {
 					pet_tbl = data.rows;
 				}
 
-				basic(req, res, 'caretaker',
-					{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-						date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-						petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
-						auth: true });
+				pool.query(sql_query.query.caretaker_fulltime_parttime, [req.user.username], (err, data) => {
+					if (err || !data.rows || data.rows.length == 0) {
+						caretaker_tbl = [];
+					} else {
+						caretaker_tbl = data.rows;
+					}
+
+					basic(req, res, 'caretaker',
+						{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+							caretaker_tbl: caretaker_tbl,
+							date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+							petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
+							auth: true });
+				})
 			})
-
-
 		});
 	});
 }
