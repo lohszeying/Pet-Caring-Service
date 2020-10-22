@@ -53,7 +53,7 @@ CREATE TABLE CareTaker
     username    VARCHAR(64) PRIMARY KEY,
     is_fulltime BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (username) REFERENCES Users (username) ON UPDATE CASCADE
-)
+);
 
 CREATE TABLE PetTypes
 (
