@@ -32,7 +32,7 @@ CREATE TABLE PetOwner
 (
     username VARCHAR(64) PRIMARY KEY,
     credit_card_number NUMERIC(20) DEFAULT NULL,
-    FOREIGN KEY (username) REFERENCES Users (username)
+    FOREIGN KEY (username) REFERENCES Users (username) ON UPDATE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION insert_pet_owner()
@@ -52,8 +52,8 @@ CREATE TABLE CareTaker
 (
     username    VARCHAR(64) PRIMARY KEY,
     is_fulltime BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (username) REFERENCES Users (username)
-);
+    FOREIGN KEY (username) REFERENCES Users (username) ON UPDATE CASCADE
+)
 
 CREATE TABLE PetTypes
 (
@@ -74,8 +74,8 @@ CREATE TABLE Pet
     enabled        BOOLEAN DEFAULT TRUE,
     pet_type       VARCHAR(64) NOT NULL,
     PRIMARY KEY (owner_username, name),
-    FOREIGN KEY (owner_username) REFERENCES PetOwner (username) ON DELETE CASCADE,
-    FOREIGN KEY (pet_type) REFERENCES PetTypes (name) ON DELETE CASCADE
+    FOREIGN KEY (owner_username) REFERENCES PetOwner (username) ON UPDATE CASCADE,
+    FOREIGN KEY (pet_type) REFERENCES PetTypes (name) ON UPDATE CASCADE
 );
 
 CREATE TABLE PetSpecialRequirements
@@ -83,9 +83,9 @@ CREATE TABLE PetSpecialRequirements
     owner_username       VARCHAR(64),
     name                 VARCHAR(64),
     special_requirements VARCHAR,
-    PRIMARY KEY (owner_username, name, special_requirements),
-    FOREIGN KEY (owner_username, name) REFERENCES Pet (owner_username, name) ON DELETE CASCADE,
-    FOREIGN KEY (special_requirements) REFERENCES SpecialRequirements (description) ON DELETE CASCADE
+    PRIMARY KEY (owner_username, name, special_requirements), 
+    FOREIGN KEY (owner_username, name) REFERENCES Pet (owner_username, name) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (special_requirements) REFERENCES SpecialRequirements (description) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE CareTakerPricing
@@ -94,8 +94,8 @@ CREATE TABLE CareTakerPricing
     pet_type VARCHAR(64),
     price    DECIMAL(8, 2),
     PRIMARY KEY (username, pet_type),
-    FOREIGN KEY (username) REFERENCES CareTaker (username),
-    FOREIGN KEY (pet_type) REFERENCES PetTypes (name)
+    FOREIGN KEY (username) REFERENCES CareTaker (username) ON UPDATE CASCADE,
+    FOREIGN KEY (pet_type) REFERENCES PetTypes (name) ON UPDATE CASCADE
 );
 
 CREATE TABLE CareTakerAvailability
@@ -103,7 +103,7 @@ CREATE TABLE CareTakerAvailability
     username VARCHAR(64),
     date     DATE NOT NULL,
     PRIMARY KEY (username, date),
-    FOREIGN KEY (username) REFERENCES CareTaker (username)
+    FOREIGN KEY (username) REFERENCES CareTaker (username) ON UPDATE CASCADE
 );
 
 CREATE TYPE transfer_methods AS ENUM ('OWNER_DELIVER', 'CARETAKER_PICKUP', 'PCS_BUILDING');
@@ -156,9 +156,9 @@ CREATE TABLE Bids
     end_date DATE NOT NULL,
 
     PRIMARY KEY (owner_username, pet_name, caretaker_username, start_date, end_date),
-    FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, name),
-    FOREIGN KEY (caretaker_username, start_date) REFERENCES CareTakerAvailability (username, date),
-    FOREIGN KEY (caretaker_username, end_date) REFERENCES CareTakerAvailability(username, date),
+    FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, name) ON UPDATE CASCADE,
+    FOREIGN KEY (caretaker_username, start_date) REFERENCES CareTakerAvailability (username, date) ON UPDATE CASCADE,
+    FOREIGN KEY (caretaker_username, end_date) REFERENCES CareTakerAvailability(username, date) ON UPDATE CASCADE,
     CHECK (start_date <= end_date),
     CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username)),
     CHECK (successful OR (rating IS NULL AND review IS NULL AND transfer_method IS NULL AND payment_type IS NULL))
