@@ -39,10 +39,15 @@
 							</div>
 						</div>
 						<div class="form-group row">
-							<label for="name" class="col-sm-2 col-form-label"><b>Full time status:</b></label>
+							<label for="name" class="col-sm-2 col-form-label"><b>Status:</b></label>
 							<div class="col-sm-4">
-								<input type="text" required="required" readonly class="form-control-plaintext" id="name" placeholder="Name" name="name"
-									   value="<%= caretaker_tbl[0].is_fulltime %>">
+								<% if (caretaker_tbl[0].is_fulltime) { %>
+									<input type="text" required="required" readonly class="form-control-plaintext" id="name" placeholder="Name" name="name"
+										   value="Full-timer">
+								<% } else { %>
+									<input type="text" required="required" readonly class="form-control-plaintext" id="name" placeholder="Name" name="name"
+										   value="Part-timer">
+								<% } %>
 							</div>
 						</div>
 					</div>
@@ -53,12 +58,6 @@
 						</div>
 						<form method="post" action="/add_availability">
 							<div class="card-body">
-								<div class="form-group row">
-									<label for="username" class="col-sm-3 col-form-label"><b>User ID:</b></label>
-									<div class="col-sm-9">
-										<input type="text" required="required" readonly class="form-control-plaintext" id="username" value="<%= user %>" name="username">
-									</div>
-								</div>
 								<div class="form-group row">
 									<label for="date" class="col-sm-3 col-form-label"><b>Date:</b></label>
 									<div class="col-sm-9">
@@ -75,17 +74,11 @@
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice-d20"></i> &nbsp; Add or edit type of pet that you can care for and the price:
+							<i class="fas fa-dice-d20"></i> &nbsp; Add the type of pet that you can care for:
 						</div>
 
 						<form method="post" action="/add_caretaker_type_of_pet">
 							<div class="card-body">
-								<div class="form-group row">
-									<label for="username" class="col-sm-3 col-form-label"><b>User ID:</b></label>
-									<div class="col-sm-9">
-										<input type="text" required="required" readonly class="form-control-plaintext" id="username" value="<%= user %>" name="username">
-									</div>
-								</div>
 								<!-- Type of pet -->
 								<div class="form-group row">
 									<label for="date" class="col-sm-3 col-form-label"><b>Type of pet:</b></label>
@@ -100,6 +93,36 @@
 										</select>
 									</div>
 								</div>
+							</div>
+							<div class="card-footer small text-muted">
+								<button type="submit" class="btn btn-secondary">Add</button>
+								<span class="badge badge-pill badge-info"><%= caretaker_pet_type_msg %></span>
+							</div>
+						</form>
+					</div>
+
+					<!-- ONLY FOR PART-TIMER -->
+					<% if (caretaker_tbl[0].is_fulltime == false && caretaker_pet_tbl.length > 0) { %>
+					<div class="card mb-3">
+						<div class="card-header">
+							<i class="fas fa-dice-d20"></i> &nbsp; Edit the price of pet you can care for
+						</div>
+
+						<form method="post" action="/edit_caretaker_price_of_pet">
+							<div class="card-body">
+								<!-- Type of pet -->
+								<div class="form-group row">
+									<label for="date" class="col-sm-3 col-form-label"><b>Type of pet:</b></label>
+									<div class="col-sm-9">
+										<select name="type" class="custom-select">
+											<% for(var i=0; i<caretaker_pet_tbl.length; i++) { %>
+												<option>
+													<%= caretaker_pet_tbl[i].pet_type %>
+												</option>
+											<% } %>
+										</select>
+									</div>
+								</div>
 
 								<!-- Price -->
 								<div class="form-group row">
@@ -108,13 +131,15 @@
 										<input type="text" required="required" class="form-control" id="price" placeholder="15.90" name="price" value="">
 									</div>
 								</div>
+
 							</div>
 							<div class="card-footer small text-muted">
-								<button type="submit" class="btn btn-secondary">Add</button>
-								<span class="badge badge-pill badge-info"><%= petprice_msg %></span>
+								<button type="submit" class="btn btn-secondary">Edit</button>
+								<span class="badge badge-pill badge-info"><%= caretaker_pet_price_msg %></span>
 							</div>
 						</form>
 					</div>
+					<% } %>
 					
 					<div class="card mb-3">
 						<div class="card-header">
@@ -143,7 +168,6 @@
 						</div>
 						<div class="card-footer small text-muted"></div>
 					</div>
-
 
 					<div class="card mb-3">
 						<div class="card-header">
