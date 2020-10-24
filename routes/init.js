@@ -375,31 +375,6 @@ function add_caretaker_type_of_pet(req, res, next) {
 						console.error("Pet type already existed in the table, cannot add");
 						res.redirect('/caretaker?add-pet_type=fail');
 					}
-					/*else {
-						//Same pet type, update price. ONLY FOR PART-TIMER
-						pool.query(sql_query.query.caretaker_fulltime_parttime, [username], (err6, data6) => {
-							if (err6 || !data6.rows || data6.rows.length == 0) {
-								caretaker_tbl = [];
-							} else {
-								caretaker_tbl = data.rows;
-
-								//Part-timer
-								if (caretaker_tbl[0].is_fulltime == false) {
-									pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
-										if (err5) {
-											console.error("Error in updating pet type + price, ERROR: " + err);
-											res.redirect('/caretaker?add-pet_typeprice=fail');
-										} else {
-											res.redirect('/caretaker?add-pet_typeprice=pass');
-										}
-									})
-								} else {
-									console.error("Full-timer, cannot update price");
-									res.redirect('/caretaker?add-pet_typeprice=fail');
-								}
-							}
-						})
-					} */
 				})
 			}
 		})
