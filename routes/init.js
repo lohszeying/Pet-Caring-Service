@@ -34,6 +34,7 @@ function initRouter(app) {
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
+	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
 	
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -132,6 +133,7 @@ function caretaker(req, res, next) {
 	var ctx2 = 0, tbl2;
 	var pet_ctx = 0, pet_tbl;
 	var caretaker_tbl;
+	var caretaker_pet_tbl;
 	
 	pool.query(sql_query.query.find_caretaker, [req.user.username], (err, data) => {
 		if (err || !data.rows || data.rows.length == 0) {
@@ -174,12 +176,21 @@ function caretaker(req, res, next) {
 								caretaker_tbl = data.rows;
 							}
 
-							basic(req, res, 'caretaker',
-								{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-									caretaker_tbl: caretaker_tbl,
-									date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-									petprice_msg: msg(req, 'add-pet_typeprice', 'Type of pet and price added successfully', 'Failed in adding type of pet and price'),
-									auth: true });
+							pool.query(sql_query.query.all_caretaker_pettypeprice, [req.user.username], (err, data) => {
+								if (err || !data.rows || data.rows.length == 0) {
+									caretaker_pet_tbl = [];
+								} else {
+									caretaker_pet_tbl = data.rows;
+								}
+
+								basic(req, res, 'caretaker',
+									{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+										caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
+										date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+										caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
+										caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
+										auth: true });
+							})
 						})
 					})
 				});
@@ -326,55 +337,127 @@ function add_availability(req, res, next) {
 	});
 }
 
+//Only add pet-type for caretaker
 function add_caretaker_type_of_pet(req, res, next) {
 	var username = req.user.username;
 	var type = req.body.type;
 	var price = req.body.price;
 
 	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
+		//If caretaker is not in caretaker table
 		if (data.rowCount == 0) {
+			//Add to caretaker table
 			add_caretaker(req, res, next);
 		}
 		pool.query(sql_query.query.find_pettypes, [type], (err_pettype, data_pettype) => {
 			if (data_pettype.rowCount == 0) {
-				//console.log("add pet type");
-				//add_pettypes(req, res, next);
-				res.redirect('/caretaker?add-pet_typeprice=fail');
+				res.redirect('/caretaker?add-pet_type=fail');
 			} else {
+				//Pet type exist
 				pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
+					//Pet type is in caretaker's table
 					if (data_caretakerpricing.rowCount == 0) {
 						//No pet type within CareTakerPricing table, add
+						if (price == "") {
+							price = null;
+						}
+
 						pool.query(sql_query.query.add_caretaker_type_of_pet, [username, type, price], (err4, data4) => {
 							if (err4) {
 								console.error("Error in adding pet type + price, ERROR: " + err);
-								res.redirect('/caretaker?add-pet_typeprice=fail');
+								res.redirect('/caretaker?add-pet_type=fail');
 							} else {
-								res.redirect('/caretaker?add-pet_typeprice=pass');
+								res.redirect('/caretaker?add-pet_type=pass');
 							}
 						})
 					} else {
-						//Same pet type, update price
-						pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
-							if (err5) {
-								console.error("Error in updating pet type + price, ERROR: " + err);
-								res.redirect('/caretaker?add-pet_typeprice=fail');
+						//Pet type already existed in the Caretaker's table
+						console.error("Pet type already existed in the table, cannot add");
+						res.redirect('/caretaker?add-pet_type=fail');
+					}
+					/*else {
+						//Same pet type, update price. ONLY FOR PART-TIMER
+						pool.query(sql_query.query.caretaker_fulltime_parttime, [username], (err6, data6) => {
+							if (err6 || !data6.rows || data6.rows.length == 0) {
+								caretaker_tbl = [];
 							} else {
-								res.redirect('/caretaker?add-pet_typeprice=pass');
+								caretaker_tbl = data.rows;
+
+								//Part-timer
+								if (caretaker_tbl[0].is_fulltime == false) {
+									pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
+										if (err5) {
+											console.error("Error in updating pet type + price, ERROR: " + err);
+											res.redirect('/caretaker?add-pet_typeprice=fail');
+										} else {
+											res.redirect('/caretaker?add-pet_typeprice=pass');
+										}
+									})
+								} else {
+									console.error("Full-timer, cannot update price");
+									res.redirect('/caretaker?add-pet_typeprice=fail');
+								}
 							}
 						})
+					} */
+				})
+			}
+		})
+	});
+}
 
+//Only edit price for caretaker, pet must exist first in caretaker's table already
+function edit_caretaker_price_of_pet(req, res, next) {
+	var username = req.user.username;
+	var type = req.body.type;
+	var price = req.body.price;
+	var caretaker_tbl;
+
+	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
+		//If caretaker is not in caretaker table, not it's not possible as user cannot access this page
+		if (data.rowCount == 0) {
+			//Add to caretaker table
+			add_caretaker(req, res, next);
+		}
+		pool.query(sql_query.query.find_pettypes, [type], (err_pettype, data_pettype) => {
+			if (data_pettype.rowCount == 0) {
+				res.redirect('/caretaker?edit-pet_price=fail');
+			} else {
+				//Pet type exist
+				pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
+					//Pet type is not in caretaker's table
+					if (data_caretakerpricing.rowCount == 0) {
+						console.error("Error in adding pet type + price, ERROR: " + err);
+						res.redirect('/caretaker?edit-pet_price=fail');
+					} else {
+						//Pet type already existed in the Caretaker's table
+						pool.query(sql_query.query.caretaker_fulltime_parttime, [username], (err6, data6) => {
+							if (err6 || !data6.rows || data6.rows.length == 0) {
+								caretaker_tbl = [];
+							} else {
+								caretaker_tbl = data.rows;
+
+								//Part-timer
+								if (caretaker_tbl[0].is_fulltime == false) {
+									pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
+										if (err5) {
+											console.error("Error in updating pet type + price, ERROR: " + err);
+											res.redirect('/caretaker?edit-pet_price=fail');
+										} else {
+											res.redirect('/caretaker?edit-pet_price=pass');
+										}
+									})
+								} else {
+									console.error("Full-timer, cannot update price");
+									res.redirect('/caretaker?edit-pet_price=fail');
+								}
+							}
+						})
 					}
 				})
-
 			}
-
-
-
 		})
-
 	});
-
-
 }
 
 /*function add_game(req, res, next) {
