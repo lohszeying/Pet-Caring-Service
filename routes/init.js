@@ -21,6 +21,7 @@ function initRouter(app) {
 	app.get('/dashboard', passport.authMiddleware(), dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
+	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), caretaker);
 	
 	app.get('/register' , passport.antiMiddleware(), register );
@@ -29,6 +30,7 @@ function initRouter(app) {
 	/* PROTECTED POST */
 	app.post('/update_info', passport.authMiddleware(), update_info);
 	app.post('/update_pass', passport.authMiddleware(), update_pass);
+	app.post('/update_credcard', passport.authMiddleware(), update_credcard);
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
@@ -123,7 +125,14 @@ function dashboard(req, res, next) {
 		cannot_go_to_caretaker_page_msg: msg(req, 'add-caretaker', '', 'You are not a caretaker. You can only view caretaker page if you are a caretaker. You can enable it below.'),
 		caretaker_add_msg: msg(req, 'caretaker', 'You are now a caretaker', 'Error in updating caretaker status. You are already a caretaker.'),
 		info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'),
+		credcard_msg: msg(req, 'creditcard', 'Credit card updated successfully', 'Error in updating credit card'),
 		pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
+}
+
+// PET OWNER'S MANAGE PET
+function managepet(req, res, next) {
+
+	
 }
 
 //CARETAKER FUNCTION
@@ -257,6 +266,21 @@ function update_info(req, res, next) {
 		}
 	});
 }
+
+function update_credcard(req, res, next) {
+	var username = req.user.username;
+	var creditcard = req.body.creditcard;
+
+	pool.query(sql_query.query.update_credcard, [username, creditcard], (err, data) => {
+		if (err) {
+			console.error("Error in update credit card");
+			res.redirect('/dashboard?credcard=fail');
+		} else {
+			res.redirect('/dashboard?credcard=pass');
+		}
+	});
+}
+
 function update_caretaker_status(req, res, next) {
 	var username = req.user.username;
 	var yes = req.body.username;
@@ -419,20 +443,28 @@ function reg_user(req, res, next) {
 			console.error("Error in adding user", err);
 			res.redirect('/register?reg=fail');
 		} else {
-			req.login({
-				username    : username,
-				passwordHash: password,
-				name   : name,
-				area    : area,
-				enabled      : true
-
-			}, function(err) {
-				if(err) {
-					return res.redirect('/register?reg=fail');
+			pool.query(sql_query.query.add_petowner, [username], (err2, data) => { 
+				if (err2) {
+					console.error("Error in adding pet owner", err2);
+					res.redirect('/register?reg=fail');
 				} else {
-					return res.redirect('/dashboard');
+					req.login({
+						username: username,
+						passwordHash: password,
+						name: name,
+						area: area,
+						enabled: true
+
+					}, function (err) {
+						if (err) {
+							return res.redirect('/register?reg=fail');
+						} else {
+							return res.redirect('/dashboard');
+						}
+					});
 				}
 			});
+			
 		}
 	});
 }

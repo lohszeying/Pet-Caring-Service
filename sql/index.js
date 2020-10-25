@@ -21,6 +21,7 @@ sql.query = {
 	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
 	add_play: 'INSERT INTO game_plays (user1, user2, gamename, winner) VALUES($1,$2,$3,$4)',
 	add_user: 'INSERT INTO Users (username, password, name, area) VALUES ($1,$2,$3,$4)',
+	add_petowner: 'INSERT INTO PetOwner (username) VALUES ($1)',
 	add_caretaker: 'INSERT INTO CareTaker (username) VALUES ($1)',
 	add_availability: 'INSERT INTO CareTakerAvailability (username, date) VALUES ($1,$2)',
 	add_caretaker_pet_types: 'INSERT INTO PetTypes (name) VALUES ($1)',
@@ -32,6 +33,7 @@ sql.query = {
 	// Update
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
+	update_credcard: 'UPDATE PetOwner SET credit_card_number=$2 WHERE username=$1',
 	update_caretaker_pettype_price: 'UPDATE CareTakerPricing SET price=$3 WHERE username=$1 AND pet_type=$2',
 	
 	// Search
