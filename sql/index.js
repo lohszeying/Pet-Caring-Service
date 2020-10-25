@@ -32,6 +32,10 @@ sql.query = {
 	// Login
 	user: 'SELECT * FROM Users WHERE username=$1',
 	
+	get_all_bids: 'SELECT * FROM Bids',
+	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
+	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\'',
+	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\'',
 	// Update
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
