@@ -27,6 +27,9 @@ sql.query = {
 	add_caretaker_pet_types: 'INSERT INTO PetTypes (name) VALUES ($1)',
 	add_caretaker_type_of_pet: 'INSERT INTO CareTakerPricing (username, pet_type, price) VALUES ($1,$2,$3)',
 	
+	//get caretaker ratings to display
+	get_rating: 'SELECT GET_RATING(username) FROM CareTaker WHERE username = $1',
+	get_all_rating: 'SELECT GET_RATING(username) FROM CareTaker',
 	// Login
 	user: 'SELECT * FROM Users WHERE username=$1',
 	
