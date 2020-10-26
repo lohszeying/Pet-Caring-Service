@@ -492,37 +492,29 @@ function edit_caretaker_price_of_pet(req, res, next) {
 } */
 
 function reg_user(req, res, next) {
-	var username  = req.body.username;
-	var password  = bcrypt.hashSync(req.body.password, salt);
+	var username = req.body.username;
+	var password = bcrypt.hashSync(req.body.password, salt);
 	var name = req.body.name;
-	var area  = req.body.area;
-	pool.query(sql_query.query.add_user, [username,password,name,area], (err, data) => {
-		if(err) {
+	var area = req.body.area;
+	pool.query(sql_query.query.add_user, [username, password, name, area], (err, data) => {
+		if (err) {
 			console.error("Error in adding user", err);
 			res.redirect('/register?reg=fail');
 		} else {
-			pool.query(sql_query.query.add_petowner, [username], (err2, data) => { 
-				if (err2) {
-					console.error("Error in adding pet owner", err2);
-					res.redirect('/register?reg=fail');
-				} else {
-					req.login({
-						username: username,
-						passwordHash: password,
-						name: name,
-						area: area,
-						enabled: true
+			req.login({
+				username: username,
+				passwordHash: password,
+				name: name,
+				area: area,
+				enabled: true
 
-					}, function (err) {
-						if (err) {
-							return res.redirect('/register?reg=fail');
-						} else {
-							return res.redirect('/dashboard');
-						}
-					});
+			}, function (err) {
+				if (err) {
+					return res.redirect('/register?reg=fail');
+				} else {
+					return res.redirect('/dashboard');
 				}
 			});
-			
 		}
 	});
 }
