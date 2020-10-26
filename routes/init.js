@@ -126,13 +126,13 @@ function dashboard(req, res, next) {
 		cannot_go_to_caretaker_page_msg: msg(req, 'add-caretaker', '', 'You are not a caretaker. You can only view caretaker page if you are a caretaker. You can enable it below.'),
 		caretaker_add_msg: msg(req, 'caretaker', 'You are now a caretaker', 'Error in updating caretaker status. You are already a caretaker.'),
 		info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'),
-		credcard_msg: msg(req, 'creditcard', 'Credit card updated successfully', 'Error in updating credit card'),
+		credcard_msg: msg(req, 'credcard', 'Credit card updated successfully', 'Error in updating credit card'),
 		pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
 }
 
 // PET OWNER'S MANAGE PET
 function managepet(req, res, next) {
-
+	basic(req, res, 'managepet', { page: 'managepet', auth: true });
 	
 }
 
