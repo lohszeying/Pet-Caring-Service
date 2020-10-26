@@ -42,7 +42,7 @@ function findUser (username, callback) {
 }
 
 function findAdmin(username, callback) {
-    pool.query(sql_query.query.admin, [username], (err, data) => {
+    pool.query(sql_query.admin.login, [username], (err, data) => {
         if(err) {
             console.error("Cannot find admin");
             return callback(null);
@@ -63,12 +63,26 @@ function findAdmin(username, callback) {
     });
 }
 
-passport.serializeUser(function (user, cb) {
-  cb(null, user.username);
+passport.serializeUser((user, cb) => {
+    const userObject = {
+        username: user.username,
+        is_admin: false
+    };
+
+    // User has name, admin does not
+    if (!user.hasOwnProperty('name')) {
+        userObject.is_admin = true;
+    }
+
+    cb(null, userObject);
 })
 
-passport.deserializeUser(function (username, cb) {
-  findUser(username, cb);
+passport.deserializeUser((userObject, cb) => {
+    if (userObject.is_admin) {
+        findAdmin(userObject.username, cb);
+    } else {
+        findUser(userObject.username, cb);
+    }
 })
 
 function initPassport () {

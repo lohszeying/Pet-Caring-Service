@@ -34,7 +34,6 @@ sql.query = {
 	get_all_rating: 'SELECT GET_RATING(username) FROM CareTaker',
 	// Login
 	user: 'SELECT * FROM Users WHERE username=$1',
-	admin: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
 
 	get_all_bids: 'SELECT * FROM Bids',
 	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
@@ -57,6 +56,10 @@ sql.query = {
 	find_caretaker: 'SELECT * FROM CareTaker WHERE username=$1',
 	find_pettypes: 'SELECT * FROM PetTypes WHERE name=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
+}
+
+sql.admin = {
+	login: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
 }
 
 module.exports = sql
