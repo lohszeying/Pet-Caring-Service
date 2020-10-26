@@ -34,7 +34,8 @@ sql.query = {
 	get_all_rating: 'SELECT GET_RATING(username) FROM CareTaker',
 	// Login
 	user: 'SELECT * FROM Users WHERE username=$1',
-	
+	admin: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
+
 	get_all_bids: 'SELECT * FROM Bids',
 	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
 	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\'',

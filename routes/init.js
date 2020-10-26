@@ -1,6 +1,7 @@
 const sql_query = require('../sql');
 const passport = require('passport');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const adminController = require('../controllers/admin');
 
 // Postgre SQL Connection
 const { Pool } = require('pg');
@@ -16,17 +17,17 @@ function initRouter(app) {
 	/* GET */
 	app.get('/'      , index );
 	app.get('/search', search);
-	
+
 	/* PROTECTED GET */
 	app.get('/dashboard', passport.authMiddleware(), dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), caretaker);
-	
+
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
-	
+
 	/* PROTECTED POST */
 	app.post('/update_info', passport.authMiddleware(), update_info);
 	app.post('/update_pass', passport.authMiddleware(), update_pass);
@@ -37,7 +38,7 @@ function initRouter(app) {
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
 	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
-	
+
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
 	/* LOGIN */
@@ -45,7 +46,10 @@ function initRouter(app) {
 		successRedirect: '/dashboard',
 		failureRedirect: '/'
 	}));
-	
+
+	// TODO: create separate admin passport strategy
+	app.use('/admin', adminController);
+
 	/* LOGOUT */
 	app.get('/logout', passport.authMiddleware(), logout);
 }
@@ -133,7 +137,7 @@ function dashboard(req, res, next) {
 // PET OWNER'S MANAGE PET
 function managepet(req, res, next) {
 	basic(req, res, 'managepet', { page: 'managepet', auth: true });
-	
+
 }
 
 //CARETAKER FUNCTION
@@ -143,7 +147,7 @@ function caretaker(req, res, next) {
 	var pet_ctx = 0, pet_tbl;
 	var caretaker_tbl;
 	var caretaker_pet_tbl;
-	
+
 	pool.query(sql_query.query.find_caretaker, [req.user.username], (err, data) => {
 		if (err || !data.rows || data.rows.length == 0) {
 			//Not a caretaker
