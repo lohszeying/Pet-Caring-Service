@@ -133,19 +133,34 @@ function dashboard(req, res, next) {
 
 // PET OWNER'S MANAGE PET
 function managepet(req, res, next) {
-	var pet_ctx = 0, pet_tbl;
-	
+	var pet_ctx = 0;
+	var pettype_tbl; 
+	var pet_tbl;
+	var owner_username = req.user.username;
+
 	pool.query(sql_query.query.all_pet_types, (err, data) => {
 		if (err || !data.rows || data.rows.length == 0) {
 			pet_ctx = 0;
-			pet_tbl = [];
+			pettype_tbl = [];
 		} else {
 			pet_ctx = data.rows.length;
-			pet_tbl = data.rows;
+			pettype_tbl = data.rows;
 		}
-		basic(req, res, 'managepet', { page: 'managepet', pet_tbl: pet_tbl, 
-			addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
-			auth: true });
+		
+		pool.query(sql_query.query.list_of_pets, [owner_username], (err, data) => {
+			if (err) {
+				pet_tbl = [];
+			} else {
+				pet_tbl = data.rows;
+			}
+
+			basic(req, res, 'managepet', {
+				pettype_tbl: pettype_tbl, pet_tbl: pet_tbl,
+				addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
+				auth: true
+			});
+		});
+		
 	});
 
 }

@@ -16,6 +16,7 @@ sql.query = {
 	all_caretaker_pettypeprice: 'SELECT * FROM CareTakerPricing WHERE username=$1 ORDER BY pet_type ASC',
 	all_pet_types: 'SELECT * FROM PetTypes ORDER BY name ASC',
 	caretaker_fulltime_parttime: 'SELECT is_fulltime FROM CareTaker WHERE username=$1',
+	list_of_pets: 'SELECT * FROM Pet WHERE owner_username=$1',
 
 	// Insertion
 	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
