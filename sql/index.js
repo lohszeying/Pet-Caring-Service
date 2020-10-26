@@ -12,6 +12,8 @@ sql.query = {
 	ctx_games: 'SELECT COUNT(*) FROM game_list',
 	all_games: 'SELECT ranking,game_list.gamename AS game,rating FROM user_games INNER JOIN game_list ON user_games.gamename=game_list.gamename WHERE username=$1 ORDER BY ranking ASC',
 	all_plays: 'SELECT gamename AS game, user1, user2, winner FROM game_plays WHERE user1=$1 OR user2=$1',
+
+	//Our queries
 	all_availability: 'SELECT * FROM CareTakerAvailability WHERE username=$1 ORDER BY date ASC',
 	all_caretaker_pettypeprice: 'SELECT * FROM CareTakerPricing WHERE username=$1 ORDER BY pet_type ASC',
 	all_pet_types: 'SELECT * FROM PetTypes ORDER BY name ASC',
@@ -36,6 +38,12 @@ sql.query = {
 	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
 	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\'',
 	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\'',
+
+	//get pending bid for caretaker
+	get_pending_bids_for_caretaker: 'SELECT * FROM Bids WHERE status = \'PENDING\' AND caretaker_username = $1',
+
+	//get all accepted bid for caretaker
+	get_all_accepted_bids_for_caretaker: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\' AND caretaker_username = $1',
 	// Update
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
