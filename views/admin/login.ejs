@@ -10,6 +10,11 @@
             <div class="card">
                 <div class="card-header">Admin Login</div>
                 <div class="card-body">
+                    <% if (error) { %>
+                        <div class="alert alert-danger">
+                            <%= error %>
+                        </div>
+                    <% } %>
                     <form method="post" action="/admin/login">
                         <div class="form-group">
                             <label for="username">User Name</label>
