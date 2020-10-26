@@ -7,7 +7,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="">
 
-		<title>Meeple World</title>
+		<title>Pet Caring Service </title>
 
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 		<link href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -18,14 +18,14 @@
 	<body id="page-top">
 		<%- include navbar.ejs %>
 		
-		<div id="wrapper">
+		<div>
 			<% if(!auth) { %>
 				<%- include loginsidebar.ejs %>
 			<% } else { %>
 				<%- include sidebar.ejs %>
 			<% } %>
 			
-			<div id="content-wrapper">
+			<!-- <div id="content-wrapper">
 				<div class="container-fluid">
 					<div class="card mb-3">
 						<div class="card-header">
@@ -101,7 +101,7 @@
 						<div class="card-footer small text-muted">CS2102 Database Project</div>
 					</div>
 				</div>
-			</div>
+			</div> -->
 		</div>
 		
 		<%- include bottomscript.ejs %>
