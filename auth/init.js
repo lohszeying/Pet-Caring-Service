@@ -42,7 +42,7 @@ function findUser (username, callback) {
 }
 
 function findAdmin(username, callback) {
-    pool.query(sql_query.query.admin, [username], (err, data) => {
+    pool.query(sql_query.admin.login, [username], (err, data) => {
         if(err) {
             console.error("Cannot find admin");
             return callback(null);
