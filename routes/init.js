@@ -48,7 +48,7 @@ function initRouter(app) {
 	}));
 
 	// TODO: create separate admin passport strategy
-	app.get('/admin', adminController);
+	app.use('/admin', adminController);
 
 	/* LOGOUT */
 	app.get('/logout', passport.authMiddleware(), logout);

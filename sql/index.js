@@ -32,7 +32,8 @@ sql.query = {
 	get_all_rating: 'SELECT GET_RATING(username) FROM CareTaker',
 	// Login
 	user: 'SELECT * FROM Users WHERE username=$1',
-	
+	admin: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
+
 	// Update
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
