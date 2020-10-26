@@ -21,7 +21,7 @@ sql.query = {
 	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
 	add_play: 'INSERT INTO game_plays (user1, user2, gamename, winner) VALUES($1,$2,$3,$4)',
 	add_user: 'INSERT INTO Users (username, password, name, area) VALUES ($1,$2,$3,$4)',
-	add_petowner: 'INSERT INTO PetOwner (username) VALUES ($1)',
+	add_pet: 'INSERT INTO Pet (name, pet_type, owner_username) VALUES ($1, $2, $3)',
 	add_caretaker: 'INSERT INTO CareTaker (username) VALUES ($1)',
 	add_availability: 'INSERT INTO CareTakerAvailability (username, date) VALUES ($1,$2)',
 	add_caretaker_pet_types: 'INSERT INTO PetTypes (name) VALUES ($1)',

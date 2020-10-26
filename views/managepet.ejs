@@ -45,7 +45,47 @@
                     </div>
                    
                 </div>
+                
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-dice-d20"></i> &nbsp; Add a pet 
+                    </div>
+                
+                    <form method="post" action="/add_pet">
+                        <div class="card-body">
+                            <!-- Type of pet -->
+                            <div class="form-group row">
+                                <label for="name" class="col-sm-2 col-form-label"><b>Pet Name:</b></label>
+                                <div class="col-sm-4">
+                                    <input type="text" required="required" class="form-control" id="petname" placeholder="Pet Name" name="petname">
+                                </div>
+                                <label for="" class="col-sm-2 col-form-label"><b>Type of pet:</b></label>
+                                <div class="col-sm-4">
+                                    <!-- <input type="text" required="required" class="form-control" id="type" placeholder="Cat" name="type" value=""> -->
+                                    <select name="type" class="custom-select">
+                                        <% for(var i=0; i<pet_tbl.length; i++) { %>
+                                        <option>
+                                            <%= pet_tbl[i].name %>
+                                        </option>
+                                        <% } %>
+                                    </select>
+                                </div>
 
+                                <!-- <br />
+                                <br />
+                                
+                                <label for="specreq" class="col-sm-4 col-form-label"><b>Special Requirement:</b></label>
+                                <div class="col-sm-12">
+                                    <input type="text" class="form-control" id="specreq" placeholder="Special Requirement" name="specreq">
+                                </div> -->
+                            </div>
+                        </div>
+                        <div class="card-footer small text-muted">
+                            <button type="submit" class="btn btn-secondary">Add Pet</button>
+                            <span class="badge badge-pill badge-info"><%= addpet_msg %></span>
+                        </div>
+                    </form>
+                </div>
                 
                 
 
