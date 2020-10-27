@@ -44,7 +44,7 @@ function initRouter(app) {
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
 	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
 	app.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker_accept_bid);
-
+	app.post('/make_bid', passport.authMiddleware(), make_bid);
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
 	/* LOGIN */
@@ -143,7 +143,7 @@ function dashboard(req, res, next) {
 //BID FUNCTION 
 function bid(req, res, next){
 	var pet_ctx = 0, pet_tbl;
-	var caretaker_tbl;
+	var caretaker_tbl; tm_tb1; pt_tb1;
 
 		pool.query(sql_query.query.all_pet_types, (err, data) => {
 						if (err || !data.rows || data.rows.length == 0) {
@@ -154,21 +154,64 @@ function bid(req, res, next){
 							pet_tbl = data.rows;
 						}
 
-						pool.query(sql_query.query.caretaker_fulltime_parttime, [req.user.username], (err, data) => {
+						pool.query(sql_query.query.all_caretaker, (err, data) => {
 							if (err || !data.rows || data.rows.length == 0) {
 								caretaker_tbl = [];
 							} else {
 								caretaker_tbl = data.rows;
 							}
 
+							pool.query(sql_query.query.all_transfer_methods, (err, data) => {
+								if (err || !data.rows || data.rows.length == 0) {
+									tm_tb1 = [];
+								} else {
+									tm_tb1 = data.rows;
+								}
+								pool.query(sql_query.query.all_payment_types, (err, data) => {
+									if (err || !data.rows || data.rows.length == 0) {
+										pt_tb1 = [];
+									} else {
+										pt_tb1 = data.rows;
+									}
+
 								basic(req, res, 'bid',
 									{ pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-										caretaker_tbl: caretaker_tbl, 
+										caretaker_tbl: caretaker_tbl, tm_tb1:tm_tb1 , pt_tb1:pt_tb1,
+										makebid_msg: msg(req, 'make_bid', 'Pending Bid made successfully ', 'Bid is not made'),
 										auth: true });
+								});
 							});
-					});
 				
+						});
+					});
+	}
+
+
+function make_bid(req, res, next){
+
+	var owner_username = req.user.username;
+	var type = req.body.type;
+	var caretaker = req.body.caretaker;
+	var start_date = req.body.start_date;
+	var end_date = req.body.end_date;
+	var tm = req.body.tm;
+	var pt = req.body.pt;
+
+	pool.query(sql_query.query.make_bid, [owner_username,type,caretaker,start_date,end_date,tm,pt], (err, data) => {
+		if (err) {
+			console.error("Error in making bid");
+			res.redirect('/bid?make_bid=fail');
+		} else {
+			res.redirect('/managepet?add_req=pass');
+		}
+	});
+
 }
+	
+				
+
+
+
 
 
 function rating_review(req, res, next){
@@ -517,6 +560,7 @@ function add_pettypes(req, res, next) {
 		}
 	});
 }
+
 
 function add_availability(req, res, next) {
 	var username = req.user.username;
