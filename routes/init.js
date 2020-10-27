@@ -138,10 +138,34 @@ function dashboard(req, res, next) {
 
 //BID FUNCTION 
 function bid(req, res, next){
-	basic(req, res, 'bid', { page: 'bid', auth: true });
+	var pet_ctx = 0, pet_tbl;
+	var caretaker_tbl;
 
+		pool.query(sql_query.query.all_pet_types, (err, data) => {
+						if (err || !data.rows || data.rows.length == 0) {
+							pet_ctx = 0;
+							pet_tbl = [];
+						} else {
+							pet_ctx = data.rows.length;
+							pet_tbl = data.rows;
+						}
 
+						pool.query(sql_query.query.caretaker_fulltime_parttime, [req.user.username], (err, data) => {
+							if (err || !data.rows || data.rows.length == 0) {
+								caretaker_tbl = [];
+							} else {
+								caretaker_tbl = data.rows;
+							}
+
+								basic(req, res, 'bid',
+									{ pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+										caretaker_tbl: caretaker_tbl, 
+										auth: true });
+							});
+					});
+				
 }
+
 
 function rating_review(req, res, next){
 	basic(req, res, 'rating_review', { page: 'rating_review', auth: true });
