@@ -38,6 +38,7 @@ function initRouter(app) {
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
 	app.post('/update_pet', passport.authMiddleware(), update_pet);
+	app.post('/add_req', passport.authMiddleware(), add_req);
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
@@ -245,6 +246,23 @@ function update_pet(req, res, next) {
 			res.redirect('/managepet?update_pet=fail');
 		} else {
 			res.redirect('/managepet?update_pet=pass');
+		}
+	});
+
+}
+
+function add_req(req, res, next) {
+
+	var pet_name = req.body.name;
+	var specreq = req.body.specreqtype;
+	var owner_username = req.user.username;
+
+	pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
+		if (err) {
+			console.error("Error in adding requirement");
+			res.redirect('/managepet?add_req=fail');
+		} else {
+			res.redirect('/managepet?add_req=pass');
 		}
 	});
 
