@@ -124,8 +124,17 @@
                                             value="<%= pet_tbl[i].pet_type %>" name="pettype">
                                     </div>
                                     
-                                    <label for="specreq" class="col-sm-4 col-form-label"><b>Special Requirement:</b></label>
+                                    <label for="specreq" class="col-sm-10 col-form-label"><b>Special Requirement:</b></label>
                                     
+                                    <!-- <select name="newspecreqtype" class="custom-select"> -->
+                                        <% for(var a=0; a<listspecreq_tbl.length; a++) { %>
+                                            <% if (listspecreq_tbl[a].pet_name === pet_tbl[i].pet_name) {%>
+                                            <label for="specreq" class="col-sm-4 col-form-label">
+                                                <%= listspecreq_tbl[a].special_requirement %>
+                                            </label>
+                                            <% } %>
+                                        <% } %>
+                                    <!-- </select> -->
 
                                     <hr>
 

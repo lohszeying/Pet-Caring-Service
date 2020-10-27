@@ -182,7 +182,7 @@ function managepet(req, res, next) {
 					allspecreq_tbl = data.rows;
 				}
 
-				pool.query(sql_query.query.list_of_specreq, (err, data) => {
+				pool.query(sql_query.query.list_of_specreq, [owner_username], (err, data) => {
 					if (err) {
 						listspecreq_tbl = [];
 					} else {
