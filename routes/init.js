@@ -34,6 +34,7 @@ function initRouter(app) {
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
+	app.post('/update_pet', passport.authMiddleware(), update_pet);
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
@@ -170,9 +171,24 @@ function add_pet(req, res, next) {
 	var pet_type =req.body.type;
 	var owner_username = req.user.username;
 	
-	console.log(pet_name);
-	console.log(pet_type);
-	console.log(owner_username);
+	// console.log(pet_name);
+	// console.log(pet_type);
+	// console.log(owner_username);
+
+	pool.query(sql_query.query.add_pet, [pet_name, pet_type, owner_username], (err, data) => {
+		if (err) {
+			console.error("Error in adding pet");
+			res.redirect('/managepet?add_pet=fail');
+		} else {
+			res.redirect('/managepet?add_pet=pass');
+		}
+	});
+
+}
+
+function update_pet(req, res, next) {
+	var pet_name = req.body.petname;
+	var owner_username = req.user.username;
 
 	pool.query(sql_query.query.add_pet, [pet_name, pet_type, owner_username], (err, data) => {
 		if (err) {
