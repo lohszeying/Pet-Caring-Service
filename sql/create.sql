@@ -2,7 +2,8 @@
 DO $$
     BEGIN
         for r in 1..1000 loop
-            insert into Users (username, name, password) values(r, 'John', cast (r as VARCHAR));
+        --password is '1'.
+            insert into Users (username, name, password) values(r, 'John', '$2b$10$gbBSQv0Zl2BouA8kehfu/.ErlOvFitj.BPs0gbPoT3gE3gXicx0CW');
         end loop;
     END;
 $$; 
@@ -40,7 +41,29 @@ do $$
         prices := array[40.50, 89.1, 100, 200, 154.2, 167.2, 10.3, 18.5, 20.1];
         FOREACH var in ARRAY types LOOP
             ind := ind+1;
-            INSERT INTO PetTypes (name, base_price) VALUES(var, prices[ind]);
+            INSERT INTO PetTypes (pet_type, base_price) VALUES(var, prices[ind]);
+        END LOOP;
+    END;
+$$;
+
+-- special requirements function
+CREATE OR REPLACE FUNCTION list_of_special_requirements() 
+    RETURNS varchar[] AS $$
+        BEGIN
+            --add more you can think of
+            return array['must walk', 'must bathe', 'must eat', 'extra care'];
+        END;
+    $$
+LANGUAGE plpgsql;
+
+--generate special requirement
+do $$
+    declare reqs varchar[];
+    declare var varchar;
+    BEGIN
+        reqs := list_of_special_requirements();
+        FOREACH var in ARRAY reqs LOOP
+            INSERT INTO SpecialRequirements (special_requirement) VALUES(var);
         END LOOP;
     END;
 $$;
@@ -55,8 +78,12 @@ DO $$
         WHILE count<= 50 LOOP
             pet:=1;
             WHILE pet <=20 LOOP
-                INSERT INTO Pet (owner_username,name, pet_type) 
+                INSERT INTO Pet (owner_username, pet_name, pet_type) 
                     VALUES(count, pet,  (list_of_pet_types())[mod(pet, array_length(list_of_pet_types(),1))+1] );
+                INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement)
+                    VALUES(count, pet, (list_of_special_requirements())[mod(pet, array_length(list_of_special_requirements(), 1) ) + 1]);
+                INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement)
+                    VALUES(count, pet, (list_of_special_requirements())[mod(pet + 3, array_length(list_of_special_requirements(), 1) ) + 1]);
                 pet := pet + 1;
             END LOOP;
             count := count + 1;
