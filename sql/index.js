@@ -22,6 +22,8 @@ sql.query = {
 	list_of_specreq: 'SELECT * FROM PetSpecialRequirements WHERE owner_username=$1',
 	all_specreq: 'SELECT * FROM SpecialRequirements',
 	all_bid:'SELECT * FROM Bids WHERE username=$1',
+	all_transfer_methods: 'SELECT  enum.enumlabel AS value FROM pg_enum AS enum JOIN pg_type AS type ON (type.oid = enum.enumtypid) WHERE type.typname =\'transfer_methods\' GROUP by type.typname, enum.enumlabel',
+	all_payment_types: 'SELECT enum.enumlabel AS value FROM pg_enum AS enum JOIN pg_type AS type ON (type.oid = enum.enumtypid) WHERE type.typname =\'payment_types\' GROUP by type.typname, enum.enumlabel',
 
 	// Insertion
 	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
@@ -46,6 +48,9 @@ sql.query = {
 	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
 	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\'',
 	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\'',
+
+	//get top available caretaker
+	get_top_available_caretaker: 'SELECT cp.username, GET_RATING(cp.username) FROM caretakerpricing cp LEFT OUTER JOIN caretakeravailability ca on cp.username = ca.username WHERE ca.date BETWEEN $1 AND $2 AND cp.pet_type=$3 GROUP BY cp.username ORDER BY GET_RATING(cp.username) DESC, cp.username LIMIT 10', 
 
 	//get pending bid for caretaker
 	get_pending_bids_for_caretaker: 'SELECT * FROM Bids WHERE status = \'PENDING\' AND caretaker_username = $1',

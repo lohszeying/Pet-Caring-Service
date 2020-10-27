@@ -46,6 +46,7 @@
 						</div>
 						
 					</div>
+					<form method="post" action="/make_bid">
 					<div class="card mb-1">
 						<div class="card-header">
 							<i class="fas fa-file-signature"></i> &nbsp; Make A Bid
@@ -63,8 +64,13 @@
 							<div class="form-group row">
 								<label for="username" class="col-sm-2 col-form-label"><b>Type of pet:</b></label>
 								<div class="col-sm-4">
-									<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-										value="<%= name %>" name="name">
+									<select name="type" class="custom-select">
+										<% for(var i=0; i<pet_tbl.length; i++) { %>
+											<option>
+												<%= pet_tbl[i].name %>
+											</option>
+										<% } %>
+									</select>
 								</div>
 							</div>
 						</div>
@@ -72,52 +78,66 @@
 							<div class="form-group row">
 								<label for="username" class="col-sm-2 col-form-label"><b>Caretaker name:</b></label>
 								<div class="col-sm-4">
-									<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-										value="<%= name %>" name="name">
+									<select name="caretaker" class="custom-select">
+										<% for(var i=0; i<caretaker_tbl.length; i++) { %>
+											<option>
+												<%= caretaker_tbl[i].name %>
+											</option>
+										<% } %>
+									</select>
 								</div>
 							</div>
 						</div>
 						<div class="card-body">
 								<div class="form-group row">
-									<label for="username" class="col-sm-2 col-form-label"><b>Start Date:</b></label>
-									<div class="col-sm-4">
-										<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-											value="<%= name %>" name="name">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="card-body">
-								<div class="form-group row">
-									<label for="username" class="col-sm-2 col-form-label"><b>End date:</b></label>
-									<div class="col-sm-4">
-										<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-											value="<%= name %>" name="name">
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="card-body">
-								<div class="form-group row">
-									<label for="username" class="col-sm-2 col-form-label"><b>Transfer method:</b></label>
-									<div class="col-sm-4">
-										<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-											value="<%= name %>" name="name">
+									<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
+									<div class="col-sm-9">
+										<input required="required" class="form-control" id="date" placeholder="2020-01-01" name="start_date" value="" type="date">
 									</div>
 								</div>
 						</div>
 						<div class="card-body">
-								<div class="form-group row">
-									<label for="username" class="col-sm-2 col-form-label"><b>Payment type:</b></label>
-									<div class="col-sm-4">
-										<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-											value="<%= name %>" name="name">
-									</div>
+							<div class="form-group row">
+								<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
+								<div class="col-sm-9">
+									<input required="required" class="form-control" id="date" placeholder="2020-01-01" name="end_date" value="" type="date">
 								</div>
 							</div>
+						</div>
+						<div class="card-body">
+							<div class="form-group row">
+								<label for="username" class="col-sm-2 col-form-label"><b>Transfer method:</b></label>
+								<div class="col-sm-4">
+									<select name="tm" class="custom-select">
+										<% for(var i=0; i<tm_tbl.length; i++) { %>
+											<option>
+												<%= tm_tbl[i].name %>
+											</option>
+										<% } %>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="card-body">
+							<div class="form-group row">
+								<label for="username" class="col-sm-2 col-form-label"><b>Payment type:</b></label>
+								<div class="col-sm-4">
+									<select name="pt" class="custom-select">
+										<% for(var i=0; i<pt_tbl.length; i++) { %>
+											<option>
+												<%= pt_tbl[i].name %>
+											</option>
+										<% } %>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="card-footer small text-muted">
+							<button type="submit" class="btn btn-secondary">Make Bid</button>
 						</div>
 						
 					</div>
+					</form>
 
 					<div class="card mb-3">
 						<div class="card-header">
@@ -142,11 +162,8 @@
 						
 					</div>
 					
-
-
-
-				</div>
 			</div>
+		</div>
 
 		</div>
 
