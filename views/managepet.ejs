@@ -72,13 +72,13 @@
                                     </select>
                                 </div>
 
-                                <!-- <br />
+                                <br />
                                 <br />
                                 
                                 <label for="specreq" class="col-sm-4 col-form-label"><b>Special Requirement:</b></label>
                                 <div class="col-sm-12">
                                     <input type="text" class="form-control" id="specreq" placeholder="Special Requirement" name="specreq">
-                                </div> -->
+                                </div>
                             </div>
                         </div>
                         <div class="card-footer small text-muted">
@@ -96,30 +96,40 @@
 
                     <% for(var i=0; i<pet_tbl.length; i++) { %>
                         <form method="post" action="/update_pet">
-                            <div class="card ">
-                                <label for="name" class="col-sm-2 col-form-label"><b>Pet Name:</b> </label>
-                                <div class="col-sm-4">
-                                    <input type="text" required="required" class="form-control" id="name"
-                                        value="<%= pet_tbl[i].name %>" name="name">
+                            <div class="card">
+                                <div class="card-body">
+                                    <label for="name" class="col-sm-2 col-form-label"><b>Pet Name:</b> </label>
+                                    <div class="col-sm-4">
+                                        <input type="text" required="required" readonly class="form-control-plaintext" id="currname"
+                                            value="<%= pet_tbl[i].name %>" name="currname">
+                                    </div>
+                                    
+                                    <label for="type" class="col-sm-10 col-form-label"> <b>Pet Type:</b> </label>
+                                    <div class="col-sm-4">
+                                        <input type="text" required="required" readonly class="form-control-plaintext" id="pettype"
+                                            value="<%= pet_tbl[i].pet_type %>" name="pettype">
+                                    </div>
+                                    
+                                    <label for="specreq" class="col-sm-4 col-form-label"><b>Special Requirement:</b></label>
+                                    <div class="col-sm-12">
+                                        <input type="text" readyonly class="form-control-plaintext" id="specreq" placeholder="" name="specreq">
+                                    </div>
+
+                                    <label for="changename" class="col-sm-4 col-form-label"><b>Change Name:</b></label>
+                                    <div class="col-sm-12">
+                                        <input type="text" class="form-control" id="specreq" placeholder="New Name"
+                                            name="newname">
+                                    </div>
+
+                                    
                                 </div>
-                                <label for="type" class="col-sm-10 col-form-label">
-                                    <b>Pet Type:</b> <%= pet_tbl[i].pet_type %> </label>
-
-                                <label for="specreq" class="col-sm-4 col-form-label"><b>Special Requirement:</b></label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="specreq" placeholder="Special Requirement" name="specreq">
+                                <div class="card-body small text-muted">
+                                    <button type="submit" class="btn btn-secondary">Update Pet</button>
+                                    <span class="badge badge-pill badge-info"><%= updatepet_msg %></span>
                                 </div>
 
-                                <br>
                             </div>
-
-                            
-
-                            <div class="card-footer small text-muted">
-                                <button type="submit" class="btn btn-secondary">Update Pet</button>
-                                <span class="badge badge-pill badge-info"><%=  %></span>
-                            </div>
-                            
+          
                         </form>
 
                          

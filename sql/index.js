@@ -50,6 +50,7 @@ sql.query = {
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
 	update_credcard: 'UPDATE PetOwner SET credit_card_number=$2 WHERE username=$1',
+	update_pet: 'UPDATE Pet SET name=$2 WHERE name=$1 AND owner_username=$3',
 	update_caretaker_pettype_price: 'UPDATE CareTakerPricing SET price=$3 WHERE username=$1 AND pet_type=$2',
 	
 	// Search
