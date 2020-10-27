@@ -46,14 +46,14 @@ CREATE TABLE CareTaker
 
 CREATE TABLE PetTypes
 (
-    name VARCHAR(64) PRIMARY KEY,
+    pet_type VARCHAR(64) PRIMARY KEY,
     base_price NUMERIC(10,2) NOT NULL
 );
 
 
 CREATE TABLE SpecialRequirements
 (
-    description VARCHAR PRIMARY KEY
+    special_requirement VARCHAR PRIMARY KEY
 );
 
 CREATE TABLE Pet
@@ -64,17 +64,17 @@ CREATE TABLE Pet
     pet_type       VARCHAR(64) NOT NULL,
     PRIMARY KEY (owner_username, name),
     FOREIGN KEY (owner_username) REFERENCES PetOwner (username) ON UPDATE CASCADE,
-    FOREIGN KEY (pet_type) REFERENCES PetTypes (name) ON UPDATE CASCADE
+    FOREIGN KEY (pet_type) REFERENCES PetTypes (pet_type) ON UPDATE CASCADE
 );
 
 CREATE TABLE PetSpecialRequirements
 (
     owner_username       VARCHAR(64),
     name                 VARCHAR(64),
-    special_requirements VARCHAR,
-    PRIMARY KEY (owner_username, name, special_requirements), 
+    special_requirement VARCHAR,
+    PRIMARY KEY (owner_username, name, special_requirement), 
     FOREIGN KEY (owner_username, name) REFERENCES Pet (owner_username, name) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (special_requirements) REFERENCES SpecialRequirements (description) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (special_requirement) REFERENCES SpecialRequirements (special_requirement) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE CareTakerPricing
@@ -84,7 +84,7 @@ CREATE TABLE CareTakerPricing
     price    DECIMAL(8, 2),
     PRIMARY KEY (username, pet_type),
     FOREIGN KEY (username) REFERENCES CareTaker (username) ON UPDATE CASCADE,
-    FOREIGN KEY (pet_type) REFERENCES PetTypes (name) ON UPDATE CASCADE
+    FOREIGN KEY (pet_type) REFERENCES PetTypes (pet_type) ON UPDATE CASCADE
 );
 
 CREATE TABLE CareTakerAvailability

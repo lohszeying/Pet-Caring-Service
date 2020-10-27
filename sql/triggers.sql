@@ -1,4 +1,5 @@
 
+
 --Get a rating of a particular caretaker
 CREATE OR REPLACE FUNCTION GET_RATING(username VARCHAR) 
     RETURNS NUMERIC(3,2) LANGUAGE plpgsql AS
@@ -23,7 +24,7 @@ $$;
 
 
 --get the default price of a pet by a caretaker of a particular rating
-CREATE OR REPLACE FUNCTION GET_PRICE(pet_type VARCHAR, rating NUMERIC(3,2))
+CREATE OR REPLACE FUNCTION GET_PRICE(ptype VARCHAR, rating NUMERIC(3,2))
     RETURNS NUMERIC(3,2) LANGUAGE plpgsql AS $$
         BEGIN 
             RETURN (SELECT CASE  WHEN rating>=4.5 THEN P.base_price*1.5
@@ -31,7 +32,7 @@ CREATE OR REPLACE FUNCTION GET_PRICE(pet_type VARCHAR, rating NUMERIC(3,2))
                             ELSE P.base_price 
                             END 
                 FROM PetTypes P
-                WHERE P.name = pet_type);
+                WHERE P.pet_type = ptype);
         END;
 $$;
 
@@ -131,7 +132,7 @@ CREATE OR REPLACE FUNCTION CHECKBEFOREINSERTBID()
         END IF;
     END IF;
     RETURN NEW;
-    END; $$;
+END; $$;
 
     
 
