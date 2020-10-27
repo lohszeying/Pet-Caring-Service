@@ -41,12 +41,48 @@ function findUser (username, callback) {
 	});
 }
 
-passport.serializeUser(function (user, cb) {
-  cb(null, user.username);
+function findAdmin(username, callback) {
+    pool.query(sql_query.admin.login, [username], (err, data) => {
+        if(err) {
+            console.error("Cannot find admin");
+            return callback(null);
+        }
+
+        if(data.rows.length === 0) {
+            console.error("Admin does not exists?");
+            return callback(null)
+        } else if(data.rows.length === 1) {
+            return callback(null, {
+                username    : data.rows[0].username,
+                passwordHash: data.rows[0].password,
+            });
+        } else {
+            console.error("More than one admin?");
+            return callback(null);
+        }
+    });
+}
+
+passport.serializeUser((user, cb) => {
+    const userObject = {
+        username: user.username,
+        is_admin: false
+    };
+
+    // User has name, admin does not
+    if (!user.hasOwnProperty('name')) {
+        userObject.is_admin = true;
+    }
+
+    cb(null, userObject);
 })
 
-passport.deserializeUser(function (username, cb) {
-  findUser(username, cb);
+passport.deserializeUser((userObject, cb) => {
+    if (userObject.is_admin) {
+        findAdmin(userObject.username, cb);
+    } else {
+        findUser(userObject.username, cb);
+    }
 })
 
 function initPassport () {
@@ -76,6 +112,32 @@ function initPassport () {
       })
     }
   ));
+
+    passport.use('admin', new LocalStrategy({usernameField: 'username', passwordField: 'password'}, (username, password, done) => {
+        findAdmin(username, (err, admin) => {
+            if (err) {
+                return done(err);
+            }
+
+            // admin not found
+            if (!admin) {
+                console.error('Admin not found');
+                return done(null, false);
+            }
+
+            // Always use hashed passwords and fixed time comparison
+            bcrypt.compare(password, admin.passwordHash, (err, isValid) => {
+                if (err) {
+                    return done(err);
+                }
+                if (!isValid) {
+                    return done(null, false);
+                }
+                return done(null, admin);
+            });
+        });
+    }));
+
 
   passport.authMiddleware = authMiddleware;
   passport.antiMiddleware = antiMiddleware;
