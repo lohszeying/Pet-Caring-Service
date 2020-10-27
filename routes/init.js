@@ -36,6 +36,8 @@ function initRouter(app) {
 	app.post('/update_credcard', passport.authMiddleware(), update_credcard);
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
+	app.post('/add_pet', passport.authMiddleware(), add_pet);
+	app.post('/update_pet', passport.authMiddleware(), update_pet);
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
@@ -150,9 +152,77 @@ function rating_review(req, res, next){
 
 // PET OWNER'S MANAGE PET
 function managepet(req, res, next) {
-	basic(req, res, 'managepet', { page: 'managepet', auth: true });
+	var pet_ctx = 0;
+	var pettype_tbl; 
+	var pet_tbl;
+	var owner_username = req.user.username;
+
+	pool.query(sql_query.query.all_pet_types, (err, data) => {
+		if (err || !data.rows || data.rows.length == 0) {
+			pet_ctx = 0;
+			pettype_tbl = [];
+		} else {
+			pet_ctx = data.rows.length;
+			pettype_tbl = data.rows;
+		}
+		
+		pool.query(sql_query.query.list_of_pets, [owner_username], (err, data) => {
+			if (err) {
+				pet_tbl = [];
+			} else {
+				pet_tbl = data.rows;
+			}
+
+			basic(req, res, 'managepet', {
+				pettype_tbl: pettype_tbl, pet_tbl: pet_tbl,
+				addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
+				updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
+				auth: true
+			});
+		});
+		
+	});
 
 }
+
+function add_pet(req, res, next) {
+	var pet_name = req.body.petname;
+	var pet_type =req.body.type;
+	var owner_username = req.user.username;
+	//var specreq = req.body.specreq;
+	
+	// console.log(pet_name);
+	// console.log(pet_type);
+	// console.log(owner_username);
+
+	pool.query(sql_query.query.add_pet, [pet_name, pet_type, owner_username], (err, data) => {
+		if (err) {
+			console.error("Error in adding pet");
+			res.redirect('/managepet?add_pet=fail');
+		} else {
+			
+			res.redirect('/managepet?add_pet=pass');
+		}
+	});
+
+}
+
+function update_pet(req, res, next) {
+	var old_name = req.body.currname;
+	var new_name = req.body.newname;
+	var owner_username = req.user.username;
+
+	pool.query(sql_query.query.update_pet, [old_name, new_name, owner_username], (err, data) => {
+		if (err) {
+			console.error("Error in updating pet");
+			res.redirect('/managepet?update_pet=fail');
+		} else {
+			res.redirect('/managepet?update_pet=pass');
+		}
+	});
+
+}
+
 
 //CARETAKER FUNCTION
 function caretaker(req, res, next) {
