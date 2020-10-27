@@ -19,6 +19,8 @@ sql.query = {
 	all_pet_types: 'SELECT * FROM PetTypes ORDER BY pet_type ASC',
 	caretaker_fulltime_parttime: 'SELECT is_fulltime FROM CareTaker WHERE username=$1',
 	list_of_pets: 'SELECT * FROM Pet WHERE owner_username=$1',
+	list_of_specreq: 'SELECT * FROM PetSpecialRequirements WHERE owner_username=$1',
+	all_specreq: 'SELECT * FROM SpecialRequirements',
 	all_bid:'SELECT * FROM Bids WHERE username=$1',
 
 	// Insertion
@@ -26,6 +28,7 @@ sql.query = {
 	add_play: 'INSERT INTO game_plays (user1, user2, gamename, winner) VALUES($1,$2,$3,$4)',
 	add_user: 'INSERT INTO Users (username, password, name, area) VALUES ($1,$2,$3,$4)',
 	add_pet: 'INSERT INTO Pet (pet_name, pet_type, owner_username) VALUES ($1, $2, $3)',
+	add_specreq: 'INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement) VALUES ($1, $2, $3)',
 	add_caretaker: 'INSERT INTO CareTaker (username) VALUES ($1)',
 	make_bid:'INSERT INTO Bids (owner_username, pet_name, caretaker_username, start_date, end_date, transfer_method, payment_type) VALUES ($1,$2,$3,$4,$5,$6,$7)',
 	add_rating_review:'INSERT INTO Bids (rating, review) VALUES ($1, $2)',
