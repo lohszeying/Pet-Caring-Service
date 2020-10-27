@@ -23,6 +23,44 @@
 
     <div id="content-wrapper">
         <div class="container-fluid">
+            <form method="post" action="/bids/search-availability">
+            <div class="card-body">
+                <div class="form-group row">
+                    <label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
+                    <div class="col-sm-9">
+                        <input required="required" class="form-control" id="date" placeholder="2020-01-01" name="start_date" value="" type="date">
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="date2" class="col-sm-3 col-form-label"><b>End Date:</b></label>
+                        <div class="col-sm-9">
+                            <input required="required" class="form-control" id="date2" placeholder="2020-01-01" name="end_date" value="" type="date">
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="username" class="col-sm-2 col-form-label"><b>Type of pet:</b></label>
+                        <div class="col-sm-4">
+                            <select name="type" class="custom-select">
+                                <% for(var i=0; i<pet_tbl.length; i++) { %>
+                                    <option>
+                                        <%= pet_tbl[i].name %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer small text-muted">
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+            </form>
+            
+        
+        </div>
+        
         </div>
     </div>
 </div>
