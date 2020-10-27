@@ -16,7 +16,7 @@ sql.query = {
 	//Our queries
 	all_availability: 'SELECT * FROM CareTakerAvailability WHERE username=$1 ORDER BY date ASC',
 	all_caretaker_pettypeprice: 'SELECT * FROM CareTakerPricing WHERE username=$1 ORDER BY pet_type ASC',
-	all_pet_types: 'SELECT * FROM PetTypes ORDER BY name ASC',
+	all_pet_types: 'SELECT * FROM PetTypes ORDER BY pet_type ASC',
 	caretaker_fulltime_parttime: 'SELECT is_fulltime FROM CareTaker WHERE username=$1',
 	list_of_pets: 'SELECT * FROM Pet WHERE owner_username=$1',
 	all_bid:'SELECT * FROM Bids WHERE username=$1',
@@ -60,7 +60,7 @@ sql.query = {
 	// Search
 	search_game: 'SELECT * FROM game_list WHERE lower(gamename) LIKE $1',
 	find_caretaker: 'SELECT * FROM CareTaker WHERE username=$1',
-	find_pettypes: 'SELECT * FROM PetTypes WHERE name=$1',
+	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
 }
 
