@@ -24,6 +24,8 @@ function initRouter(app) {
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), caretaker);
+	app.get('/bid',passport.authMiddleware(), bid);
+	app.get('/rating_review',passport.authMiddleware(), rating_review);
 
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
@@ -133,6 +135,17 @@ function dashboard(req, res, next) {
 		info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'),
 		credcard_msg: msg(req, 'credcard', 'Credit card updated successfully', 'Error in updating credit card'),
 		pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
+}
+
+//BID FUNCTION 
+function bid(req, res, next){
+	basic(req, res, 'bid', { page: 'bid', auth: true });
+
+
+}
+
+function rating_review(req, res, next){
+	basic(req, res, 'rating_review', { page: 'rating_review', auth: true });
 }
 
 // PET OWNER'S MANAGE PET
