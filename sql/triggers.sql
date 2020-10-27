@@ -124,7 +124,7 @@ CREATE OR REPLACE FUNCTION CHECKBEFOREINSERTBID()
         NEW.total_price := 
             (SELECT price * (DATE_PART('day',NEW.end_date::timestamp - NEW.start_date::timestamp) + 1)
                 FROM CareTakerPricing C, Pet P
-                WHERE NEW.pet_name = P.name AND NEW.owner_username = P.owner_username 
+                WHERE NEW.pet_name = P.pet_name AND NEW.owner_username = P.owner_username 
                     AND P.pet_type = C.pet_type AND C.username = NEW.caretaker_username);
         IF fulltime THEN
             --autoaccept if fulltime and able

@@ -12,6 +12,9 @@ DROP TABLE IF EXISTS SpecialRequirements;
 DROP TYPE IF EXISTS transfer_methods;
 DROP TYPE IF EXISTS payment_types;
 DROP TYPE IF EXISTS Bidstatus;
+
+DROP FUNCTION ABLETOCAREFOR(pname VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) ;
+
 CREATE TABLE PCSAdmin
 (
     username VARCHAR(64) PRIMARY KEY,
@@ -59,10 +62,10 @@ CREATE TABLE SpecialRequirements
 CREATE TABLE Pet
 (
     owner_username VARCHAR(64),
-    name           VARCHAR(64),
+    pet_name           VARCHAR(64),
     enabled        BOOLEAN DEFAULT TRUE,
     pet_type       VARCHAR(64) NOT NULL,
-    PRIMARY KEY (owner_username, name),
+    PRIMARY KEY (owner_username, pet_name),
     FOREIGN KEY (owner_username) REFERENCES PetOwner (username) ON UPDATE CASCADE,
     FOREIGN KEY (pet_type) REFERENCES PetTypes (pet_type) ON UPDATE CASCADE
 );
@@ -70,10 +73,10 @@ CREATE TABLE Pet
 CREATE TABLE PetSpecialRequirements
 (
     owner_username       VARCHAR(64),
-    name                 VARCHAR(64),
+    pet_name                 VARCHAR(64),
     special_requirement VARCHAR,
-    PRIMARY KEY (owner_username, name, special_requirement), 
-    FOREIGN KEY (owner_username, name) REFERENCES Pet (owner_username, name) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (owner_username, pet_name, special_requirement), 
+    FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, pet_name) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (special_requirement) REFERENCES SpecialRequirements (special_requirement) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -101,13 +104,13 @@ CREATE TYPE payment_types AS ENUM ('CREDIT_CARD', 'CASH');
 
 
 --boolean function to check if a certain caretaker can care for a certain pet
-CREATE OR REPLACE FUNCTION ABLETOCAREFOR(pet_name VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) 
+CREATE OR REPLACE FUNCTION ABLETOCAREFOR(pname VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) 
     RETURNS BOOLEAN AS 
     $$ BEGIN
         RETURN EXISTS (
             SELECT 1 
             FROM pet P, CareTakerPricing C
-            WHERE pet_name = P.name AND owner_name = P.owner_username AND P.pet_type = C.pet_type AND caretaker_username = C.username
+            WHERE pname = P.pet_name AND owner_name = P.owner_username AND P.pet_type = C.pet_type AND caretaker_username = C.username
             );
     END;
 $$
@@ -130,7 +133,7 @@ CREATE TABLE Bids
     end_date DATE NOT NULL,
 
     PRIMARY KEY (owner_username, pet_name, caretaker_username, start_date, end_date),
-    FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, name) ON UPDATE CASCADE,
+    FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, pet_name) ON UPDATE CASCADE,
     FOREIGN KEY (caretaker_username) REFERENCES CareTaker (username) ON UPDATE CASCADE,
     CONSTRAINT LEGALTIMEPERIOD CHECK (start_date <= end_date),
     CONSTRAINT ABLETOCAREFOR CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username)),

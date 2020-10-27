@@ -78,11 +78,11 @@ DO $$
         WHILE count<= 50 LOOP
             pet:=1;
             WHILE pet <=20 LOOP
-                INSERT INTO Pet (owner_username,name, pet_type) 
+                INSERT INTO Pet (owner_username, pet_name, pet_type) 
                     VALUES(count, pet,  (list_of_pet_types())[mod(pet, array_length(list_of_pet_types(),1))+1] );
-                INSERT INTO PetSpecialRequirements (owner_username, name, special_requirement)
+                INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement)
                     VALUES(count, pet, (list_of_special_requirements())[mod(pet, array_length(list_of_special_requirements(), 1) ) + 1]);
-                INSERT INTO PetSpecialRequirements (owner_username, name, special_requirement)
+                INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement)
                     VALUES(count, pet, (list_of_special_requirements())[mod(pet + 3, array_length(list_of_special_requirements(), 1) ) + 1]);
                 pet := pet + 1;
             END LOOP;
