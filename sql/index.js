@@ -25,12 +25,12 @@ sql.query = {
 	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
 	add_play: 'INSERT INTO game_plays (user1, user2, gamename, winner) VALUES($1,$2,$3,$4)',
 	add_user: 'INSERT INTO Users (username, password, name, area) VALUES ($1,$2,$3,$4)',
-	add_pet: 'INSERT INTO Pet (name, pet_type, owner_username) VALUES ($1, $2, $3)',
+	add_pet: 'INSERT INTO Pet (pet_name, pet_type, owner_username) VALUES ($1, $2, $3)',
 	add_caretaker: 'INSERT INTO CareTaker (username) VALUES ($1)',
 	make_bid:'INSERT INTO Bids (owner_username, pet_name, caretaker_username, start_date, end_date, transfer_method, payment_type) VALUES ($1,$2,$3,$4,$5,$6,$7)',
 	add_rating_review:'INSERT INTO Bids (rating, review) VALUES ($1, $2)',
 	add_availability: 'INSERT INTO CareTakerAvailability (username, date) VALUES ($1,$2)',
-	add_caretaker_pet_types: 'INSERT INTO PetTypes (name) VALUES ($1)',
+	add_caretaker_pet_types: 'INSERT INTO PetTypes (pet_type) VALUES ($1)',
 	add_caretaker_type_of_pet: 'INSERT INTO CareTakerPricing (username, pet_type, price) VALUES ($1,$2,$3)',
 	
 	//get caretaker ratings to display
@@ -53,7 +53,7 @@ sql.query = {
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
 	update_credcard: 'UPDATE PetOwner SET credit_card_number=$2 WHERE username=$1',
-	update_pet: 'UPDATE Pet SET name=$2 WHERE name=$1 AND owner_username=$3',
+	update_pet: 'UPDATE Pet SET pet_name=$2 WHERE pet_name=$1 AND owner_username=$3',
 	update_caretaker_pettype_price: 'UPDATE CareTakerPricing SET price=$3 WHERE username=$1 AND pet_type=$2',
 	update_caretaker_accepted_bid: 'UPDATE Bids SET status=\'ACCEPTED\' WHERE username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	
