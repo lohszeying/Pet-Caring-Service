@@ -74,11 +74,20 @@
 
                                 <br />
                                 <br />
-                                
+                                <br />
+
                                 <label for="specreq" class="col-sm-4 col-form-label"><b>Special Requirement:</b></label>
-                                <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="specreq" placeholder="Special Requirement" name="specreq">
+                                <div class="col-sm-8">
+                                    <!-- <input type="text" required="required" class="form-control" id="type" placeholder="Cat" name="type" value=""> -->
+                                    <select name="specreqtype" class="custom-select">
+                                        <% for(var i=0; i<pettype_tbl.length; i++) { %>
+                                        <option>
+                                            <%= pettype_tbl[i].name %>
+                                        </option>
+                                        <% } %>
+                                    </select>
                                 </div>
+
                             </div>
                         </div>
                         <div class="card-footer small text-muted">
@@ -91,13 +100,19 @@
                 <!-- list of pets -->
                 <div class="card mb-3">
                     <div class="card-header">
-                        <i class="fas fa-dice-d20"></i> &nbsp; Pets
+                        <i class="fas fa-dice-d20"></i> &nbsp; Your Pets
                     </div>
 
                     <% for(var i=0; i<pet_tbl.length; i++) { %>
+                        <div class="card-header">
+                            Pet <%= i + 1 %>
+                        </div>
+
                         <form method="post" action="/update_pet">
                             <div class="card">
                                 <div class="card-body">
+                                    <label for="changename" class="col-sm-10 col-form-label"><b>Current Details</b></label>
+
                                     <label for="name" class="col-sm-2 col-form-label"><b>Pet Name:</b> </label>
                                     <div class="col-sm-4">
                                         <input type="text" required="required" readonly class="form-control-plaintext" id="currname"
@@ -115,10 +130,27 @@
                                         <input type="text" readyonly class="form-control-plaintext" id="specreq" placeholder="" name="specreq">
                                     </div>
 
-                                    <label for="changename" class="col-sm-4 col-form-label"><b>Update Name:</b></label>
-                                    <div class="col-sm-12">
-                                        <input type="text" class="form-control" id="specreq" placeholder="New Name"
+                                    <hr>
+
+                                    <label for="changename" class="col-sm-10 col-form-label"><b>Update Pet Details</b></label>
+                                    
+                                    <label for="changename" class="col-sm-4 col-form-label"><b>New Name:</b></label>
+                                    <div class="col-sm-4">
+                                        <input type="text" required="required" class="form-control" id="specreq" value="<%= pet_tbl[i].name %>" placeholder="New Name"
                                             name="newname">
+                                    </div>
+
+                                    <label for="changename" class="col-sm-4 col-form-label"><b>Add Special Requirement:</b></label>
+
+                                    <div class="col-sm-8">
+                                        <!-- <input type="text" required="required" class="form-control" id="type" placeholder="Cat" name="type" value=""> -->
+                                        <select name="newspecreqtype" class="custom-select">
+                                            <% for(var j=0; j<pettype_tbl.length; j++) { %>
+                                            <option>
+                                                <%= pettype_tbl[j].name %>
+                                            </option>
+                                            <% } %>
+                                        </select>
                                     </div>
 
                                     
