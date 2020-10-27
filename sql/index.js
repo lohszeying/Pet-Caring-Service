@@ -16,7 +16,7 @@ sql.query = {
 	//Our queries
 	all_availability: 'SELECT * FROM CareTakerAvailability WHERE username=$1 ORDER BY date ASC',
 	all_caretaker_pettypeprice: 'SELECT * FROM CareTakerPricing WHERE username=$1 ORDER BY pet_type ASC',
-	all_pet_types: 'SELECT * FROM PetTypes ORDER BY pet_type ASC',
+	all_pet_types: 'SELECT * FROM PetTypes ORDER BY pet_type',
 	caretaker_fulltime_parttime: 'SELECT is_fulltime FROM CareTaker WHERE username=$1',
 	list_of_pets: 'SELECT * FROM Pet WHERE owner_username=$1',
 	list_of_specreq: 'SELECT * FROM PetSpecialRequirements WHERE owner_username=$1',
