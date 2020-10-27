@@ -73,7 +73,10 @@ sql.query = {
 }
 
 sql.admin = {
+	create_admin: 'INSERT INTO PCSAdmin (username, password, enabled) VALUES ($1, $2, true)',
 	login: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
+	month_pets_taken_care: 'SELECT COUNT(*) FROM Bids WHERE status=\'ACCEPTED\' AND start_date <= to_date($1, \'YYYY-MM\') AND start_date > to_date($1 + interval \'1 month\', \'YYYY-MM\')',
+	month_caretaker_salary: 'SELECT SUM(total_price) FROM Bids WHERE status=\'ACCEPTED\' AND start_date <= to_date($1, \'YYYY-MM\') AND start_date > to_date($1 + interval \'1 month\', \'YYYY-MM\')'
 }
 
 module.exports = sql

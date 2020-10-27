@@ -2,31 +2,32 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 
-router.get('/', function (req, res) {
+router.get('/', passport.authMiddleware(), function (req, res) {
+    res.render("admin/dashboard", {auth: true});
 });
 
-router.get('/login', function (req, res) {
-    res.render('admin/login', {error: null});
+router.get('/login', passport.antiMiddleware(), function (req, res) {
+    res.render('admin/login', {error: null, auth: false});
 });
 
-router.post('/login', function (req, res, next) {
+router.post('/login', passport.antiMiddleware(), function (req, res, next) {
     passport.authenticate('admin', (err, admin, info) => {
         const error = err || info;
         if (error) {
-            return res.render('admin/login', {error: error});
+            return res.render('admin/login', {error: error, auth: false});
         }
 
         if (admin) {
             req.logIn(admin, function (err) {
                 if (err) {
-                    return res.render('admin/login', {error: err});
+                    return res.render('admin/login', {error: err, auth: false});
                 }
 
-                return res.redirect('/admin/dashboard');
+                return res.redirect('/admin/');
             });
         }
 
-        return res.render('admin/login', {error: "Incorrect login details!"});
+        return res.render('admin/login', {error: "Incorrect login details!", auth: false});
     })(req, res, next);
 });
 

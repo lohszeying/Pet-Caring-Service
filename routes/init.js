@@ -2,6 +2,7 @@ const sql_query = require('../sql');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const adminController = require('../controllers/admin');
+const bidsController = require('../controllers/bids');
 
 // Postgre SQL Connection
 const { Pool } = require('pg');
@@ -29,7 +30,7 @@ function initRouter(app) {
 
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
-	
+
 	/* PROTECTED POST */
 	app.post('/update_info', passport.authMiddleware(), update_info);
 	app.post('/update_pass', passport.authMiddleware(), update_pass);
@@ -52,6 +53,8 @@ function initRouter(app) {
 		successRedirect: '/dashboard',
 		failureRedirect: '/'
 	}));
+
+	app.use('/bids', bidsController);
 
 	// TODO: create separate admin passport strategy
 	app.use('/admin', adminController);
@@ -181,7 +184,7 @@ function bid(req, res, next){
 										auth: true });
 								});
 							});
-				
+
 						});
 					});
 	}
@@ -207,8 +210,8 @@ function make_bid(req, res, next){
 	});
 
 }
-	
-				
+
+
 
 
 
@@ -221,7 +224,7 @@ function rating_review(req, res, next){
 // PET OWNER'S MANAGE PET
 function managepet(req, res, next) {
 	var pet_ctx = 0;
-	var pettype_tbl; 
+	var pettype_tbl;
 	var pet_tbl;
 	var allspecreq_tbl;
 	var listspecreq_tbl;
@@ -235,7 +238,7 @@ function managepet(req, res, next) {
 			pet_ctx = data.rows.length;
 			pettype_tbl = data.rows;
 		}
-		
+
 		pool.query(sql_query.query.list_of_pets, [owner_username], (err, data) => {
 			if (err) {
 				pet_tbl = [];
@@ -258,7 +261,7 @@ function managepet(req, res, next) {
 					}
 
 					basic(req, res, 'managepet', {
-						pettype_tbl: pettype_tbl, pet_tbl: pet_tbl, 
+						pettype_tbl: pettype_tbl, pet_tbl: pet_tbl,
 						specreq_tbl: allspecreq_tbl, listspecreq_tbl: listspecreq_tbl,
 						addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
 						updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
@@ -268,7 +271,7 @@ function managepet(req, res, next) {
 				});
 			});
 		});
-		
+
 	});
 
 }
@@ -278,7 +281,7 @@ function add_pet(req, res, next) {
 	var pet_type =req.body.type;
 	var specreq = req.body.specreqtype;
 	var owner_username = req.user.username;
-	
+
 	// console.log(pet_name);
 	// console.log(pet_type);
 	// console.log(owner_username);
@@ -296,7 +299,7 @@ function add_pet(req, res, next) {
 					res.redirect('/managepet?add_pet=pass');
 				}
 			});
-			
+
 		}
 	});
 
