@@ -6,11 +6,11 @@ router.get('/', passport.authMiddleware(), function (req, res) {
     res.render("admin/dashboard", {auth: true});
 });
 
-router.get('/login', function (req, res) {
+router.get('/login', passport.antiMiddleware(), function (req, res) {
     res.render('admin/login', {error: null, auth: false});
 });
 
-router.post('/login', function (req, res, next) {
+router.post('/login', passport.antiMiddleware(), function (req, res, next) {
     passport.authenticate('admin', (err, admin, info) => {
         const error = err || info;
         if (error) {
