@@ -155,6 +155,8 @@ function managepet(req, res, next) {
 	var pet_ctx = 0;
 	var pettype_tbl; 
 	var pet_tbl;
+	var allspecreq_tbl;
+	var listspecreq_tbl;
 	var owner_username = req.user.username;
 
 	pool.query(sql_query.query.all_pet_types, (err, data) => {
@@ -173,11 +175,29 @@ function managepet(req, res, next) {
 				pet_tbl = data.rows;
 			}
 
-			basic(req, res, 'managepet', {
-				pettype_tbl: pettype_tbl, pet_tbl: pet_tbl,
-				addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
-				updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
-				auth: true
+			pool.query(sql_query.query.all_specreq, (err, data) => {
+				if (err) {
+					allspecreq_tbl = [];
+				} else {
+					allspecreq_tbl = data.rows;
+				}
+
+				pool.query(sql_query.query.list_of_specreq, (err, data) => {
+					if (err) {
+						listspecreq_tbl = [];
+					} else {
+						listspecreq_tbl = data.rows;
+					}
+
+					basic(req, res, 'managepet', {
+						pettype_tbl: pettype_tbl, pet_tbl: pet_tbl, 
+						specreq_tbl: allspecreq_tbl, listspecreq_tbl: listspecreq_tbl,
+						addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
+						updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
+						auth: true
+					});
+
+				});
 			});
 		});
 		
@@ -188,8 +208,8 @@ function managepet(req, res, next) {
 function add_pet(req, res, next) {
 	var pet_name = req.body.petname;
 	var pet_type =req.body.type;
+	var specreq = req.body.specreqtype;
 	var owner_username = req.user.username;
-	//var specreq = req.body.specreq;
 	
 	// console.log(pet_name);
 	// console.log(pet_type);
@@ -200,8 +220,15 @@ function add_pet(req, res, next) {
 			console.error("Error in adding pet");
 			res.redirect('/managepet?add_pet=fail');
 		} else {
+			pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
+				if (err) {
+					console.error("Error in adding pet");
+					res.redirect('/managepet?add_pet=fail');
+				} else {
+					res.redirect('/managepet?add_pet=pass');
+				}
+			});
 			
-			res.redirect('/managepet?add_pet=pass');
 		}
 	});
 
