@@ -13,8 +13,6 @@ DROP TYPE IF EXISTS transfer_methods;
 DROP TYPE IF EXISTS payment_types;
 DROP TYPE IF EXISTS Bidstatus;
 
-DROP FUNCTION ABLETOCAREFOR(pname VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) ;
-
 CREATE TABLE PCSAdmin
 (
     username VARCHAR(64) PRIMARY KEY,
