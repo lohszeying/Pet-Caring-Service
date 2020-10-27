@@ -9,7 +9,8 @@
 
     <title>Meeple World</title>
 
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+          integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
     <link href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template-->
@@ -24,18 +25,21 @@
     <div id="content-wrapper">
         <div class="container-fluid">
             <form method="post" action="/bids/search-availability">
-            <div class="card-body">
-                <div class="form-group row">
-                    <label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
-                    <div class="col-sm-9">
-                        <input required="required" class="form-control" id="date" placeholder="2020-01-01" name="start_date" value="" type="date">
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
+                        <div class="col-sm-9">
+                            <input required="required" class="form-control" id="date" placeholder="2020-01-01"
+                                   name="start_date" value="" type="date">
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
                         <label for="date2" class="col-sm-3 col-form-label"><b>End Date:</b></label>
                         <div class="col-sm-9">
-                            <input required="required" class="form-control" id="date2" placeholder="2020-01-01" name="end_date" value="" type="date">
+                            <input required="required" class="form-control" id="date2" placeholder="2020-01-01"
+                                   name="end_date" value="" type="date">
                         </div>
                     </div>
                 </div>
@@ -44,9 +48,9 @@
                         <label for="username" class="col-sm-2 col-form-label"><b>Type of pet:</b></label>
                         <div class="col-sm-4">
                             <select name="type" class="custom-select">
-                                <% for(var i=0; i<pet_tbl.length; i++) { %>
+                                <% for(var i = 0; i < pet_tbl.length; i++) { %>
                                     <option>
-                                        <%= pet_tbl[i].name %>
+                                        <%= pet_tbl[i].pet_type %>
                                     </option>
                                 <% } %>
                             </select>
@@ -57,10 +61,6 @@
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
             </form>
-            
-        
-        </div>
-        
         </div>
     </div>
 </div>
