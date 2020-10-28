@@ -61,7 +61,7 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
 
             res.render("bids/search-availability", info);
         });
-    });S
+    });
 });
 
 module.exports = router
