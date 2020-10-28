@@ -244,7 +244,7 @@ CREATE TRIGGER FillAvailability AFTER INSERT ON CareTaker
 
 -----------------------------------------------------------------
 
-    -- automaticallly create a pet owner upon account creation
+-- automaticallly create a pet owner upon account creation
 CREATE OR REPLACE FUNCTION insert_pet_owner()
     RETURNS TRIGGER LANGUAGE plpgsql
     AS $$ 
@@ -256,6 +256,32 @@ $$;
 
 CREATE TRIGGER INSERT_ON_CREATION AFTER INSERT ON Users
     FOR EACH ROW EXECUTE PROCEDURE insert_pet_owner();
+
+---------------------------------------------------------------------
+--check if there is any bids before allowing leave
+CREATE OR REPLACE FUNCTION CHECKBEFORELEAVE()
+    RETURNS TRIGGER LANGUAGE plpgsql
+    AS $$
+    DECLARE initial INTEGER;
+    BEGIN 
+        -- check if he already have bids on the day
+        IF (SELECT EXISTS (SELECT 1 
+                        FROM Bids 
+                        WHERE OLD.username = caretaker_username AND status = 'ACCEPTED' AND OLD.date >= start_date AND OLD.date <= end_date)) THEN
+        RAISE EXCEPTION 'YOU CANNOT APPLY FOR LEAVE! YOU HAVE AN ACCEPTED BID IN THIS DAY!';
+        END IF;
+        --autoreject bids if you apply for leave
+        initial := (SELECT COUNT(*) FROM Bids WHERE status = 'PENDING');
+        Update Bids 
+        SET status = 'REJECTED' 
+        WHERE status = 'PENDING' AND OLD.username = caretaker_username AND OLD.date >= start_date AND OLD.date <= end_date;
+        
+        RAISE NOTICE 'REJECTING % Bids', initial - (SELECT COUNT(*) FROM Bids WHERE status = 'PENDING');
+        RETURN OLD;
+    END; $$;
+
+CREATE TRIGGER CHECKBEFOREDELETINGAVAILABILITY BEFORE DELETE ON CareTakerAvailability
+    FOR EACH ROW EXECUTE PROCEDURE CHECKBEFORELEAVE();
 
 ---------------------------------------------------------------
 -- Given a caretaker, year and month, get the total salary of the caretaker
@@ -333,3 +359,4 @@ BEGIN
                                 FROM generate_series(start_date, end_date, interval '1 day') AS t(day))
                                 );
 END; $$;
+

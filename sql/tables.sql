@@ -114,6 +114,19 @@ CREATE OR REPLACE FUNCTION ABLETOCAREFOR(pname VARCHAR, owner_name VARCHAR, care
 $$
 LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION ONLEAVE(cname VARCHAR, start_date date, end_date date)
+    RETURNS BOOLEAN AS 
+    $$ BEGIN 
+        RETURN EXISTS (SELECT 1 
+                            FROM generate_series(start_date, end_date, interval '1 day') AS t(day)
+                            WHERE NOT EXISTS (SELECT 1
+                                                FROM CareTakerAvailability
+                                                WHERE username = cname and date = t.day)
+                        );
+        END;
+        $$ LANGUAGE plpgsql;
+
+
 CREATE TYPE bidstatus AS ENUM ('ACCEPTED', 'PENDING', 'REJECTED');
 
 CREATE TABLE Bids
@@ -134,8 +147,9 @@ CREATE TABLE Bids
     FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, pet_name) ON UPDATE CASCADE,
     FOREIGN KEY (caretaker_username) REFERENCES CareTaker (username) ON UPDATE CASCADE,
     CONSTRAINT LEGALTIMEPERIOD CHECK (start_date <= end_date),
-    CONSTRAINT ABLETOCAREFOR CHECK (ABLETOCAREFOR(pet_name, owner_username, caretaker_username)),
-    CONSTRAINT NOFALSERATINGS CHECK (status = 'ACCEPTED' OR (rating IS NULL AND review IS NULL AND transfer_method IS NULL AND payment_type IS NULL))
+    CONSTRAINT ABLETOCAREFOR CHECK (status = 'REJECTED' OR ABLETOCAREFOR(pet_name, owner_username, caretaker_username)),
+    CONSTRAINT NOFALSERATINGS CHECK (status = 'ACCEPTED' OR (rating IS NULL AND review IS NULL AND transfer_method IS NULL AND payment_type IS NULL)),
+    CONSTRAINT NOTONLEAVE CHECK (status = 'REJECTED' OR NOT ONLEAVE(caretaker_username, start_date, end_date))
 );
 
 
