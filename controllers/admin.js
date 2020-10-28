@@ -58,7 +58,6 @@ router.post('/caretaker-stats', passport.authMiddleware(), (req, res) => {
         if (err) {
             console.error(err);
         } else {
-            console.log(data);
             info.queryResult = data.rows[0].month_total_salary;
         }
 
