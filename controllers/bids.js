@@ -58,6 +58,8 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
             } else {
                 info.caretakers = data2.rows;
             }
+            
+
 
             res.render("bids/search-availability", info);
         });

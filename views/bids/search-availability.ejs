@@ -23,8 +23,8 @@
     <%- include ../sidebar.ejs %>
 
     <div id="content-wrapper">
+        <form method="post" action="/bids/search-availability">
         <div class="container-fluid">
-            <form method="post" action="/bids/search-availability">
                 <div class="card-body">
                     <div class="form-group row">
                         <label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
@@ -57,17 +57,27 @@
                         </div>
                     </div>
                 </div>
-                <div>
-                    <% for(var i = 0; i < caretakers.length; i++) { %>
-                        <div>
-                            <%= caretakers[i].username %>
-                        </div>
-                    <% } %>
-                </div>
                 <div class="card-footer small text-muted">
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
-            </form>
+            
+            <div class="container-fluid"> 
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="ct" class="col-sm-2 col-form-label"><b>Select caretakers:</b></label>
+                        <div class="col-sm-4">
+                            <select name="type" class="custom-select">
+                                <% for(var i = 0; i < caretakers.length; i++) { %>
+                                    <option>
+                                        <%= caretakers[i].username %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>   
+            </div>
         </div>
+        </form>
     </div>
 </div>
