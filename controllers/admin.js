@@ -1,5 +1,11 @@
+require('dotenv').load();
 const express = require('express');
 const router = express.Router();
+const {Pool} = require('pg');
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+});
+const sql_query = require('../sql');
 const passport = require('passport');
 
 router.get('/', passport.authMiddleware(), function (req, res) {
@@ -29,6 +35,35 @@ router.post('/login', passport.antiMiddleware(), function (req, res, next) {
 
         return res.render('admin/login', {error: "Incorrect login details!", auth: false});
     })(req, res, next);
+});
+
+router.get('/caretaker-stats', passport.authMiddleware(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        queryResult: null
+    };
+
+    res.render('admin/caretaker-stats', info);
+});
+
+router.post('/caretaker-stats', passport.authMiddleware(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        queryResult: null
+    };
+
+    pool.query(sql_query.admin.month_caretaker_salary, [req.body['stat-date']], (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log(data);
+            info.queryResult = data.rows[0].month_total_salary;
+        }
+
+        res.render('admin/caretaker-stats', info);
+    });
 });
 
 module.exports = router
