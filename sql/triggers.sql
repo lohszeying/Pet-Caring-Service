@@ -256,3 +256,80 @@ $$;
 
 CREATE TRIGGER INSERT_ON_CREATION AFTER INSERT ON Users
     FOR EACH ROW EXECUTE PROCEDURE insert_pet_owner();
+
+---------------------------------------------------------------
+-- Given a caretaker, year and month, get the total salary of the caretaker
+CREATE OR REPLACE FUNCTION GET_SALARY(caretaker_name VARCHAR, yr INTEGER, mth INTEGER) 
+RETURNS NUMERIC(10,2) LANGUAGE plpgsql
+AS $$
+DECLARE var RECORD;
+DECLARE pet_days INTEGER;
+DECLARE extra_pay NUMERIC(10,2);
+BEGIN
+    IF (yr < 2000 OR mth > 12 OR mth < 1) THEN
+        RAISE EXCEPTION 'INVALID INPUT';
+    END IF;
+    IF ((SELECT NOT EXISTS(
+            SELECT 1 
+            FROM CareTaker
+            WHERE caretaker_name = username)) OR yr < 2000 OR mth > 12 OR mth < 1) THEN
+        RAISE EXCEPTION 'NO SUCH CARETAKER';
+    END IF;
+    IF (SELECT is_fulltime FROM CareTaker WHERE caretaker_name = username) THEN
+       
+        pet_days := 0;
+        extra_pay := 0;
+        FOR var IN SELECT total_price, (DATE_PART('day', end_date::timestamp - start_date::timestamp) + 1) AS d
+                FROM Bids 
+                 WHERE caretaker_name = caretaker_username AND status = 'ACCEPTED' 
+                 AND EXTRACT(MONTH FROM start_date) = mth AND EXTRACT(YEAR FROM start_date) = yr
+                 ORDER BY start_date ASC, (DATE_PART('day', end_date::timestamp - start_date::timestamp) + 1) ASC 
+        LOOP
+            IF (pet_days > 60) THEN
+                extra_pay = extra_pay + var.total_price * 0.8;
+            ELSEIF ((pet_days + var.d) > 60) THEN
+                extra_pay = extra_pay + (var.total_price/var.d) * (pet_days + var.d - 60);
+            ELSE
+                extra_pay = extra_pay;
+            END IF;
+            pet_days = pet_days + var.d;
+        END LOOP;
+
+        IF (pet_days > 0) THEN
+            RETURN 3000 + extra_pay;
+        ELSE
+            RETURN 0;
+        END IF;
+    ELSE
+        RETURN (SELECT 0.75 * SUM(total_price) FROM Bids 
+            WHERE caretaker_name = caretaker_username AND status = 'ACCEPTED' AND EXTRACT(MONTH FROM start_date) = mth AND EXTRACT(YEAR FROM start_date) = yr);
+    END IF;
+END; $$;
+
+-------------------------------------------------------------------------------------
+--check if caretaker is available from a particular timeframe (checks for availability AND if he can still care for more pets based on accepted bids)
+CREATE OR REPLACE FUNCTION ISAVAILABLE(ctaker VARCHAR, start_date DATE, end_date DATE) 
+RETURNS BOOLEAN LANGUAGE plpgsql
+AS $$
+DECLARE rating INTEGER;
+BEGIN
+    rating = GET_RATING(ctaker);
+    IF rating IS NULL THEN
+        RAISE EXCEPTION 'NO SUCH CARETAKER!';
+    END IF;
+    RETURN (SELECT NOT EXISTS (SELECT 1 
+                                FROM generate_series(start_date, end_date, interval '1 day') AS t(day)
+                                WHERE NOT EXISTS ( SELECT 1 
+                                                    FROM CareTakerAvailability A
+                                                    WHERE A.date = t.day AND A.username = ctaker
+                                                    )
+                                ) AND (SELECT CASE WHEN (SELECT is_fulltime FROM CareTaker WHERE username = ctaker) THEN 5
+                                WHEN rating > 4.5 THEN 5
+                                WHEN rating > 4 THEN 4
+                                WHEN rating > 3.5 THEN 3
+                                ELSE 2
+                                END ) > 
+                                ALL(SELECT GET_PETS_TAKEN_CARE_BY(ctaker, t.day::date)
+                                FROM generate_series(start_date, end_date, interval '1 day') AS t(day))
+                                );
+END; $$;
