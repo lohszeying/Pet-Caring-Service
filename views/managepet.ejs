@@ -227,48 +227,48 @@
 
                         <form method="post" action="">
                             <div class="card">
-                                <div class="card-body">
-                                    <label for="changename" class="col-sm-10 col-form-label"><b>Current Details</b></label>
+                                
+                                <!-- <label for="changename" class="col-sm-10 col-form-label"><b>Current Details</b></label> -->
 
-                                    <label for="name" class="col-sm-2 col-form-label"><b>Pet Name:</b> </label>
-                                    <div class="col-sm-4">
-                                        <input type="text" required="required" readonly class="form-control-plaintext" id="currname"
-                                            value="<%= pet_tbl[i].pet_name %>" name="currname">
-                                    </div>
+                                <label for="name" class="col-sm-2 col-form-label"><b>Pet Name:</b> </label>
+                                <div class="col-sm-4">
+                                    <input type="text" required="required" readonly class="form-control-plaintext" id="currname"
+                                        value="<%= pet_tbl[i].pet_name %>" name="currname">
+                                </div>
+                                
+                                <label for="type" class="col-sm-10 col-form-label"> <b>Pet Type:</b> </label>
+                                <div class="col-sm-4">
+                                    <input type="text" required="required" readonly class="form-control-plaintext" id="pettype"
+                                        value="<%= pet_tbl[i].pet_type %>" name="pettype">
+                                </div>
+                                
+                                <label for="status" class="col-sm-10 col-form-label"> <b>Pet Status:</b> </label>
+                                
                                     
-                                    <label for="type" class="col-sm-10 col-form-label"> <b>Pet Type:</b> </label>
-                                    <div class="col-sm-4">
-                                        <input type="text" required="required" readonly class="form-control-plaintext" id="pettype"
-                                            value="<%= pet_tbl[i].pet_type %>" name="pettype">
-                                    </div>
-                                    
-                                    <label for="status" class="col-sm-10 col-form-label"> <b>Pet Status:</b> </label>
-                                    
-                                       
-                                    <% if (pet_tbl[i].enabled === true) {%>
-                                        <label for="status" class="col-sm-4 col-form-label">
-                                            Enabled
-                                        </label>
-                                        <br>
-                                    <% } else { %>
-                                        <label for="status" class="col-sm-4 col-form-label">
-                                            Disabled
-                                        </label>
-                                        <br>
-                                    <% } %>
-                                   
+                                <% if (pet_tbl[i].enabled === true) {%>
+                                    <label for="status" class="col-sm-4 col-form-label">
+                                        Enabled
+                                    </label>
+                                    <br>
+                                <% } else { %>
+                                    <label for="status" class="col-sm-4 col-form-label">
+                                        Disabled
+                                    </label>
+                                    <br>
+                                <% } %>
+                                
 
-                                    
-                                    <label for="specreq" class="col-sm-10 col-form-label"><b>Special Requirement:</b></label>
-                                    <% for(var a=0; a<listspecreq_tbl.length; a++) { %>
-                                        <% if (listspecreq_tbl[a].pet_name === pet_tbl[i].pet_name) {%>
-                                        <label for="specreq" class="col-sm-4 col-form-label">
-                                            <%= listspecreq_tbl[a].special_requirement %>
-                                        </label>
-                                        <br>
-                                        <% } %>
+                                
+                                <label for="specreq" class="col-sm-10 col-form-label"><b>Special Requirement:</b></label>
+                                <% for(var a=0; a<listspecreq_tbl.length; a++) { %>
+                                    <% if (listspecreq_tbl[a].pet_name === pet_tbl[i].pet_name) {%>
+                                    <label for="specreq" class="col-sm-4 col-form-label">
+                                        <%= listspecreq_tbl[a].special_requirement %>
+                                    </label>
+                                    <br>
                                     <% } %>
-                                    
+                                <% } %>
+                                
                             </div>          
                         </form>
 
