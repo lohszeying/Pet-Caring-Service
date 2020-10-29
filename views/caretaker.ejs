@@ -50,29 +50,18 @@
 								<% } %>
 							</div>
 						</div>
-					</div>
-
-					<div class="card mb-3">
-						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; Salary for this month
+						<div class="form-group row">
+							<label for="name" class="col-sm-2 col-form-label"><b>Average Rating:</b></label>
+							<div class="col-sm-4">
+								<input type="text" required="required" readonly class="form-control-plaintext" id="rating" name="rating" placeholder="rating"
+									   value="<%= caretaker_rating_tbl[0].get_rating %>">
+							</div>
 						</div>
-						<div class="card-body">
-							<div class="table-responsive">
-								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-									<thead>
-									<tr>
-										<th>Salary</th>
-									</tr>
-									</thead>
-									<tbody>
-									<% for(var i=0; i<salary_tbl.length; i++) { %>
-										<tr>
-											<td><%= salary_tbl[i].get_salary %></td>
-
-										</tr>
-									<% } %>
-									</tbody>
-								</table>
+						<div class="form-group row">
+							<label for="name" class="col-sm-2 col-form-label"><b>This month's salary:</b></label>
+							<div class="col-sm-4">
+								<input type="text" required="required" readonly class="form-control-plaintext" id="salary" name="salary" placeholder="salary"
+									   value="<%= salary_tbl[0].get_salary %>">
 							</div>
 						</div>
 					</div>
