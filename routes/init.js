@@ -446,8 +446,6 @@ function caretaker(req, res, next) {
 												salary_tbl = data.rows;
 											}
 
-											console.error(salary_tbl.get_salary);
-
 											basic(req, res, 'caretaker',
 												{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
 													caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
