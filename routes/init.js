@@ -266,6 +266,8 @@ function managepet(req, res, next) {
 						specreq_tbl: allspecreq_tbl, listspecreq_tbl: listspecreq_tbl,
 						addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
 						updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
+						addreq_msg: msg(req, 'add_req', 'Requirement added successfully', 'Cannot add this requirement'),
+						updatestat_msg: msg(req, 'change_pet_status', 'Status changed successfully', 'Cannot change status'),
 						auth: true
 					});
 
@@ -280,7 +282,7 @@ function managepet(req, res, next) {
 function add_pet(req, res, next) {
 	var pet_name = req.body.petname;
 	var pet_type =req.body.type;
-	var specreq = req.body.specreqtype;
+	//var specreq = req.body.specreqtype;
 	var owner_username = req.user.username;
 
 	// console.log(pet_name);
@@ -292,14 +294,14 @@ function add_pet(req, res, next) {
 			console.error("Error in adding pet");
 			res.redirect('/managepet?add_pet=fail');
 		} else {
-			pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
-				if (err) {
-					console.error("Error in adding pet");
-					res.redirect('/managepet?add_pet=fail');
-				} else {
+			// pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
+			// 	if (err) {
+			// 		console.error("Error in adding pet");
+			// 		res.redirect('/managepet?add_pet=fail');
+			// 	} else {
 					res.redirect('/managepet?add_pet=pass');
-				}
-			});
+			// 	}
+			// });
 
 		}
 	});
