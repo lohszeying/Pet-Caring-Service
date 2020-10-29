@@ -33,6 +33,7 @@ function findUser (username, callback) {
 				name   : data.rows[0].name,
 				area    : data.rows[0].area,
                 passwordHash: data.rows[0].password,
+                isAdmin: false
 			});
 		} else {
 			console.error("More than one user?");
@@ -55,6 +56,7 @@ function findAdmin(username, callback) {
             return callback(null, {
                 username    : data.rows[0].username,
                 passwordHash: data.rows[0].password,
+                isAdmin: true
             });
         } else {
             console.error("More than one admin?");
