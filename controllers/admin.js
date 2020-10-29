@@ -1,4 +1,6 @@
 require('dotenv').load();
+const bcrypt = require('bcrypt');
+const round = 10;
 const express = require('express');
 const router = express.Router();
 const {Pool} = require('pg');
@@ -137,9 +139,37 @@ router.post('/pricing', admin_auth(), (req, res) => {
     });
 });
 
+router.get('/create-admin', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        error: null,
+        success: null
+    };
 
-router.post('/pricing', admin_auth(), (req, res) => {
+    res.render('admin/create-admin', info);
+});
 
+router.post('/create-admin', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        error: null,
+        success: null
+    };
+
+    const salt = bcrypt.genSaltSync(round);
+    const passwordHash = bcrypt.hashSync(req.body.password, salt);
+
+    pool.query(sql_query.admin.create_admin, [req.body.username, passwordHash], (err, data) => {
+        if (err) {
+            info.error = err;
+        } else {
+            info.success = "Admin created successfully.";
+        }
+
+        res.render('admin/create-admin', info);
+    });
 });
 
 module.exports = router
