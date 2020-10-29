@@ -39,6 +39,7 @@ function initRouter(app) {
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
 	app.post('/update_pet', passport.authMiddleware(), update_pet);
+	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
 	app.post('/add_req', passport.authMiddleware(), add_req);
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
@@ -265,6 +266,8 @@ function managepet(req, res, next) {
 						specreq_tbl: allspecreq_tbl, listspecreq_tbl: listspecreq_tbl,
 						addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
 						updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
+						addreq_msg: msg(req, 'add_req', 'Requirement added successfully', 'Cannot add this requirement'),
+						updatestat_msg: msg(req, 'change_pet_status', 'Status changed successfully', 'Cannot change status'),
 						auth: true
 					});
 
@@ -279,7 +282,7 @@ function managepet(req, res, next) {
 function add_pet(req, res, next) {
 	var pet_name = req.body.petname;
 	var pet_type =req.body.type;
-	var specreq = req.body.specreqtype;
+	//var specreq = req.body.specreqtype;
 	var owner_username = req.user.username;
 
 	// console.log(pet_name);
@@ -291,14 +294,14 @@ function add_pet(req, res, next) {
 			console.error("Error in adding pet");
 			res.redirect('/managepet?add_pet=fail');
 		} else {
-			pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
-				if (err) {
-					console.error("Error in adding pet");
-					res.redirect('/managepet?add_pet=fail');
-				} else {
+			// pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
+			// 	if (err) {
+			// 		console.error("Error in adding pet");
+			// 		res.redirect('/managepet?add_pet=fail');
+			// 	} else {
 					res.redirect('/managepet?add_pet=pass');
-				}
-			});
+			// 	}
+			// });
 
 		}
 	});
@@ -338,6 +341,28 @@ function add_req(req, res, next) {
 
 }
 
+function change_pet_status(req, res, next) {
+	var pet_name = req.body.name;
+	var status = req.body.status;
+	var owner_username = req.user.username;
+	var isEnabled = true;
+
+	if (status === 'enabled') {
+		isEnabled = true;
+	} else {
+		isEnabled = false;
+	}
+
+	pool.query(sql_query.query.update_pet_status, [owner_username, pet_name, isEnabled], (err, data) => {
+		if (err) {
+			console.error("Error in updating pet status");
+			res.redirect('/managepet?change_pet_status=fail');
+		} else {
+			res.redirect('/managepet?change_pet_status=pass');
+		}
+	});
+}
+
 
 //CARETAKER FUNCTION
 function caretaker(req, res, next) {
@@ -348,6 +373,9 @@ function caretaker(req, res, next) {
 	var caretaker_pet_tbl;
 	var pending_bid_tbl;
 	var accepted_bid_tbl;
+	var salary_tbl;
+	var currYear = new Date().getFullYear();
+	var currMonth = new Date().getMonth() + 1;
 
 	pool.query(sql_query.query.find_caretaker, [req.user.username], (err, data) => {
 		if (err || !data.rows || data.rows.length == 0) {
@@ -411,15 +439,24 @@ function caretaker(req, res, next) {
 											accepted_bid_tbl = data.rows;
 										}
 
-										basic(req, res, 'caretaker',
-											{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-												caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
-												pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
-												bid_msg: msg(req, 'bid', 'Bid accepted successfully', 'Error in accepting bid'),
-												date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-												caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
-												caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
-												auth: true });
+										pool.query(sql_query.query.get_salary_for_the_month, [req.user.username, currYear, currMonth], (err, data) => {
+											if (err || !data.rows || data.rows.length == 0) {
+												salary_tbl = [];
+											} else {
+												salary_tbl = data.rows;
+											}
+
+											basic(req, res, 'caretaker',
+												{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+													caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
+													pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
+													salary_tbl: salary_tbl,
+													bid_msg: msg(req, 'bid', 'Bid accepted successfully', 'Error in accepting bid'),
+													date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+													caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
+													caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
+													auth: true });
+										})
 									})
 								})
 							})
