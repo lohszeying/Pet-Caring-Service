@@ -50,25 +50,52 @@
 								<% } %>
 							</div>
 						</div>
+						<div class="form-group row">
+							<label for="name" class="col-sm-2 col-form-label"><b>Average Rating:</b></label>
+							<div class="col-sm-4">
+								<input type="text" required="required" readonly class="form-control-plaintext" id="rating" name="rating" placeholder="rating"
+									   value="<%= caretaker_rating_tbl[0].get_rating %>">
+							</div>
+						</div>
+						<div class="form-group row">
+							<label for="name" class="col-sm-2 col-form-label"><b>This month's salary:</b></label>
+							<div class="col-sm-4">
+								<input type="text" required="required" readonly class="form-control-plaintext" id="salary" name="salary" placeholder="salary"
+									   value="<%= salary_tbl[0].get_salary %>">
+							</div>
+						</div>
 					</div>
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; Salary for this month
+							<i class="fas fa-dice"></i> &nbsp; All completed bids
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
 								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
 									<thead>
 									<tr>
-										<th>Salary</th>
+										<th>Status</th>
+										<th>Total Price</th>
+										<th>Transfer Method</th>
+										<th>Payment Type</th>
+										<th>Owner username</th>
+										<th>Pet name</th>
+										<th>Start Date</th>
+										<th>End Date</th>
 									</tr>
 									</thead>
 									<tbody>
-									<% for(var i=0; i<salary_tbl.length; i++) { %>
+									<% for(var i=0; i<completed_bid_tbl.length; i++) { %>
 										<tr>
-											<td><%= salary_tbl[i].get_salary %></td>
-
+											<td><%= completed_bid_tbl[i].status %></td>
+											<td><%= completed_bid_tbl[i].total_price %></td>
+											<td><%= completed_bid_tbl[i].transfer_method %></td>
+											<td><%= completed_bid_tbl[i].payment_type %></td>
+											<td><%= completed_bid_tbl[i].owner_username %></td>
+											<td><%= completed_bid_tbl[i].pet_name %></td>
+											<td><%= completed_bid_tbl[i].start_date %></td>
+											<td><%= completed_bid_tbl[i].end_date %></td>
 										</tr>
 									<% } %>
 									</tbody>
@@ -114,6 +141,46 @@
 							</div>
 						</div>
 					</div>
+
+					<% if (accepted_bid_tbl.length > 0) { %>
+						<div class="card mb-3">
+							<div class="card-header">
+								<i class="fas fa-dice-d20"></i> &nbsp; Complete accepted bid:
+							</div>
+							<form method="post" action="/caretaker_complete_bid">
+								<div class="card-body">
+									<div class="form-group row">
+										<label for="text" class="col-sm-3 col-form-label"><b>Owner's username:</b></label>
+										<div class="col-sm-9">
+											<input required="required" class="form-control" id="owner_username" placeholder="theSuperPet" name="owner_username" value="" type="text">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
+										<div class="col-sm-9">
+											<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
+										<div class="col-sm-9">
+											<input required="required" class="form-control" id="start_date" placeholder="2020-01-01" name="start_date" value="" type="date">
+										</div>
+									</div>
+									<div class="form-group row">
+										<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
+										<div class="col-sm-9">
+											<input required="required" class="form-control" id="end_date" placeholder="2020-01-03" name="end_date" value="" type="date">
+										</div>
+									</div>
+								</div>
+								<div class="card-footer small text-muted">
+									<button type="submit" class="btn btn-secondary">Complete</button>
+									<span class="badge badge-pill badge-info"><%= complete_bid_msg %></span>
+								</div>
+							</form>
+						</div>
+					<% } %>
 
 					<div class="card mb-3">
 						<div class="card-header">
@@ -167,9 +234,9 @@
 									</div>
 								</div>
 								<div class="form-group row">
-									<label for="text" class="col-sm-3 col-form-label"><b>Type of pet:</b></label>
+									<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
 									<div class="col-sm-9">
-										<input required="required" class="form-control" id="pet_name" placeholder="cat" name="pet_name" value="" type="text">
+										<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
 									</div>
 								</div>
 								<div class="form-group row">
@@ -186,8 +253,8 @@
 								</div>
 							</div>
 							<div class="card-footer small text-muted">
-								<button type="submit" class="btn btn-secondary">Accept</button>
-								<span class="badge badge-pill badge-info"><%= bid_msg %></span>
+								<button type="submit" class="btn btn-secondary">Accept Bid</button>
+								<span class="badge badge-pill badge-info"><%= accept_bid_msg %></span>
 							</div>
 						</form>
 					</div>
@@ -209,6 +276,25 @@
 							<div class="card-footer small text-muted">
 								<button type="submit" class="btn btn-secondary">Add Date</button>
 								<span class="badge badge-pill badge-info"><%= date_msg %></span>
+							</div>
+						</form>
+					</div>
+
+					<div class="card mb-3">
+						<div class="card-header">
+							<i class="fas fa-dice-d20"></i> &nbsp; Apply for leave:
+						</div>
+						<form method="post" action="/apply_for_leave">
+							<div class="card-body">
+								<div class="form-group row">
+									<label for="date" class="col-sm-3 col-form-label"><b>Date:</b></label>
+									<div class="col-sm-9">
+										<input required="required" class="form-control" id="date" placeholder="2020-01-01" name="date" value="" type="date">
+									</div>
+								</div>
+							</div>
+							<div class="card-footer small text-muted">
+								<button type="submit" class="btn btn-secondary">Apply for leave</button>
 							</div>
 						</form>
 					</div>
@@ -281,34 +367,6 @@
 						</form>
 					</div>
 					<% } %>
-					
-					<div class="card mb-3">
-						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; Availability List
-						</div>
-						<div class="card-body">
-							<div class="table-responsive">
-								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-									<thead>
-										<tr>
-											<th>Date</th>
-										</tr>
-									</thead>
-									<tfoot>
-										<th colspan="2">Total: <i><%= ctx %></i></th>
-									</tfoot>
-									<tbody>
-										<% for(var i=0; i<tbl.length; i++) { %>
-										<tr>
-											<td><%= new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: '2-digit'}).format(tbl[i].date) %></td>
-										</tr>
-										<% } %>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="card-footer small text-muted"></div>
-					</div>
 
 					<div class="card mb-3">
 						<div class="card-header">
@@ -339,7 +397,34 @@
 						</div>
 						<div class="card-footer small text-muted"></div>
 					</div>
-
+					
+					<div class="card mb-3">
+						<div class="card-header">
+							<i class="fas fa-dice"></i> &nbsp; Availability List
+						</div>
+						<div class="card-body">
+							<div class="table-responsive">
+								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+									<thead>
+										<tr>
+											<th>Date</th>
+										</tr>
+									</thead>
+									<tfoot>
+										<th colspan="2">Total: <i><%= ctx %></i></th>
+									</tfoot>
+									<tbody>
+										<% for(var i=0; i<tbl.length; i++) { %>
+										<tr>
+											<td><%= new Intl.DateTimeFormat('en-GB', { year: 'numeric', month: 'long', day: '2-digit'}).format(tbl[i].date) %></td>
+										</tr>
+										<% } %>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="card-footer small text-muted"></div>
+					</div>
 
 				</div>
 			</div>

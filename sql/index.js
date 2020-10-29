@@ -63,6 +63,9 @@ sql.query = {
 	//get all accepted bid for caretaker
 	get_all_accepted_bids_for_caretaker: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\' AND caretaker_username = $1',
 
+	//get all accepted bid for caretaker
+	get_all_completed_bids_for_caretaker: 'SELECT * FROM Bids WHERE status = \'COMPLETED\' AND caretaker_username = $1',
+
 	//delete availability for caretaker
 	//inputs: 1. username, 2. date
 	delete_availability: 'DELETE FROM CARETAKERAVAILABILITY WHERE username = $1 AND date = $2',
@@ -74,10 +77,10 @@ sql.query = {
 	update_pet: 'UPDATE Pet SET pet_name=$2 WHERE pet_name=$1 AND owner_username=$3',
 	update_pet_status: 'UPDATE Pet SET enabled=$3 WHERE pet_name=$2 AND owner_username=$1',
 	update_caretaker_pettype_price: 'UPDATE CareTakerPricing SET price=$3 WHERE username=$1 AND pet_type=$2',
-	update_caretaker_accepted_bid: 'UPDATE Bids SET status=\'ACCEPTED\' WHERE username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
+	update_caretaker_accepted_bid: 'UPDATE Bids SET status=\'ACCEPTED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	
 	//set complete bid params: caretaker_name, owner_name, pet_name start_date, end_date
-	complete_bid: 'Update Bids SET status = \'COMPLETED\' WHERE username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
+	complete_bid: 'Update Bids SET status = \'COMPLETED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	// Search
 	search_game: 'SELECT * FROM game_list WHERE lower(gamename) LIKE $1',
 	find_caretaker: 'SELECT * FROM CareTaker WHERE username=$1',
