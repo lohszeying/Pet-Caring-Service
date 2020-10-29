@@ -1,4 +1,6 @@
 require('dotenv').load();
+const bcrypt = require('bcrypt');
+const round = 10;
 const express = require('express');
 const router = express.Router();
 const {Pool} = require('pg');
@@ -7,8 +9,9 @@ const pool = new Pool({
 });
 const sql_query = require('../sql');
 const passport = require('passport');
+const admin_auth = require('../auth/admin-auth');
 
-router.get('/', passport.authMiddleware(), function (req, res) {
+router.get('/', admin_auth(), function (req, res) {
     res.render("admin/dashboard", {auth: true});
 });
 
@@ -37,7 +40,7 @@ router.post('/login', passport.antiMiddleware(), function (req, res, next) {
     })(req, res, next);
 });
 
-router.get('/caretaker-stats', passport.authMiddleware(), (req, res) => {
+router.get('/caretaker-stats', admin_auth(), (req, res) => {
     const info = {
         user: req.user.username,
         auth: true,
@@ -47,7 +50,7 @@ router.get('/caretaker-stats', passport.authMiddleware(), (req, res) => {
     res.render('admin/caretaker-stats', info);
 });
 
-router.post('/caretaker-stats', passport.authMiddleware(), (req, res) => {
+router.post('/caretaker-stats', admin_auth(), (req, res) => {
     const info = {
         user: req.user.username,
         auth: true,
@@ -65,7 +68,7 @@ router.post('/caretaker-stats', passport.authMiddleware(), (req, res) => {
     });
 });
 
-router.get('/pet-stats', passport.authMiddleware(), (req, res) => {
+router.get('/pet-stats', admin_auth(), (req, res) => {
     const info = {
         user: req.user.username,
         auth: true,
@@ -75,7 +78,7 @@ router.get('/pet-stats', passport.authMiddleware(), (req, res) => {
     res.render('admin/pet-stats', info);
 });
 
-router.post('/pet-stats', passport.authMiddleware(), (req, res) => {
+router.post('/pet-stats', admin_auth(), (req, res) => {
     const info = {
         user: req.user.username,
         auth: true,
@@ -93,7 +96,7 @@ router.post('/pet-stats', passport.authMiddleware(), (req, res) => {
     });
 });
 
-router.get('/pricing', passport.authMiddleware(), (req, res) => {
+router.get('/pricing', admin_auth(), (req, res) => {
     const info = {
         user: req.user.username,
         auth: true,
@@ -112,7 +115,7 @@ router.get('/pricing', passport.authMiddleware(), (req, res) => {
 
 });
 
-router.post('/pricing', passport.authMiddleware(), (req, res) => {
+router.post('/pricing', admin_auth(), (req, res) => {
     const info = {
         user: req.user.username,
         auth: true,
@@ -133,6 +136,39 @@ router.post('/pricing', passport.authMiddleware(), (req, res) => {
 
             res.render('admin/pricing', info);
         });
+    });
+});
+
+router.get('/create-admin', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        error: null,
+        success: null
+    };
+
+    res.render('admin/create-admin', info);
+});
+
+router.post('/create-admin', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        error: null,
+        success: null
+    };
+
+    const salt = bcrypt.genSaltSync(round);
+    const passwordHash = bcrypt.hashSync(req.body.password, salt);
+
+    pool.query(sql_query.admin.create_admin, [req.body.username, passwordHash], (err, data) => {
+        if (err) {
+            info.error = err;
+        } else {
+            info.success = "Admin created successfully.";
+        }
+
+        res.render('admin/create-admin', info);
     });
 });
 
