@@ -121,6 +121,7 @@
 										<th>Pet name</th>
 										<th>Start Date</th>
 										<th>End Date</th>
+										<th>Complete!</th>
 									</tr>
 									</thead>
 									<tbody>
@@ -133,7 +134,16 @@
 											<td><%= accepted_bid_tbl[i].owner_username %></td>
 											<td><%= accepted_bid_tbl[i].pet_name %></td>
 											<td><%= accepted_bid_tbl[i].start_date %></td>
-											<td><%= accepted_bid_tbl[i].end_date %></td>
+											<td><%=accepted_bid_tbl[i].end_date %></td>
+											<td><form method="post" action="/caretaker_complete_bid">
+												<input type="hidden" id=<%="owner_username" + i%> name="owner_username" value=<%= accepted_bid_tbl[i].owner_username %>>
+												<input type="hidden" id=<%="pet_name" + i%> name="pet_name" value=<%= accepted_bid_tbl[i].pet_name %>>
+												<input type="hidden" id=<%="start_date"  + i%> name="start_date" value=<%= getDateString(accepted_bid_tbl[i].start_date) %>>
+												<input type="hidden" id=<%="end_date"  + i%> name="end_date" value=<%= getDateString(accepted_bid_tbl[i].end_date) %>>
+												<button type="submit" class="btn btn-secondary">Complete</button>
+											</form>
+												</td>
+												</tr>
 										</tr>
 									<% } %>
 									</tbody>
@@ -199,6 +209,8 @@
 										<th>Pet name</th>
 										<th>Start Date</th>
 										<th>End Date</th>
+										<th>Accept!</th>
+										<th>Reject!</th>
 									</tr>
 									</thead>
 									<tbody>
@@ -212,6 +224,20 @@
 											<td><%= pending_bid_tbl[i].pet_name %></td>
 											<td><%= pending_bid_tbl[i].start_date %></td>
 											<td><%= pending_bid_tbl[i].end_date %></td>
+											<td><form method="post" action="/caretaker_accept_bid">
+												<input type="hidden" id=<%="powner_username" + i%> name="owner_username" value=<%= pending_bid_tbl[i].owner_username %>>
+												<input type="hidden" id=<%="ppet_name" + i%> name="pet_name" value=<%= pending_bid_tbl[i].pet_name %>>
+												<input type="hidden" id=<%="pstart_date"  + i%> name="start_date" value=<%= getDateString(pending_bid_tbl[i].start_date) %>>
+												<input type="hidden" id=<%="pend_date"  + i%> name="end_date" value=<%= getDateString(pending_bid_tbl[i].end_date) %>>
+												<button type="submit" class="btn btn-secondary">ACCEPT</button>
+											</form></td>
+											<td><form method="post" action="/caretaker_reject_bid">
+												<input type="hidden" id=<%="powner_username" + i%> name="owner_username" value=<%= pending_bid_tbl[i].owner_username %>>
+												<input type="hidden" id=<%="ppet_name" + i%> name="pet_name" value=<%= pending_bid_tbl[i].pet_name %>>
+												<input type="hidden" id=<%="pstart_date"  + i%> name="start_date" value=<%= getDateString(pending_bid_tbl[i].start_date) %>>
+												<input type="hidden" id=<%="pend_date"  + i%> name="end_date" value=<%= getDateString(pending_bid_tbl[i].end_date) %>>
+												<button type="submit" class="btn btn-secondary">REJECT</button>
+											</form></td>
 										</tr>
 									<% } %>
 									</tbody>
