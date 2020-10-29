@@ -65,4 +65,47 @@ router.post('/caretaker-stats', passport.authMiddleware(), (req, res) => {
     });
 });
 
+router.get('/pricing', passport.authMiddleware(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        petTypePricing: null
+    };
+
+    pool.query(sql_query.admin.get_pet_type_pricing, (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            info.petTypePricing = data.rows;
+        }
+
+        res.render('admin/pricing', info);
+    });
+
+});
+
+router.post('/pricing', passport.authMiddleware(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        petTypePricing: null
+    };
+
+    pool.query(sql_query.admin.update_pet_type_pricing, [req.body.pet_type, req.body.base_price], (err, data) => {
+        if (err) {
+            console.error(err);
+        }
+
+        pool.query(sql_query.admin.get_pet_type_pricing, (err2, data2) => {
+            if (err2) {
+                console.error(err2);
+            } else {
+                info.petTypePricing = data2.rows;
+            }
+
+            res.render('admin/pricing', info);
+        });
+    });
+});
+
 module.exports = router

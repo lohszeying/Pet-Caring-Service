@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include partials/header.ejs %>
+</head>
+<body>
+<% include partials/navbar.ejs %>
+<div class="container">
+    <% if(petTypePricing != null) { %>
+        <div class="row">
+            <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+                <div class="card">
+                    <div class="card-header">Pet Type Pricing</div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <td>Pet Type</td>
+                                <td colspan="2">Base Price</td>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <% petTypePricing.forEach(petTypePrice => { %>
+                                <tr>
+                                    <form method="post" action="/admin/pricing">
+                                        <td><%= petTypePrice.pet_type %></td>
+                                        <td><input type="number" name="base_price"
+                                                   value="<%= petTypePrice.base_price %>" step="any"/></td>
+                                        <td>
+                                            <button class="btn btn-primary" type="submit">Update</button>
+                                        </td>
+                                        <input type="hidden" name="pet_type" value="<%= petTypePrice.pet_type %>">
+                                    </form>
+                                </tr>
+                            <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
