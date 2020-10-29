@@ -42,10 +42,12 @@ function initRouter(app) {
 	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
 	app.post('/add_req', passport.authMiddleware(), add_req);
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
+	app.post('/apply_for_leave', passport.authMiddleware(), apply_for_leave);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
 	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
 	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
 	app.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker_accept_bid);
+	app.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker_complete_bid);
 	app.post('/make_bid', passport.authMiddleware(), make_bid);
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -373,6 +375,7 @@ function caretaker(req, res, next) {
 	var caretaker_pet_tbl;
 	var pending_bid_tbl;
 	var accepted_bid_tbl;
+	var completed_bid_tbl;
 	var salary_tbl;
 	var currYear = new Date().getFullYear();
 	var currMonth = new Date().getMonth() + 1;
@@ -453,18 +456,28 @@ function caretaker(req, res, next) {
 												} else {
 													caretaker_rating_tbl = data.rows;
 												}
-												
 
-												basic(req, res, 'caretaker',
-													{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-														caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
-														pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
-														salary_tbl: salary_tbl, caretaker_rating_tbl: caretaker_rating_tbl,
-														bid_msg: msg(req, 'bid', 'Bid accepted successfully', 'Error in accepting bid'),
-														date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-														caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
-														caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
-														auth: true });
+												pool.query(sql_query.query.get_all_completed_bids_for_caretaker, [req.user.username], (err, data) => {
+													if (err || !data.rows || data.rows.length == 0) {
+														completed_bid_tbl = [];
+													} else {
+														completed_bid_tbl = data.rows;
+													}
+
+													basic(req, res, 'caretaker',
+														{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+															caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
+															pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
+															salary_tbl: salary_tbl, caretaker_rating_tbl: caretaker_rating_tbl,
+															completed_bid_tbl: completed_bid_tbl,
+															accept_bid_msg: msg(req, 'accept-bid', 'Bid accepted successfully', 'Error in accepting bid'),
+															complete_bid_msg: msg(req, 'complete-bid', 'Bid completed successfully', 'Error in completing bid'),
+															date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+															caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
+															caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
+															caretaker_apply_leave_msg: msg(req, 'apply-leave', 'Successfully applied for leave', 'Failed in applying leave'),
+															auth: true });
+												})
 											})
 										})
 									})
@@ -632,6 +645,26 @@ function add_availability(req, res, next) {
 	});
 }
 
+function apply_for_leave(req, res, next) {
+	var username = req.user.username;
+	var date = req.body.date;
+
+	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
+		if (data.rowCount == 0) {
+			add_caretaker(req, res, next);
+		}
+		pool.query(sql_query.query.delete_availability, [username, date], (err, data) => {
+			if (err) {
+				console.error("Error in applying for leave, ERROR: " + err);
+				res.redirect('/caretaker?apply-leave=fail');
+			} else {
+				res.redirect('/caretaker?apply-leave=pass');
+			}
+		})
+
+	});
+}
+
 //Only add pet-type for caretaker
 function add_caretaker_type_of_pet(req, res, next) {
 	var username = req.user.username;
@@ -740,9 +773,27 @@ function caretaker_accept_bid(req, res, next) {
 	pool.query(sql_query.query.update_caretaker_accepted_bid, [username, owner_username, pet_name, start_date, end_date], (err, data) => {
 		if (err) {
 			console.error("Error in accepting bid, ERROR: " + err);
-			res.redirect('/caretaker?bid=fail');
+			res.redirect('/caretaker?accept-bid=fail');
 		} else {
-			res.redirect('/caretaker?bid=pass');
+			res.redirect('/caretaker?accept-bid=pass');
+		}
+	});
+}
+
+//from accept to complete
+function caretaker_complete_bid(req, res, next) {
+	var username = req.user.username;
+	var owner_username = req.body.owner_username;
+	var pet_name = req.body.pet_name;
+	var start_date = req.body.start_date;
+	var end_date = req.body.end_date;
+
+	pool.query(sql_query.query.complete_bid, [username, owner_username, pet_name, start_date, end_date], (err, data) => {
+		if (err) {
+			console.error("Error in completing bid, ERROR: " + err);
+			res.redirect('/caretaker?complete-bid=fail');
+		} else {
+			res.redirect('/caretaker?complete-bid=pass');
 		}
 	});
 }
