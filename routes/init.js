@@ -39,6 +39,7 @@ function initRouter(app) {
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
 	app.post('/update_pet', passport.authMiddleware(), update_pet);
+	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
 	app.post('/add_req', passport.authMiddleware(), add_req);
 	app.post('/add_availability', passport.authMiddleware(), add_availability);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
@@ -336,6 +337,28 @@ function add_req(req, res, next) {
 		}
 	});
 
+}
+
+function change_pet_status(req, res, next) {
+	var pet_name = req.body.name;
+	var status = req.body.status;
+	var owner_username = req.user.username;
+	var isEnabled = true;
+
+	if (status === 'enabled') {
+		isEnabled = true;
+	} else {
+		isEnabled = false;
+	}
+
+	pool.query(sql_query.query.update_pet_status, [owner_username, pet_name, isEnabled], (err, data) => {
+		if (err) {
+			console.error("Error in updating pet status");
+			res.redirect('/managepet?change_pet_status=fail');
+		} else {
+			res.redirect('/managepet?change_pet_status=pass');
+		}
+	});
 }
 
 
