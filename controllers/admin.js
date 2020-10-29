@@ -65,6 +65,34 @@ router.post('/caretaker-stats', passport.authMiddleware(), (req, res) => {
     });
 });
 
+router.get('/pet-stats', passport.authMiddleware(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        queryResult: null
+    };
+
+    res.render('admin/pet-stats', info);
+});
+
+router.post('/pet-stats', passport.authMiddleware(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        queryResult: null
+    };
+
+    pool.query(sql_query.admin.month_pets_taken_care, [req.body['stat-date']], (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            info.queryResult = data.rows[0].month_pet_count;
+        }
+
+        res.render('admin/pet-stats', info);
+    });
+});
+
 router.get('/pricing', passport.authMiddleware(), (req, res) => {
     const info = {
         user: req.user.username,
