@@ -453,8 +453,7 @@ function caretaker(req, res, next) {
 												} else {
 													caretaker_rating_tbl = data.rows;
 												}
-
-												console.error(caretaker_rating_tbl[0].get_rating);
+												
 
 												basic(req, res, 'caretaker',
 													{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
