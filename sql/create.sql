@@ -108,6 +108,8 @@ $$;
 DELETE FROM CARETAKERAVAILABILITY WHERE username = '400' AND date = '2020-09-09';
 INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-09');
 INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-08');
+INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-02');
+INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-01');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('6','4','400','2020-08-09', '2020-08-30');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('1','4','400','2020-08-09', '2020-08-30');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('2','4','400','2020-08-09', '2020-08-30');
@@ -119,7 +121,8 @@ INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_d
 DELETE FROM CARETAKERAVAILABILITY WHERE username = '401' AND date = '2020-08-09';
 --suppose to return constrain error
 UPDATE Bids SET status = 'ACCEPTED' WHERE owner_username = '1';
+UPDATE Bids SET (status, rating) = ('COMPLETED',5) WHERE owner_username = '6';
 
 SELECT * FROM BIDS;
 SELECT GET_SALARY('400', 2020, 08);
-SELECT username, ISAVAILABLE(username,'2020-08-08', '2020-08-10') FROM caretaker LIMIT 10;
+SELECT * FROM ALLAVAILABLE('2020-08-01' ,'2020-08-02', '10', '4') LIMIT 10;
