@@ -373,6 +373,9 @@ function caretaker(req, res, next) {
 	var caretaker_pet_tbl;
 	var pending_bid_tbl;
 	var accepted_bid_tbl;
+	var salary_tbl;
+	var currYear = new Date().getFullYear();
+	var currMonth = new Date().getMonth() + 1;
 
 	pool.query(sql_query.query.find_caretaker, [req.user.username], (err, data) => {
 		if (err || !data.rows || data.rows.length == 0) {
@@ -436,15 +439,24 @@ function caretaker(req, res, next) {
 											accepted_bid_tbl = data.rows;
 										}
 
-										basic(req, res, 'caretaker',
-											{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-												caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
-												pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
-												bid_msg: msg(req, 'bid', 'Bid accepted successfully', 'Error in accepting bid'),
-												date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-												caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
-												caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
-												auth: true });
+										pool.query(sql_query.query.get_salary_for_the_month, [req.user.username, currYear, currMonth], (err, data) => {
+											if (err || !data.rows || data.rows.length == 0) {
+												salary_tbl = [];
+											} else {
+												salary_tbl = data.rows;
+											}
+
+											basic(req, res, 'caretaker',
+												{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
+													caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
+													pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
+													salary_tbl: salary_tbl,
+													bid_msg: msg(req, 'bid', 'Bid accepted successfully', 'Error in accepting bid'),
+													date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
+													caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
+													caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
+													auth: true });
+										})
 									})
 								})
 							})
