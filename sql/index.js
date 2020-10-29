@@ -95,7 +95,7 @@ sql.admin = {
 	login: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
 	get_pet_type_pricing: 'SELECT * FROM PetTypes ORDER BY pet_type',
 	update_pet_type_pricing: 'UPDATE PetTypes SET base_price=$2 WHERE pet_type=$1',
-	month_pets_taken_care: 'SELECT COUNT(*) FROM Bids WHERE status=\'ACCEPTED\' AND start_date <= to_date($1, \'YYYY-MM\') AND start_date > to_date($1 + interval \'1 month\', \'YYYY-MM\')',
+	month_pets_taken_care: 'SELECT COUNT(*) FROM Bids WHERE status=\'ACCEPTED\' AND start_date BETWEEN cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\')) as date) AND (cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\'))  + interval \'1 month\' as date))',
 	month_caretaker_salary: 'SELECT COALESCE(SUM(total_price), 0.0) AS month_total_salary ' +
 		'FROM Bids ' +
 		'WHERE status = \'ACCEPTED\' ' +
