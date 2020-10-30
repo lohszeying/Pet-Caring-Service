@@ -25,7 +25,8 @@ function initRouter(app) {
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), caretaker);
-	app.get('/bid',passport.authMiddleware(), bid);
+	app.get('/current_bids',passport.authMiddleware(), current_bids);
+	app.get('/past_bids', passport.authMiddleware(), past_bids);
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 
 	app.get('/register' , passport.antiMiddleware(), register );
@@ -147,50 +148,23 @@ function dashboard(req, res, next) {
 }
 
 //BID FUNCTION 
-function bid(req, res, next){
-	var pet_ctx = 0, pet_tbl;
-	var caretaker_tbl; tm_tb1; pt_tb1;
+function current_bids(req, res, next){
+	basic(req, res, 'current_bids',
+		{
+			page: current_bids,
+			auth: true
+		});
+	
+}
 
-		pool.query(sql_query.query.all_pet_types, (err, data) => {
-						if (err || !data.rows || data.rows.length == 0) {
-							pet_ctx = 0;
-							pet_tbl = [];
-						} else {
-							pet_ctx = data.rows.length;
-							pet_tbl = data.rows;
-						}
+function past_bids(req, res, next) {
+	basic(req, res, 'past_bids',
+		{
+			page: past_bids,
+			auth: true
+		});
 
-						pool.query(sql_query.query.all_caretaker, (err, data) => {
-							if (err || !data.rows || data.rows.length == 0) {
-								caretaker_tbl = [];
-							} else {
-								caretaker_tbl = data.rows;
-							}
-
-							pool.query(sql_query.query.all_transfer_methods, (err, data) => {
-								if (err || !data.rows || data.rows.length == 0) {
-									tm_tb1 = [];
-								} else {
-									tm_tb1 = data.rows;
-								}
-								pool.query(sql_query.query.all_payment_types, (err, data) => {
-									if (err || !data.rows || data.rows.length == 0) {
-										pt_tb1 = [];
-									} else {
-										pt_tb1 = data.rows;
-									}
-
-								basic(req, res, 'bid',
-									{ pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-										caretaker_tbl: caretaker_tbl, tm_tb1:tm_tb1 , pt_tb1:pt_tb1,
-										makebid_msg: msg(req, 'make_bid', 'Pending Bid made successfully ', 'Bid is not made'),
-										auth: true });
-								});
-							});
-
-						});
-					});
-	}
+}
 
 
 function make_bid(req, res, next){

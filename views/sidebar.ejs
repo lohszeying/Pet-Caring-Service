@@ -22,12 +22,26 @@
 			<i class="fas fa-fw fa-trophy"></i>
 			<span>Take care of other pets</span></a>
 	</li>
-	<li class="nav-item">
+	<li class="nav-item <%= page==="bids/search-availability" ? "active" : "" %>" >
 		<a class="nav-link <%= page==="bids/search-availability" ? "active" : "" %>" href="<%= page==="bids/search-availability" ? "#" : "/bids/search-availability" %>">
 			<i class="fas fa-file-signature"></i>
 			<span>Make a bid </span></a>
-    </li>	
-	<li class="nav-item">
+	</li>	
+	
+	<li class="nav-item <%= page==="current_bids" ? "active" : "" %>">
+		<a class="nav-link"
+			href="<%= page==="current_bids" ? "#" : "/current_bids" %>">
+			<i class="fas fa-file-signature"></i>
+			<span>Your current bids </span></a>
+	</li>
+
+	<li class="nav-item <%= page==="past_bids" ? "active" : "" %>">
+		<a class="nav-link <%= page==="past_bids" ? "active" : "" %>" href="<%= page==="past_bids" ? "#" : "/past_bids" %>">
+			<i class="fas fa-file-signature"></i>
+			<span>Your past bids </span></a>
+	</li>
+
+	<li class="nav-item <%= page==="rating_review" ? "active" : "" %>">
 	<a class="nav-link <%= page==="rating_review" ? "active" : "" %>" href="<%= page==="rating_review" ? "#" : "/rating_review" %>">
 		<i class="fas fa-fw fa-trophy"></i>
 		<span>Rating & Review</span></a>
