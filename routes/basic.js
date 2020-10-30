@@ -21,6 +21,12 @@ function msg(req, fld, pass, fail) {
 	return info ? (info=='pass' ? pass : fail) : '';
 }
 
+function msg2(req, fld, messages) {
+	var info = query(req,fld);
+	return info && (info in messages) ? (messages[info]) : '';
+}
+
 module.exports = {basic: basic,
                 query: query,
-                msg: msg};
+				msg: msg,
+				msg2: msg2};
