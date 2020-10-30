@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <% include partials/header.ejs %>
+</head>
+<body>
+<% include partials/navbar.ejs %>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 offset-lg-4 col-md-6 offset-md-3">
+            <div class="card">
+                <div class="card-header">Month With Highest Jobs</div>
+                <div class="card-body">
+                    <form method="post" action="/admin/job-stats">
+                        <div class="form-group">
+                            <label for="stat-date">Year Date</label>
+                            <input type="date" id="stat-date" class="form-control" placeholder="Stat Date"
+                                   required="required" autofocus="autofocus" name="stat-date">
+                        </div>
+                        <button class="btn btn-primary" type="submit">Query</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <% if(queryResult != null) { %>
+        <div class="row">
+            <div class="col-lg-4 offset-lg-4 col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-header">Month With Highest Jobs</div>
+                    <div class="card-body">
+                        <p class="lead">Month:&nbsp;<%= queryResult.month %></p>
+                        <p class="lead">Count:&nbsp;<%= queryResult.count %></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
