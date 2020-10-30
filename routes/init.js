@@ -17,14 +17,14 @@ const salt  = bcrypt.genSaltSync(round);
 function initRouter(app) {
 	/* GET */
 	app.get('/'      , index );
-	app.get('/search', search);
+	//app.get('/search', search);
 
 	/* PROTECTED GET */
-	app.get('/dashboard', passport.authMiddleware(), dashboard);
+	app.get('/dashboard', passport.authMiddleware(), require('./dashboard').dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
-	app.get('/caretaker', passport.authMiddleware(), caretaker);
+	app.get('/caretaker', passport.authMiddleware(), require('./caretaker').caretaker);
 	app.get('/bid',passport.authMiddleware(), bid);
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 
@@ -32,22 +32,23 @@ function initRouter(app) {
 	app.get('/password' , passport.antiMiddleware(), retrieve );
 
 	/* PROTECTED POST */
-	app.post('/update_info', passport.authMiddleware(), update_info);
-	app.post('/update_pass', passport.authMiddleware(), update_pass);
-	app.post('/update_credcard', passport.authMiddleware(), update_credcard);
+	app.post('/update_info', passport.authMiddleware(), require('./dashboard').update_info);
+	app.post('/update_pass', passport.authMiddleware(), require('./dashboard').update_pass);
+	app.post('/update_credcard', passport.authMiddleware(), require('./dashboard').update_credcard);
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
 	app.post('/update_pet', passport.authMiddleware(), update_pet);
 	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
 	app.post('/add_req', passport.authMiddleware(), add_req);
-	app.post('/add_availability', passport.authMiddleware(), add_availability);
-	app.post('/apply_for_leave', passport.authMiddleware(), apply_for_leave);
-	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
-	app.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
-	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
-	app.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker_accept_bid);
-	app.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker_complete_bid);
+	app.post('/add_availability', passport.authMiddleware(), require('./caretaker').add_availability);
+	app.post('/apply_for_leave', passport.authMiddleware(), require('./caretaker').apply_for_leave);
+	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), require('./caretaker').add_caretaker_type_of_pet);
+	app.post('/add_caretaker', passport.authMiddleware(), require('./dashboard').update_caretaker_status);
+	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), require('./caretaker').edit_caretaker_price_of_pet);
+	app.post('/caretaker_accept_bid', passport.authMiddleware(), require('./caretaker').caretaker_accept_bid);
+	app.post('/caretaker_reject_bid', passport.authMiddleware(), require('./caretaker').caretaker_reject_bid);
+	app.post('/caretaker_complete_bid', passport.authMiddleware(), require('./caretaker').caretaker_complete_bid);
 	app.post('/make_bid', passport.authMiddleware(), make_bid);
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -92,33 +93,14 @@ function msg(req, fld, pass, fail) {
 }
 
 // GET
-function index(req, res, next) {
-	var ctx = 0, idx = 0, tbl, total;
-	if(Object.keys(req.query).length > 0 && req.query.p) {
-		idx = req.query.p-1;
+function index(req, res, next) {	
+	if(!req.isAuthenticated()) {
+		res.render('index', { page: '', auth: false});
+	} else {
+			basic(req, res, 'index', { page: '', auth: true});
 	}
-	pool.query(sql_query.query.page_lims, [idx*10], (err, data) => {
-		if(err || !data.rows || data.rows.length == 0) {
-			tbl = [];
-		} else {
-			tbl = data.rows;
-		}
-		pool.query(sql_query.query.ctx_games, (err, data) => {
-			if(err || !data.rows || data.rows.length == 0) {
-				ctx = 0;
-			} else {
-				ctx = data.rows[0].count;
-			}
-			total = ctx%10 == 0 ? ctx/10 : (ctx - (ctx%10))/10 + 1;
-			console.log(idx*10, idx*10+10, total);
-			if(!req.isAuthenticated()) {
-				res.render('index', { page: '', auth: false, tbl: tbl, ctx: ctx, p: idx+1, t: total });
-			} else {
-				basic(req, res, 'index', { page: '', auth: true, tbl: tbl, ctx: ctx, p: idx+1, t: total });
-			}
-		});
-	});
 }
+/*
 function search(req, res, next) {
 	var ctx  = 0, avg = 0, tbl;
 	var game = "%" + req.query.gamename.toLowerCase() + "%";
@@ -137,14 +119,8 @@ function search(req, res, next) {
 		}
 	});
 }
-function dashboard(req, res, next) {
-	basic(req, res, 'dashboard', {
-		cannot_go_to_caretaker_page_msg: msg(req, 'add-caretaker', '', 'You are not a caretaker. You can only view caretaker page if you are a caretaker. You can enable it below.'),
-		caretaker_add_msg: msg(req, 'caretaker', 'You are now a caretaker', 'Error in updating caretaker status. You are already a caretaker.'),
-		info_msg: msg(req, 'info', 'Information updated successfully', 'Error in updating information'),
-		credcard_msg: msg(req, 'credcard', 'Credit card updated successfully', 'Error in updating credit card'),
-		pass_msg: msg(req, 'pass', 'Password updated successfully', 'Error in updating password'), auth: true });
-}
+*/
+
 
 //BID FUNCTION 
 function bid(req, res, next){
@@ -366,132 +342,6 @@ function change_pet_status(req, res, next) {
 }
 
 
-//CARETAKER FUNCTION
-function caretaker(req, res, next) {
-	var ctx = 0, avg = 0, tbl;
-	var ctx2 = 0, tbl2;
-	var pet_ctx = 0, pet_tbl;
-	var caretaker_tbl;
-	var caretaker_pet_tbl;
-	var pending_bid_tbl;
-	var accepted_bid_tbl;
-	var completed_bid_tbl;
-	var salary_tbl;
-	var currYear = new Date().getFullYear();
-	var currMonth = new Date().getMonth() + 1;
-	var caretaker_rating_tbl;
-
-	pool.query(sql_query.query.find_caretaker, [req.user.username], (err, data) => {
-		if (err || !data.rows || data.rows.length == 0) {
-			//Not a caretaker
-			console.error("NOT A CARETAKER");
-
-			res.redirect('/dashboard?add-caretaker=fail');
-		} else {
-			pool.query(sql_query.query.all_availability, [req.user.username], (err, data) => {
-				if(err || !data.rows || data.rows.length == 0) {
-					ctx = 0;
-					tbl = [];
-				} else {
-					ctx = data.rows.length;
-					tbl = data.rows;
-				}
-
-				pool.query(sql_query.query.all_caretaker_pettypeprice, [req.user.username], (err, data) => {
-					if(err || !data.rows || data.rows.length == 0) {
-						ctx2 = 0;
-						tbl2 = [];
-					} else {
-						ctx2 = data.rows.length;
-						tbl2 = data.rows;
-					}
-
-					pool.query(sql_query.query.all_pet_types, (err, data) => {
-						if (err || !data.rows || data.rows.length == 0) {
-							pet_ctx = 0;
-							pet_tbl = [];
-						} else {
-							pet_ctx = data.rows.length;
-							pet_tbl = data.rows;
-						}
-
-						pool.query(sql_query.query.caretaker_fulltime_parttime, [req.user.username], (err, data) => {
-							if (err || !data.rows || data.rows.length == 0) {
-								caretaker_tbl = [];
-							} else {
-								caretaker_tbl = data.rows;
-							}
-
-							pool.query(sql_query.query.all_caretaker_pettypeprice, [req.user.username], (err, data) => {
-								if (err || !data.rows || data.rows.length == 0) {
-									caretaker_pet_tbl = [];
-								} else {
-									caretaker_pet_tbl = data.rows;
-								}
-
-								pool.query(sql_query.query.get_pending_bids_for_caretaker, [req.user.username], (err, data) => {
-									if (err || !data.rows || data.rows.length == 0) {
-										pending_bid_tbl = [];
-									} else {
-										pending_bid_tbl = data.rows;
-									}
-
-									pool.query(sql_query.query.get_all_accepted_bids_for_caretaker, [req.user.username], (err, data) => {
-										if (err || !data.rows || data.rows.length == 0) {
-											accepted_bid_tbl = [];
-										} else {
-											accepted_bid_tbl = data.rows;
-										}
-
-										pool.query(sql_query.query.get_salary_for_the_month, [req.user.username, currYear, currMonth], (err, data) => {
-											if (err || !data.rows || data.rows.length == 0) {
-												salary_tbl = [];
-											} else {
-												salary_tbl = data.rows;
-											}
-
-											pool.query(sql_query.query.get_rating, [req.user.username], (err, data) => {
-												if (err || !data.rows || data.rows.length == 0) {
-													caretaker_rating_tbl = [];
-												} else {
-													caretaker_rating_tbl = data.rows;
-												}
-
-												pool.query(sql_query.query.get_all_completed_bids_for_caretaker, [req.user.username], (err, data) => {
-													if (err || !data.rows || data.rows.length == 0) {
-														completed_bid_tbl = [];
-													} else {
-														completed_bid_tbl = data.rows;
-													}
-
-													basic(req, res, 'caretaker',
-														{ ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-															caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
-															pending_bid_tbl: pending_bid_tbl, accepted_bid_tbl: accepted_bid_tbl,
-															salary_tbl: salary_tbl, caretaker_rating_tbl: caretaker_rating_tbl,
-															completed_bid_tbl: completed_bid_tbl,
-															accept_bid_msg: msg(req, 'accept-bid', 'Bid accepted successfully', 'Error in accepting bid'),
-															complete_bid_msg: msg(req, 'complete-bid', 'Bid completed successfully', 'Error in completing bid'),
-															date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-															caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
-															caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
-															caretaker_apply_leave_msg: msg(req, 'apply-leave', 'Successfully applied for leave', 'Failed in applying leave'),
-															auth: true });
-												})
-											})
-										})
-									})
-								})
-							})
-						})
-					})
-				});
-			});
-		}
-	});
-
-
-}
 
 /*function games(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
@@ -545,72 +395,6 @@ function retrieve(req, res, next) {
 
 
 // POST 
-function update_info(req, res, next) {
-	var username  = req.user.username;
-	var name = req.body.name;
-	var area = req.body.area;
-	//var firstname = req.body.firstname;
-	//var lastname  = req.body.lastname;
-	pool.query(sql_query.query.update_information, [username,name,area], (err, data) => {
-		if(err) {
-			console.error("Error in update info");
-			res.redirect('/dashboard?info=fail');
-		} else {
-			res.redirect('/dashboard?info=pass');
-		}
-	});
-}
-
-function update_credcard(req, res, next) {
-	var username = req.user.username;
-	var creditcard = req.body.creditcard;
-
-	pool.query(sql_query.query.update_credcard, [username, creditcard], (err, data) => {
-		if (err) {
-			console.error("Error in update credit card");
-			res.redirect('/dashboard?credcard=fail');
-		} else {
-			res.redirect('/dashboard?credcard=pass');
-		}
-	});
-}
-
-function update_caretaker_status(req, res, next) {
-	var username = req.user.username;
-	var yes = req.body.username;
-
-	pool.query(sql_query.query.add_caretaker, [yes], (err, data) => {
-		if(err) {
-			console.error("Error in updating caretaker status");
-			res.redirect('/dashboard?caretaker=fail');
-		} else {
-			res.redirect('/dashboard?caretaker=pass');
-		}
-	});
-}
-function update_pass(req, res, next) {
-	var username = req.user.username;
-	var password = bcrypt.hashSync(req.body.password, salt);
-	pool.query(sql_query.query.update_pass, [username, password], (err, data) => {
-		if(err) {
-			console.error("Error in update pass");
-			res.redirect('/dashboard?pass=fail');
-		} else {
-			res.redirect('/dashboard?pass=pass');
-		}
-	});
-}
-
-function add_caretaker(req, res, next) {
-	var username = req.user.username;
-
-	pool.query(sql_query.query.add_caretaker, [username], (err, data) => {
-		if (err) {
-			console.error("Error in adding caretaker, ERROR: " + err);
-			res.redirect('/caretaker?add-caretaker=fail');
-		}
-	});
-}
 
 //Maybe PCS Admin can use this
 function add_pettypes(req, res, next) {
@@ -625,178 +409,6 @@ function add_pettypes(req, res, next) {
 }
 
 
-function add_availability(req, res, next) {
-	var username = req.user.username;
-	var date = req.body.date;
-
-	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
-		if (data.rowCount == 0) {
-			add_caretaker(req, res, next);
-		}
-		pool.query(sql_query.query.add_availability, [username, date], (err, data) => {
-			if (err) {
-				console.error("Error in adding availability, ERROR: " + err);
-				res.redirect('/caretaker?add-availability=fail');
-			} else {
-				res.redirect('/caretaker?add-availability=pass');
-			}
-		})
-
-	});
-}
-
-function apply_for_leave(req, res, next) {
-	var username = req.user.username;
-	var date = req.body.date;
-
-	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
-		if (data.rowCount == 0) {
-			add_caretaker(req, res, next);
-		}
-		pool.query(sql_query.query.delete_availability, [username, date], (err, data) => {
-			if (err) {
-				console.error("Error in applying for leave, ERROR: " + err);
-				res.redirect('/caretaker?apply-leave=fail');
-			} else {
-				res.redirect('/caretaker?apply-leave=pass');
-			}
-		})
-
-	});
-}
-
-//Only add pet-type for caretaker
-function add_caretaker_type_of_pet(req, res, next) {
-	var username = req.user.username;
-	var type = req.body.type;
-	var price = req.body.price;
-
-	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
-		//If caretaker is not in caretaker table
-		if (data.rowCount == 0) {
-			//Add to caretaker table
-			add_caretaker(req, res, next);
-		}
-		pool.query(sql_query.query.find_pettypes, [type], (err_pettype, data_pettype) => {
-			if (data_pettype.rowCount == 0) {
-				res.redirect('/caretaker?add-pet_type=fail');
-			} else {
-				//Pet type exist
-				pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
-					//Pet type is in caretaker's table
-					if (data_caretakerpricing.rowCount == 0) {
-						//No pet type within CareTakerPricing table, add
-						if (price == "") {
-							price = null;
-						}
-
-						pool.query(sql_query.query.add_caretaker_type_of_pet, [username, type, price], (err4, data4) => {
-							if (err4) {
-								console.error("Error in adding pet type + price, ERROR: " + err);
-								res.redirect('/caretaker?add-pet_type=fail');
-							} else {
-								res.redirect('/caretaker?add-pet_type=pass');
-							}
-						})
-					} else {
-						//Pet type already existed in the Caretaker's table
-						console.error("Pet type already existed in the table, cannot add");
-						res.redirect('/caretaker?add-pet_type=fail');
-					}
-				})
-			}
-		})
-	});
-}
-
-//Only edit price for caretaker, pet must exist first in caretaker's table already
-function edit_caretaker_price_of_pet(req, res, next) {
-	var username = req.user.username;
-	var type = req.body.type;
-	var price = req.body.price;
-	var caretaker_tbl;
-
-	pool.query(sql_query.query.find_caretaker, [username], (err, data) => {
-		//If caretaker is not in caretaker table, not it's not possible as user cannot access this page
-		if (data.rowCount == 0) {
-			//Add to caretaker table
-			add_caretaker(req, res, next);
-		}
-		pool.query(sql_query.query.find_pettypes, [type], (err_pettype, data_pettype) => {
-			if (data_pettype.rowCount == 0) {
-				res.redirect('/caretaker?edit-pet_price=fail');
-			} else {
-				//Pet type exist
-				pool.query(sql_query.query.find_caretaker_pricing, [username, type], (err_3, data_caretakerpricing) => {
-					//Pet type is not in caretaker's table
-					if (data_caretakerpricing.rowCount == 0) {
-						console.error("Error in adding pet type + price, ERROR: " + err);
-						res.redirect('/caretaker?edit-pet_price=fail');
-					} else {
-						//Pet type already existed in the Caretaker's table
-						pool.query(sql_query.query.caretaker_fulltime_parttime, [username], (err6, data6) => {
-							if (err6 || !data6.rows || data6.rows.length == 0) {
-								caretaker_tbl = [];
-							} else {
-								caretaker_tbl = data.rows;
-
-								//Part-timer
-								if (caretaker_tbl[0].is_fulltime == false) {
-									pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price], (err5, data5) => {
-										if (err5) {
-											console.error("Error in updating pet type + price, ERROR: " + err);
-											res.redirect('/caretaker?edit-pet_price=fail');
-										} else {
-											res.redirect('/caretaker?edit-pet_price=pass');
-										}
-									})
-								} else {
-									console.error("Full-timer, cannot update price");
-									res.redirect('/caretaker?edit-pet_price=fail');
-								}
-							}
-						})
-					}
-				})
-			}
-		})
-	});
-}
-
-function caretaker_accept_bid(req, res, next) {
-	var username = req.user.username;
-	var owner_username = req.body.owner_username;
-	var pet_name = req.body.pet_name;
-	var start_date = req.body.start_date;
-	var end_date = req.body.end_date;
-
-	pool.query(sql_query.query.update_caretaker_accepted_bid, [username, owner_username, pet_name, start_date, end_date], (err, data) => {
-		if (err) {
-			console.error("Error in accepting bid, ERROR: " + err);
-			res.redirect('/caretaker?accept-bid=fail');
-		} else {
-			res.redirect('/caretaker?accept-bid=pass');
-		}
-	});
-}
-
-//from accept to complete
-function caretaker_complete_bid(req, res, next) {
-	var username = req.user.username;
-	var owner_username = req.body.owner_username;
-	var pet_name = req.body.pet_name;
-	var start_date = req.body.start_date;
-	var end_date = req.body.end_date;
-
-	pool.query(sql_query.query.complete_bid, [username, owner_username, pet_name, start_date, end_date], (err, data) => {
-		if (err) {
-			console.error("Error in completing bid, ERROR: " + err);
-			res.redirect('/caretaker?complete-bid=fail');
-		} else {
-			res.redirect('/caretaker?complete-bid=pass');
-		}
-	});
-}
 
 /*function add_game(req, res, next) {
 	var username = req.user.username;
