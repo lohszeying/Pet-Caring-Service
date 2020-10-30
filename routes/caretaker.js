@@ -5,6 +5,7 @@ const pool = new Pool({
 	connectionString: process.env.DATABASE_URL,
   //ssl: true
 });
+const moment = require('moment');
 const {
     wrapError,
     DBError,
@@ -18,7 +19,8 @@ const query = require('./basic').query;
 const msg = require('./basic').msg;
 
 function getDateString(da) {
-    return da.getUTCFullYear()+'/'+(da.getUTCMonth()+1)+'/'+(da.getUTCDate()+1);
+	var m = moment(da, 'ddd MMM DD YYYY hh:mm:ss [GMT]ZZ').format('MM-DD-YYYY');
+	return m;
 }
 //CARETAKER FUNCTION
 async function caretaker(req, res, next) {
