@@ -135,7 +135,7 @@
 											<td><%= accepted_bid_tbl[i].pet_name %></td>
 											<td><%= accepted_bid_tbl[i].start_date %></td>
 											<td><%=accepted_bid_tbl[i].end_date %></td>
-											<td><form method="post" action="/caretaker_accept_bid">
+											<td><form method="post" action="/caretaker_complete_bid">
                                                 <input type="hidden" id=<%="owner_username" + i%> name="owner_username" value=<%= accepted_bid_tbl[i].owner_username %>>
                                                 <input type="hidden" id=<%="pet_name" + i%> name="pet_name" value=<%= accepted_bid_tbl[i].pet_name %>>
                                                 <input type="hidden" id=<%="start_date"  + i%> name="start_date" value=<%= getDateString(accepted_bid_tbl[i].start_date) %>>
