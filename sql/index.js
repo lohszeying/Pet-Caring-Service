@@ -13,6 +13,7 @@ sql.query = {
 	all_games: 'SELECT ranking,game_list.gamename AS game,rating FROM user_games INNER JOIN game_list ON user_games.gamename=game_list.gamename WHERE username=$1 ORDER BY ranking ASC',
 	all_plays: 'SELECT gamename AS game, user1, user2, winner FROM game_plays WHERE user1=$1 OR user2=$1',
 
+
 	//Our queries
 	all_availability: 'SELECT * FROM CareTakerAvailability WHERE username=$1 ORDER BY date ASC',
 	all_caretaker_pettypeprice: 'SELECT * FROM CareTakerPricing WHERE username=$1 ORDER BY pet_type ASC',
@@ -36,7 +37,7 @@ sql.query = {
 	add_rating_review:'INSERT INTO Bids (rating, review) VALUES ($1, $2)',
 	add_availability: 'INSERT INTO CareTakerAvailability (username, date) VALUES ($1,$2)',
 	add_caretaker_pet_types: 'INSERT INTO PetTypes (pet_type) VALUES ($1)',
-	add_caretaker_type_of_pet: 'INSERT INTO CareTakerPricing (username, pet_type, price) VALUES ($1,$2,$3)',
+	add_caretaker_type_of_pet: 'INSERT INTO CareTakerPricing (username, pet_type) VALUES ($1,$2)',
 	
 	//get caretaker ratings to display
 	get_rating: 'SELECT GET_RATING(username) FROM CareTaker WHERE username = $1',
@@ -78,7 +79,7 @@ sql.query = {
 	update_pet_status: 'UPDATE Pet SET enabled=$3 WHERE pet_name=$2 AND owner_username=$1',
 	update_caretaker_pettype_price: 'UPDATE CareTakerPricing SET price=$3 WHERE username=$1 AND pet_type=$2',
 	update_caretaker_accepted_bid: 'UPDATE Bids SET status=\'ACCEPTED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
-	
+	update_caretaker_rejected_bid: 'UPDATE Bids SET status=\'REJECTED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	//set complete bid params: caretaker_name, owner_name, pet_name start_date, end_date
 	complete_bid: 'Update Bids SET status = \'COMPLETED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	// Search
@@ -87,7 +88,9 @@ sql.query = {
 	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
 	//get salary with 1. caretaker username 2. year(INTEGER) 3. month(INTEGER)
-	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)'
+	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)',
+	//get all months salary
+	get_salary_record: 'SELECT YR.y, MTH.m, GET_SALARY($1, YR.y, MTH.m) FROM generate_series(2020, 2020) as YR(y),  generate_series(1,12) as MTH(m) ORDER BY Mth.m ASC'
 }
 
 sql.admin = {

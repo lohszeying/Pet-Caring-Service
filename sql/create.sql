@@ -110,6 +110,7 @@ INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-09');
 INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-08');
 INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-02');
 INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-08-01');
+INSERT INTO CARETAKERAVAILABILITY(username, date) VALUES ('401', '2020-07-31');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('6','4','400','2020-08-09', '2020-08-30');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('1','4','400','2020-08-09', '2020-08-30');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('2','4','400','2020-08-09', '2020-08-30');
@@ -117,7 +118,8 @@ INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_d
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('1','5','401','2020-08-09', '2020-08-09');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('2','5','401','2020-08-09', '2020-08-09');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('3','5','401','2020-08-09', '2020-08-09');
-INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('4','5','401','2020-08-09', '2020-08-09');
+INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('4','5','401','2020-08-08', '2020-08-08');
+INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('4','5','401','2020-07-31', '2020-08-01');
 DELETE FROM CARETAKERAVAILABILITY WHERE username = '401' AND date = '2020-08-09';
 --suppose to return constrain error
 UPDATE Bids SET status = 'ACCEPTED' WHERE owner_username = '1';

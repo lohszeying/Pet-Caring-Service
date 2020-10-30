@@ -68,7 +68,7 @@
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; All completed bids
+							<i class="fas fa-paw"></i> &nbsp; All completed bids
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
@@ -106,7 +106,7 @@
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; All accepted bids
+							<i class="fas fa-paw"></i> &nbsp; All accepted bids
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
@@ -121,6 +121,7 @@
 										<th>Pet name</th>
 										<th>Start Date</th>
 										<th>End Date</th>
+										<th>Complete</th>
 									</tr>
 									</thead>
 									<tbody>
@@ -133,8 +134,15 @@
 											<td><%= accepted_bid_tbl[i].owner_username %></td>
 											<td><%= accepted_bid_tbl[i].pet_name %></td>
 											<td><%= accepted_bid_tbl[i].start_date %></td>
-											<td><%= accepted_bid_tbl[i].end_date %></td>
-										</tr>
+											<td><%=accepted_bid_tbl[i].end_date %></td>
+											<td><form method="post" action="/caretaker_complete_bid">
+                                                <input type="hidden" id=<%="owner_username" + i%> name="owner_username" value=<%= accepted_bid_tbl[i].owner_username %>>
+                                                <input type="hidden" id=<%="pet_name" + i%> name="pet_name" value=<%= accepted_bid_tbl[i].pet_name %>>
+                                                <input type="hidden" id=<%="start_date"  + i%> name="start_date" value=<%= getDateString(accepted_bid_tbl[i].start_date) %>>
+                                                <input type="hidden" id=<%="end_date"  + i%> name="end_date" value=<%= getDateString(accepted_bid_tbl[i].end_date) %>>
+                                                <button type="submit" class="btn btn-secondary">Complete</button>
+                                            	</form>
+                                            </td>
 									<% } %>
 									</tbody>
 								</table>
@@ -142,49 +150,9 @@
 						</div>
 					</div>
 
-					<% if (accepted_bid_tbl.length > 0) { %>
-						<div class="card mb-3">
-							<div class="card-header">
-								<i class="fas fa-dice-d20"></i> &nbsp; Complete accepted bid:
-							</div>
-							<form method="post" action="/caretaker_complete_bid">
-								<div class="card-body">
-									<div class="form-group row">
-										<label for="text" class="col-sm-3 col-form-label"><b>Owner's username:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="owner_username" placeholder="theSuperPet" name="owner_username" value="" type="text">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="start_date" placeholder="2020-01-01" name="start_date" value="" type="date">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="end_date" placeholder="2020-01-03" name="end_date" value="" type="date">
-										</div>
-									</div>
-								</div>
-								<div class="card-footer small text-muted">
-									<button type="submit" class="btn btn-secondary">Complete</button>
-									<span class="badge badge-pill badge-info"><%= complete_bid_msg %></span>
-								</div>
-							</form>
-						</div>
-					<% } %>
-
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; All pending bids
+							<i class="fas fa-cat"></i> &nbsp; All pending bids
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
@@ -199,6 +167,8 @@
 										<th>Pet name</th>
 										<th>Start Date</th>
 										<th>End Date</th>
+										<th>Accept</th>
+										<th>Reject</th>
 									</tr>
 									</thead>
 									<tbody>
@@ -211,7 +181,24 @@
 											<td><%= pending_bid_tbl[i].owner_username %></td>
 											<td><%= pending_bid_tbl[i].pet_name %></td>
 											<td><%= pending_bid_tbl[i].start_date %></td>
-											<td><%= pending_bid_tbl[i].end_date %></td>
+											<td><%= pending_bid_tbl[i].end_date %></td>                                            
+											<td><form method="post" action="/caretaker_accept_bid">
+                                                <input type="hidden" id=<%="aowner_username" + i%> name="owner_username" value=<%= pending_bid_tbl[i].owner_username %>>
+                                                <input type="hidden" id=<%="apet_name" + i%> name="pet_name" value=<%= pending_bid_tbl[i].pet_name %>>
+                                                <input type="hidden" id=<%="astart_date"  + i%> name="start_date" value=<%= getDateString(pending_bid_tbl[i].start_date) %>>
+                                                <input type="hidden" id=<%="aend_date"  + i%> name="end_date" value=<%= getDateString(pending_bid_tbl[i].end_date) %>>
+                                                <button type="submit" class="btn btn-secondary">Accept</button>
+                                            	</form>
+											</td>
+											<td><form method="post" action="/caretaker_reject_bid">
+                                                <input type="hidden" id=<%="rowner_username" + i%> name="owner_username" value=<%= pending_bid_tbl[i].owner_username %>>
+                                                <input type="hidden" id=<%="rpet_name" + i%> name="pet_name" value=<%= pending_bid_tbl[i].pet_name %>>
+                                                <input type="hidden" id=<%="rstart_date"  + i%> name="start_date" value=<%= getDateString(pending_bid_tbl[i].start_date) %>>
+                                                <input type="hidden" id=<%="rend_date"  + i%> name="end_date" value=<%= getDateString(pending_bid_tbl[i].end_date) %>>
+                                                <button type="submit" class="btn btn-secondary">Reject</button>
+                                            	</form>
+                                            </td>
+                            			</tr>
 										</tr>
 									<% } %>
 									</tbody>
@@ -220,49 +207,9 @@
 						</div>
 					</div>
 
-					<% if (pending_bid_tbl.length > 0) { %>
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice-d20"></i> &nbsp; Accept pending bid:
-						</div>
-						<form method="post" action="/caretaker_accept_bid">
-							<div class="card-body">
-								<div class="form-group row">
-									<label for="text" class="col-sm-3 col-form-label"><b>Owner's username:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="owner_username" placeholder="theSuperPet" name="owner_username" value="" type="text">
-									</div>
-								</div>
-								<div class="form-group row">
-									<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
-									</div>
-								</div>
-								<div class="form-group row">
-									<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="start_date" placeholder="2020-01-01" name="start_date" value="" type="date">
-									</div>
-								</div>
-								<div class="form-group row">
-									<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="end_date" placeholder="2020-01-03" name="end_date" value="" type="date">
-									</div>
-								</div>
-							</div>
-							<div class="card-footer small text-muted">
-								<button type="submit" class="btn btn-secondary">Accept Bid</button>
-								<span class="badge badge-pill badge-info"><%= accept_bid_msg %></span>
-							</div>
-						</form>
-					</div>
-					<% } %>
-
-					<div class="card mb-3">
-						<div class="card-header">
-							<i class="fas fa-dice-d20"></i> &nbsp; Add available date:
+							<i class="fas fa-cat"></i> &nbsp; Add available date:
 						</div>
 						<form method="post" action="/add_availability">
 							<div class="card-body">
@@ -282,7 +229,7 @@
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice-d20"></i> &nbsp; Apply for leave:
+							<i class="fas fa-paw"></i> &nbsp; Apply for leave:
 						</div>
 						<form method="post" action="/apply_for_leave">
 							<div class="card-body">
@@ -301,7 +248,7 @@
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice-d20"></i> &nbsp; Add the type of pet that you can care for:
+							<i class="fas fa-paw"></i> &nbsp; Add the type of pet that you can care for:
 						</div>
 
 						<form method="post" action="/add_caretaker_type_of_pet">
@@ -332,7 +279,7 @@
 					<% if (caretaker_tbl[0].is_fulltime == false && caretaker_pet_tbl.length > 0) { %>
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice-d20"></i> &nbsp; Edit the price of pet you can care for
+							<i class="fas fa-cat"></i> &nbsp; Edit the price of pet you can care for
 						</div>
 
 						<form method="post" action="/edit_caretaker_price_of_pet">
@@ -370,7 +317,7 @@
 
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; Pet type
+							<i class="fas fa-cat"></i> &nbsp; Pet type
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
@@ -400,7 +347,36 @@
 					
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; Availability List
+							<i class="fas fa-dove"></i> &nbsp; Your Salaries
+						</div>
+						<div class="card-body">
+							<div class="table-responsive">
+								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+									<thead>
+									<tr>
+										<th>Month</th>
+										<th>Amount Earned (SGD)</th>										
+									</tr>
+									</thead>
+									<tbody>
+									<% for(var i=0; i<all_salary_tbl.length; i++) { %>
+										<tr>
+											<td><%= getYearMonth(all_salary_tbl[i].y, all_salary_tbl[i].m) %></td>
+											<td><%= parseFloat(all_salary_tbl[i].get_salary).toFixed(2) %></td>
+										
+                            			</tr>
+									<% } %>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="card mb-3">
+						<div class="card-header">
+							<i class="fas fa-paw"></i> &nbsp; Availability List
 						</div>
 						<div class="card-body">
 							<div class="table-responsive">
