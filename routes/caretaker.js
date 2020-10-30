@@ -13,6 +13,7 @@ const {
     NotNullViolationError, 
     ForeignKeyViolationError
   } = require('db-errors');
+const { msg2 } = require('./basic');
 
 const basic = require('./basic').basic;
 const query = require('./basic').query;
@@ -87,7 +88,7 @@ async function caretaker(req, res, next) {
 
 			data = await pool.query(sql_query.query.get_salary_record, [req.user.username]);
 			all_salary_tbl = data.rows;
-    
+			
 	        basic(req, res, 'caretaker',
 	        { ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
 	        caretaker_tbl: caretaker_tbl, caretaker_pet_tbl: caretaker_pet_tbl,
@@ -97,10 +98,27 @@ async function caretaker(req, res, next) {
 	        accept_bid_msg: msg(req, 'accept-bid', 'Bid accepted successfully', 'Error in accepting bid'),
 			reject_bid_msg: msg(req, 'reject-bid', 'Bid rejected successfully', 'Error in rejecting bid'),
             complete_bid_msg: msg(req, 'complete-bid', 'Bid completed successfully', 'Error in completing bid'),
-	        date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
-	        caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
-	        caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
-	        caretaker_apply_leave_msg: msg(req, 'apply-leave', 'Successfully applied for leave', 'Failed in applying leave'),
+	        date_msg: msg2(req, 'add-availability', {
+				'pass': 'Date added successfully',
+				'duplicate': 'You are already available on this date!',
+				'fail': 'Error. Cannot add this date to availability'
+			}),
+	        caretaker_pet_type_msg: msg2(req, 'add-pet_type', {
+				'pass' : 'Type of pet added successfully',
+				'duplicate' : 'You are already caring for this pet',
+				'non_exist': 'This pet does not exist',
+				'fail': 'Unknown error. Failed to add pet'
+			}),
+	        caretaker_pet_price_msg: msg2(req, 'edit-pet_price', {
+				'pass': 'Pet price edited successfully!',
+				'fulltimer' : 'Fulltimers cannot change prices!',
+				'fail' : 'Failed in editing pet price'
+			}),			
+			caretaker_apply_leave_msg: msg2(req, 'apply-leave', {
+				'pass' : 'Successfully applied for leave',
+				'have_bid': 'You already have a bid here',
+				'no_availability': 'You are already not available!'
+			}),
 			auth: true,
 			all_salary_tbl: all_salary_tbl,
 			getDateString: getDateString,
@@ -118,25 +136,31 @@ function add_availability(req, res, next) {
 		if (err) {
             err = wrapError(err);
             if (err instanceof UniqueViolationError) {
-                console.error("You are already available on this date!")
+				console.error("You are already available on this date!")
+				res.redirect('/caretaker?add-availability=duplicate');
             } else {
-                console.error("Error in adding availability, ERROR: " + err);
+				console.error("Error in adding availability, ERROR: " + err);
+				res.redirect('/caretaker?add-availability=fail');
             }
-			res.redirect('/caretaker?add-availability=fail');
 		} else {
 			res.redirect('/caretaker?add-availability=pass');
 		}
 	});
 }
 
-function apply_for_leave(req, res, next) {
+async function apply_for_leave(req, res, next) {
 	var username = req.user.username;
 	var date = req.body.date;
-	pool.query(sql_query.query.delete_availability, [username, date], (err, data) => {
+	pool.query(sql_query.query.delete_availability, [username, date], (err, result) => {
+		console.log(result);
 		if (err) {
-			console.error("Error in applying for leave, ERROR: " + err);
-			res.redirect('/caretaker?apply-leave=fail');
-		} else {
+			console.log(wrapError(err).nativeError);
+			res.redirect('/caretaker?apply-leave=have_bid');
+		} else if (result.rowCount ==0 ){
+			console.log('You do not have an availability here!')
+			res.redirect('/caretaker?apply-leave=no_availability');
+		} else{
+
 			res.redirect('/caretaker?apply-leave=pass');
 		}
 	});
@@ -152,13 +176,15 @@ async function add_caretaker_type_of_pet(req, res, next) {
     }  catch (err) {
         err = wrapError(err);
         if (err instanceof UniqueViolationError) {
-            console.error("You can take care of this pet!");
+			console.error("You can take care of this pet!");
+			res.redirect('/caretaker?add-pet_type=duplicate');
         } else if (err instanceof ForeignKeyViolationError) {
-            console.error("No such pet");
+			console.error("No such pet");
+			res.redirect('/caretaker?add-pet_type=non_exist');
         } else {
-            console.error(err);
+			console.error(err);
+			res.redirect('/caretaker?add-pet_type=fail');
         }
-        res.redirect('/caretaker?add-pet_type=fail');
     }
 }
 
@@ -172,7 +198,7 @@ async function edit_caretaker_price_of_pet(req, res, next) {
         data = await pool.query(sql_query.query.caretaker_fulltime_parttime, [username]);
         if (data.rows[0].is_fulltime) {
             console.error("Full-timer, cannot update price");
-			res.redirect('/caretaker?edit-pet_price=fail');
+			res.redirect('/caretaker?edit-pet_price=fulltimer');
         } else {
             pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price]);
             res.redirect('/caretaker?edit-pet_price=pass');
