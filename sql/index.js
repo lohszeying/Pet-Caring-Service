@@ -104,7 +104,7 @@ sql.admin = {
 		'WHERE status = \'ACCEPTED\' ' +
 		'  AND start_date BETWEEN cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\')) as date) ' +
 		'    AND (cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\'))  + interval \'1 month\' as date));',
-	month_highest_jobs: 'SELECT b.month\n' +
+	month_highest_jobs: 'SELECT b.month, b.count ' +
 		'FROM (SELECT COUNT(*), cast(date_trunc(\'month\', Bids.start_date) as date) AS month ' +
 		'      FROM Bids ' +
 		'      WHERE status = \'ACCEPTED\' ' +
