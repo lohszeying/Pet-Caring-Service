@@ -89,6 +89,7 @@ async function caretaker(req, res, next) {
 	        salary_tbl: salary_tbl, caretaker_rating_tbl: caretaker_rating_tbl,
 	        completed_bid_tbl: completed_bid_tbl,
 	        accept_bid_msg: msg(req, 'accept-bid', 'Bid accepted successfully', 'Error in accepting bid'),
+			reject_bid_msg: msg(req, 'reject-bid', 'Bid rejected successfully', 'Error in rejecting bid'),
             complete_bid_msg: msg(req, 'complete-bid', 'Bid completed successfully', 'Error in completing bid'),
 	        date_msg: msg(req, 'add-availability', 'Date added successfully', 'Cannot add this date to availability'),
 	        caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
