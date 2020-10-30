@@ -127,7 +127,7 @@ CREATE OR REPLACE FUNCTION ONLEAVE(cname VARCHAR, start_date date, end_date date
         $$ LANGUAGE plpgsql;
 
 
-CREATE TYPE bidstatus AS ENUM ('ACCEPTED', 'PENDING', 'REJECTED');
+CREATE TYPE bidstatus AS ENUM ('ACCEPTED', 'PENDING', 'REJECTED', 'COMPLETED');
 
 CREATE TABLE Bids
 (
@@ -148,7 +148,7 @@ CREATE TABLE Bids
     FOREIGN KEY (caretaker_username) REFERENCES CareTaker (username) ON UPDATE CASCADE,
     CONSTRAINT LEGALTIMEPERIOD CHECK (start_date <= end_date),
     CONSTRAINT ABLETOCAREFOR CHECK (status = 'REJECTED' OR ABLETOCAREFOR(pet_name, owner_username, caretaker_username)),
-    CONSTRAINT NOFALSERATINGS CHECK (status = 'ACCEPTED' OR (rating IS NULL AND review IS NULL AND transfer_method IS NULL AND payment_type IS NULL)),
+    CONSTRAINT NOFALSERATINGS CHECK (status = 'COMPLETED' OR (rating IS NULL AND review IS NULL)),
     CONSTRAINT NOTONLEAVE CHECK (status = 'REJECTED' OR NOT ONLEAVE(caretaker_username, start_date, end_date))
 );
 

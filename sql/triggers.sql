@@ -13,12 +13,29 @@ CREATE OR REPLACE FUNCTION GET_RATING(username VARCHAR)
     END;
 $$;
 
+--get all ratings
+CREATE OR REPLACE FUNCTION GETALLRATINGS()
+RETURNS TABLE(caretaker_username VARCHAR, rating NUMERIC(3,2)) LANGUAGE plpgsql AS
+$$
+BEGIN
+    RETURN QUERY 
+    SELECT  C.username, COALESCE(R.ra, 3.00) 
+    FROM CareTaker C LEFT OUTER JOIN
+            (SELECT B.caretaker_username AS n, AVG(B.rating)::numeric(3,2) AS ra
+                FROM Bids B 
+                WHERE B.rating IS NOT NULL
+                GROUP BY B.caretaker_username) AS R
+               ON C.username = r.n ;
+    END;
+
+$$;
+
 --get the number of pets currently cared for by a caretaker on a particular date
 CREATE OR REPLACE FUNCTION GET_PETS_TAKEN_CARE_BY(caretaker VARCHAR, dateToCheck DATE)
     RETURNS INTEGER LANGUAGE plpgsql AS $$
         BEGIN 
             RETURN (SELECT COUNT (*) FROM Bids 
-            WHERE caretaker = caretaker_username AND status = 'ACCEPTED' AND (dateToCheck BETWEEN start_date AND end_date));
+            WHERE caretaker = caretaker_username AND (status = 'ACCEPTED' OR status = 'COMPLETED') AND (dateToCheck BETWEEN start_date AND end_date));
         END; 
 $$;
 
@@ -88,11 +105,11 @@ CREATE OR REPLACE FUNCTION CHECKBEFOREINSERTBID()
     -- check for overlapping bids with the same pet that is already accepted
     able := (SELECT NOT EXISTS (SELECT 1
                     FROM Bids B
-                    WHERE B.status = 'ACCEPTED' AND B.pet_name = NEW.pet_name AND B.owner_username = NEW.owner_username 
+                    WHERE (B.status = 'ACCEPTED' OR B.status = 'COMPLETED') AND B.pet_name = NEW.pet_name AND B.owner_username = NEW.owner_username 
                         AND (NEW.start_date, NEW.end_date + interval '1 day') OVERLAPS (B.start_date, B.end_date + interval '1 day')
                     ));
     IF NOT able THEN
-        RAISE EXCEPTION 'YOU ALREADY HAVE ACCEPTED BID OVERLAPPING!';
+        RAISE EXCEPTION 'YOU ALREADY HAVE ACCEPTED OR COMPLETED BID OVERLAPPING!';
     END IF;
     --check for caretaker availability
     able := (SELECT NOT EXISTS (SELECT 1 
@@ -148,16 +165,24 @@ CREATE OR REPLACE FUNCTION CHECKBEFOREUPDATEBID()
     DECLARE rating NUMERIC;
     DECLARE fulltime BOOLEAN;
     BEGIN 
-    IF OLD.Status <> 'ACCEPTED' AND NEW.STATUS = 'ACCEPTED' THEN
+    IF NEW.Status = 'COMPLETED' AND OLD.status <> 'ACCEPTED' AND OLD.status = 'COMPLETED' THEN
+        RAISE EXCEPTION 'YOU CAN ONLY COMPLETE ACCEPTED BIDS!';
+    END IF;
+
+    IF NEW.status = 'ACCEPTED' AND OLD.STATUS <> 'ACCEPTED' AND OLD.STATUS <> 'PENDING' THEN
+        RAISE EXCEPTION 'YOU CANNOT ACCEPT REJECTED OR COMPLETED BIDS!';
+    END IF;
+
+    IF OLD.Status = 'PENDING' AND NEW.STATUS = 'ACCEPTED' THEN  
         --check for autolapping bids that involve the same pet that has already been accepted
         able := (SELECT NOT EXISTS (SELECT 1
                     FROM Bids B
-                    WHERE B.status = 'ACCEPTED' AND B.pet_name = OLD.pet_name AND B.owner_username = OLD.owner_username 
+                    WHERE (B.status = 'ACCEPTED' OR B.status = 'COMPLETED') AND B.pet_name = OLD.pet_name AND B.owner_username = OLD.owner_username 
                         AND (OLD.start_date, OLD.end_date + interval '1 day') OVERLAPS (B.start_date, B.end_date + interval '1 day')
                         AND NOT (OLD.caretaker_username = B.caretaker_username AND OLD.start_date = B.start_date AND OLD.end_date = B.end_date)
                     ));
         IF NOT able THEN
-        RAISE EXCEPTION 'YOU ALREADY HAVE ACCEPTED BID OVERLAPPING!';
+        RAISE EXCEPTION 'YOU ALREADY HAVE ACCEPTED OR COMPLETED BID OVERLAPPING!';
         END IF;
 
         --check if caretaker can indeed care for so many
@@ -267,7 +292,8 @@ CREATE OR REPLACE FUNCTION CHECKBEFORELEAVE()
         -- check if he already have bids on the day
         IF (SELECT EXISTS (SELECT 1 
                         FROM Bids 
-                        WHERE OLD.username = caretaker_username AND status = 'ACCEPTED' AND OLD.date >= start_date AND OLD.date <= end_date)) THEN
+                        WHERE OLD.username = caretaker_username AND (status = 'ACCEPTED' OR status = 'COMPLETED')
+                        AND OLD.date >= start_date AND OLD.date <= end_date)) THEN
         RAISE EXCEPTION 'YOU CANNOT APPLY FOR LEAVE! YOU HAVE AN ACCEPTED BID IN THIS DAY!';
         END IF;
         --autoreject bids if you apply for leave
@@ -295,11 +321,11 @@ BEGIN
     IF (yr < 2000 OR mth > 12 OR mth < 1) THEN
         RAISE EXCEPTION 'INVALID INPUT';
     END IF;
-    IF ((SELECT NOT EXISTS(
+    IF (SELECT NOT EXISTS(
             SELECT 1 
             FROM CareTaker
-            WHERE caretaker_name = username)) OR yr < 2000 OR mth > 12 OR mth < 1) THEN
-        RAISE EXCEPTION 'NO SUCH CARETAKER';
+            WHERE caretaker_name = username)) THEN
+        RAISE EXCEPTION 'NO SUCH CARETAKER!';
     END IF;
     IF (SELECT is_fulltime FROM CareTaker WHERE caretaker_name = username) THEN
        
@@ -307,7 +333,7 @@ BEGIN
         extra_pay := 0;
         FOR var IN SELECT total_price, (DATE_PART('day', end_date::timestamp - start_date::timestamp) + 1) AS d
                 FROM Bids 
-                 WHERE caretaker_name = caretaker_username AND status = 'ACCEPTED' 
+                 WHERE caretaker_name = caretaker_username AND (status = 'ACCEPTED' OR status = 'COMPLETED') 
                  AND EXTRACT(MONTH FROM start_date) = mth AND EXTRACT(YEAR FROM start_date) = yr
                  ORDER BY start_date ASC, (DATE_PART('day', end_date::timestamp - start_date::timestamp) + 1) ASC 
         LOOP
@@ -320,15 +346,16 @@ BEGIN
             END IF;
             pet_days = pet_days + var.d;
         END LOOP;
-
-        IF (pet_days > 0) THEN
-            RETURN 3000 + extra_pay;
-        ELSE
-            RETURN 0;
-        END IF;
+        
+        RETURN 3000 + extra_pay;
     ELSE
-        RETURN (SELECT 0.75 * SUM(total_price) FROM Bids 
-            WHERE caretaker_name = caretaker_username AND status = 'ACCEPTED' AND EXTRACT(MONTH FROM start_date) = mth AND EXTRACT(YEAR FROM start_date) = yr);
+        RETURN (SELECT CASE 
+                    WHEN COUNT(*) = 0 THEN 0 
+                        ELSE 0.75 * SUM(total_price) 
+                        END
+                    FROM Bids 
+                     WHERE caretaker_name = caretaker_username AND (status = 'ACCEPTED' OR status = 'COMPLETED')
+                     AND EXTRACT(MONTH FROM start_date) = mth AND EXTRACT(YEAR FROM start_date) = yr);
     END IF;
 END; $$;
 
@@ -340,8 +367,8 @@ AS $$
 DECLARE rating INTEGER;
 BEGIN
     rating = GET_RATING(ctaker);
-    IF rating IS NULL THEN
-        RAISE EXCEPTION 'NO SUCH CARETAKER!';
+   IF rating IS NULL THEN
+       RAISE EXCEPTION 'NO SUCH CARETAKER!';
     END IF;
     RETURN (SELECT NOT EXISTS (SELECT 1 
                                 FROM generate_series(start_date, end_date, interval '1 day') AS t(day)
@@ -349,7 +376,8 @@ BEGIN
                                                     FROM CareTakerAvailability A
                                                     WHERE A.date = t.day AND A.username = ctaker
                                                     )
-                                ) AND (SELECT CASE WHEN (SELECT is_fulltime FROM CareTaker WHERE username = ctaker) THEN 5
+                                ) AND (SELECT CASE 
+                                WHEN (SELECT is_fulltime FROM CareTaker WHERE username = ctaker) THEN 5
                                 WHEN rating > 4.5 THEN 5
                                 WHEN rating > 4 THEN 4
                                 WHEN rating > 3.5 THEN 3
@@ -359,4 +387,54 @@ BEGIN
                                 FROM generate_series(start_date, end_date, interval '1 day') AS t(day))
                                 );
 END; $$;
+------------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION ALLAVAILABLE(sdate DATE, edate DATE, puser VARCHAR, pname VARCHAR) 
+RETURNS TABLE(caretaker_username VARCHAR, rate NUMERIC(3,2))
+LANGUAGE plpgsql
+AS $$
+BEGIN
+RETURN QUERY
+    SELECT pMax.n, R.rat
+        FROM (SELECT C2.username AS n, COALESCE(pMAX1.m1, 0) AS m
+            FROM CareTaker C2 LEFT OUTER JOIN
+            (SELECT CP.cname AS n1, MAX(CP.c) AS m1 
+                FROM (SELECT B.caretaker_username AS cname, t.day AS d, COUNT(*) AS c 
+                        FROM Bids B, generate_series(sdate, edate, interval '1 day') AS t(day)
+                        WHERE (status = 'ACCEPTED' OR status = 'COMPLETED') AND (t.day BETWEEN B.start_date AND B.end_date) 
+                        GROUP BY B.caretaker_username, t.day
+                ) AS CP
+                GROUP BY CP.cname
+            ) AS pMAX1 ON C2.username = pMAX1.n1
+            ) AS pMAX,
+            (SELECT  C4.username AS n, COALESCE(R1.ra, 3.00) AS rat
+                    FROM CareTaker C4 LEFT OUTER JOIN
+                    (SELECT B2.caretaker_username AS n1, AVG(B2.rating)::numeric(3,2) AS ra
+                    FROM Bids B2 
+                    WHERE rating IS NOT NULL
+                    GROUP BY B2.caretaker_username) AS R1
+                    ON R1.n1 = C4.username
+                    )
 
+                    AS R
+         
+        WHERE pMax.n = R.n AND pMax.m < (SELECT CASE 
+                    WHEN (SELECT C3.is_fulltime FROM CareTaker C3 WHERE C3.username = pMAX.n) THEN 5
+                    WHEN r.rat > 4.5 THEN 5
+                    WHEN r.rat > 4 THEN 4
+                    WHEN r.rat > 3.5 THEN 3
+                    ELSE 2
+                    END) AND NOT EXISTS (SELECT 1 
+                                FROM generate_series(sdate, edate, interval '1 day') AS t2(day)
+                                WHERE NOT EXISTS ( SELECT 1 
+                                                    FROM CareTakerAvailability A
+                                                    WHERE A.date = t2.day AND A.username = pMAX.n
+                                                    )
+                                )
+                AND EXISTS (
+            SELECT 1 
+            FROM pet P5, CareTakerPricing C5
+            WHERE pname = P5.pet_name AND puser = P5.owner_username AND P5.pet_type = C5.pet_type AND pMAX.n = C5.username
+            )
+        ORDER BY R.rat DESC, pMAX.n ASC 
+    ;
+ END;$$;
