@@ -150,46 +150,6 @@
 						</div>
 					</div>
 
-					<% if (accepted_bid_tbl.length > 0) { %>
-						<div class="card mb-3">
-							<div class="card-header">
-								<i class="fas fa-cat"></i> &nbsp; Complete accepted bid:
-							</div>
-							<form method="post" action="/caretaker_complete_bid">
-								<div class="card-body">
-									<div class="form-group row">
-										<label for="text" class="col-sm-3 col-form-label"><b>Owner's username:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="owner_username" placeholder="theSuperPet" name="owner_username" value="" type="text">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="start_date" placeholder="2020-01-01" name="start_date" value="" type="date">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="end_date" placeholder="2020-01-03" name="end_date" value="" type="date">
-										</div>
-									</div>
-								</div>
-								<div class="card-footer small text-muted">
-									<button type="submit" class="btn btn-secondary">Complete</button>
-									<span class="badge badge-pill badge-info"><%= complete_bid_msg %></span>
-								</div>
-							</form>
-						</div>
-					<% } %>
-
 					<div class="card mb-3">
 						<div class="card-header">
 							<i class="fas fa-cat"></i> &nbsp; All pending bids
@@ -246,86 +206,6 @@
 							</div>
 						</div>
 					</div>
-
-					<% if (pending_bid_tbl.length > 0) { %>
-					<div class="card mb-3">
-						<div class="card-header">
-							<i class="fas fa-paw"></i> &nbsp; Accept pending bid:
-						</div>
-						<form method="post" action="/caretaker_accept_bid">
-							<div class="card-body">
-								<div class="form-group row">
-									<label for="text" class="col-sm-3 col-form-label"><b>Owner's username:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="owner_username" placeholder="theSuperPet" name="owner_username" value="" type="text">
-									</div>
-								</div>
-								<div class="form-group row">
-									<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
-									</div>
-								</div>
-								<div class="form-group row">
-									<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="start_date" placeholder="2020-01-01" name="start_date" value="" type="date">
-									</div>
-								</div>
-								<div class="form-group row">
-									<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
-									<div class="col-sm-9">
-										<input required="required" class="form-control" id="end_date" placeholder="2020-01-03" name="end_date" value="" type="date">
-									</div>
-								</div>
-							</div>
-							<div class="card-footer small text-muted">
-								<button type="submit" class="btn btn-secondary">Accept Bid</button>
-								<span class="badge badge-pill badge-info"><%= accept_bid_msg %></span>
-							</div>
-						</form>
-					</div>
-					<% } %>
-
-					<% if (pending_bid_tbl.length > 0) { %>
-						<div class="card mb-3">
-							<div class="card-header">
-								<i class="fas fa-cat"></i> &nbsp; Reject pending bid:
-							</div>
-							<form method="post" action="/caretaker_reject_bid">
-								<div class="card-body">
-									<div class="form-group row">
-										<label for="text" class="col-sm-3 col-form-label"><b>Owner's username:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="owner_username" placeholder="theSuperPet" name="owner_username" value="" type="text">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="text" class="col-sm-3 col-form-label"><b>Name of pet:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="pet_name" placeholder="Kiki" name="pet_name" value="" type="text">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="start_date" placeholder="2020-01-01" name="start_date" value="" type="date">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label for="date" class="col-sm-3 col-form-label"><b>End Date:</b></label>
-										<div class="col-sm-9">
-											<input required="required" class="form-control" id="end_date" placeholder="2020-01-03" name="end_date" value="" type="date">
-										</div>
-									</div>
-								</div>
-								<div class="card-footer small text-muted">
-									<button type="submit" class="btn btn-secondary">Reject Bid</button>
-									<span class="badge badge-pill badge-info"><%= reject_bid_msg %></span>
-								</div>
-							</form>
-						</div>
-					<% } %>
 
 					<div class="card mb-3">
 						<div class="card-header">
