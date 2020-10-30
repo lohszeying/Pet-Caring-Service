@@ -88,7 +88,9 @@ sql.query = {
 	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
 	//get salary with 1. caretaker username 2. year(INTEGER) 3. month(INTEGER)
-	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)'
+	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)',
+	//get all months salary
+	get_salary_record: 'SELECT YR.y, MTH.m, GET_SALARY($1, YR.y, MTH.m) FROM generate_series(2020, 2020) as YR(y),  generate_series(1,12) as MTH(m) ORDER BY Mth.m ASC'
 }
 
 sql.admin = {

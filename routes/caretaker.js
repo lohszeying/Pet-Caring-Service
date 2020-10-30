@@ -22,6 +22,9 @@ function getDateString(da) {
 	var m = moment(da, 'ddd MMM DD YYYY hh:mm:ss [GMT]ZZ').format('MM-DD-YYYY');
 	return m;
 }
+function getYearMonth(yr, mth) {
+	return moment().month(mth-1).format("MMMM").toString() + '-' + yr.toString() ;
+}
 //CARETAKER FUNCTION
 async function caretaker(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
@@ -33,6 +36,7 @@ async function caretaker(req, res, next) {
 	var accepted_bid_tbl;
 	var completed_bid_tbl;
 	var salary_tbl;
+	var all_salary_tbl
 	var currYear = new Date().getFullYear();
 	var currMonth = new Date().getMonth() + 1;
 	var caretaker_rating_tbl;
@@ -81,6 +85,8 @@ async function caretaker(req, res, next) {
 
 	        completed_bid_tbl = data.rows;
 
+			data = await pool.query(sql_query.query.get_salary_record, [req.user.username]);
+			all_salary_tbl = data.rows;
     
 	        basic(req, res, 'caretaker',
 	        { ctx: ctx, tbl: tbl, ctx2: ctx2, tbl2: tbl2, pet_ctx: pet_ctx, pet_tbl: pet_tbl,
@@ -95,8 +101,10 @@ async function caretaker(req, res, next) {
 	        caretaker_pet_type_msg: msg(req, 'add-pet_type', 'Type of pet added successfully', 'Failed in adding type of pet, pet is already in the table'),
 	        caretaker_pet_price_msg: msg(req, 'edit-pet_price', 'Pet price edited successfully', 'Failed in editing pet price'),
 	        caretaker_apply_leave_msg: msg(req, 'apply-leave', 'Successfully applied for leave', 'Failed in applying leave'),
-            auth: true,
-            getDateString: getDateString });
+			auth: true,
+			all_salary_tbl: all_salary_tbl,
+			getDateString: getDateString,
+			getYearMonth: getYearMonth });
         }
     } catch (e) {
         console.log(e);

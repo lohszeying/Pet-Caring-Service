@@ -467,6 +467,35 @@
 					
 					<div class="card mb-3">
 						<div class="card-header">
+							<i class="fas fa-dice"></i> &nbsp; Your Salaries
+						</div>
+						<div class="card-body">
+							<div class="table-responsive">
+								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+									<thead>
+									<tr>
+										<th>Month</th>
+										<th>Amount Earned (SGD)</th>										
+									</tr>
+									</thead>
+									<tbody>
+									<% for(var i=0; i<all_salary_tbl.length; i++) { %>
+										<tr>
+											<td><%= getYearMonth(all_salary_tbl[i].y, all_salary_tbl[i].m) %></td>
+											<td><%= parseFloat(all_salary_tbl[i].get_salary).toFixed(2) %></td>
+										
+                            			</tr>
+									<% } %>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+
+
+					<div class="card mb-3">
+						<div class="card-header">
 							<i class="fas fa-dice"></i> &nbsp; Availability List
 						</div>
 						<div class="card-body">
