@@ -172,4 +172,32 @@ router.post('/create-admin', admin_auth(), (req, res) => {
     });
 });
 
+router.get('/job-stats', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        queryResult: null
+    };
+
+    res.render('admin/job-stats', info);
+});
+
+router.post('/job-stats', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        queryResult: null
+    };
+
+    pool.query(sql_query.admin.month_highest_jobs, [req.body['stat-date']], (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            info.queryResult = data.rows[0];
+        }
+
+        res.render('admin/job-stats', info);
+    });
+});
+
 module.exports = router
