@@ -67,13 +67,13 @@ sql.query = {
 	//delete availability for caretaker
 	//inputs: 1. username, 2. date
 	delete_availability: 'DELETE FROM CARETAKERAVAILABILITY WHERE username = $1 AND date = $2',
-
+	delete_specreq: 'DELETE FROM PetSpecialRequirements WHERE owner_username = $1 AND pet_name = $2 AND special_requirement = $3',
 	// Update
 	update_information: 'UPDATE Users SET name=$2, area=$3 WHERE username=$1',
 	update_pass: 'UPDATE Users SET password=$2 WHERE username=$1',
 	update_credcard: 'UPDATE PetOwner SET credit_card_number=$2 WHERE username=$1',
 	update_pet: 'UPDATE Pet SET pet_name=$2 WHERE pet_name=$1 AND owner_username=$3',
-	update_pet_status: 'UPDATE Pet SET enabled=$3 WHERE pet_name=$2 AND owner_username=$1',
+	update_pet_status: 'UPDATE Pet SET enabled=$3 WHERE pet_name=$2 AND owner_username=$1 AND NOT enabled=$3',
 	update_caretaker_pettype_price: 'UPDATE CareTakerPricing SET price=$3 WHERE username=$1 AND pet_type=$2',
 	update_caretaker_accepted_bid: 'UPDATE Bids SET status=\'ACCEPTED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	update_caretaker_rejected_bid: 'UPDATE Bids SET status=\'REJECTED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',

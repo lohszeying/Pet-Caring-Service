@@ -135,7 +135,7 @@
 											<td><%= accepted_bid_tbl[i].pet_name %></td>
 											<td><%= accepted_bid_tbl[i].start_date %></td>
 											<td><%=accepted_bid_tbl[i].end_date %></td>
-											<td><form method="post" action="/caretaker_complete_bid">
+											<td><form method="post" action="/caretaker/caretaker_complete_bid">
                                                 <input type="hidden" id=<%="owner_username" + i%> name="owner_username" value=<%= accepted_bid_tbl[i].owner_username %>>
                                                 <input type="hidden" id=<%="pet_name" + i%> name="pet_name" value=<%= accepted_bid_tbl[i].pet_name %>>
                                                 <input type="hidden" id=<%="start_date"  + i%> name="start_date" value=<%= getDateString(accepted_bid_tbl[i].start_date) %>>
@@ -182,7 +182,7 @@
 											<td><%= pending_bid_tbl[i].pet_name %></td>
 											<td><%= pending_bid_tbl[i].start_date %></td>
 											<td><%= pending_bid_tbl[i].end_date %></td>                                            
-											<td><form method="post" action="/caretaker_accept_bid">
+											<td><form method="post" action="/caretaker/caretaker_accept_bid">
                                                 <input type="hidden" id=<%="aowner_username" + i%> name="owner_username" value=<%= pending_bid_tbl[i].owner_username %>>
                                                 <input type="hidden" id=<%="apet_name" + i%> name="pet_name" value=<%= pending_bid_tbl[i].pet_name %>>
                                                 <input type="hidden" id=<%="astart_date"  + i%> name="start_date" value=<%= getDateString(pending_bid_tbl[i].start_date) %>>
@@ -190,7 +190,7 @@
                                                 <button type="submit" class="btn btn-secondary">Accept</button>
                                             	</form>
 											</td>
-											<td><form method="post" action="/caretaker_reject_bid">
+											<td><form method="post" action="/caretaker/caretaker_reject_bid">
                                                 <input type="hidden" id=<%="rowner_username" + i%> name="owner_username" value=<%= pending_bid_tbl[i].owner_username %>>
                                                 <input type="hidden" id=<%="rpet_name" + i%> name="pet_name" value=<%= pending_bid_tbl[i].pet_name %>>
                                                 <input type="hidden" id=<%="rstart_date"  + i%> name="start_date" value=<%= getDateString(pending_bid_tbl[i].start_date) %>>
@@ -211,7 +211,7 @@
 						<div class="card-header">
 							<i class="fas fa-cat"></i> &nbsp; Add available date:
 						</div>
-						<form method="post" action="/add_availability">
+						<form method="post" action="/caretaker/add_availability">
 							<div class="card-body">
 								<div class="form-group row">
 									<label for="date" class="col-sm-3 col-form-label"><b>Date:</b></label>
@@ -231,7 +231,7 @@
 						<div class="card-header">
 							<i class="fas fa-paw"></i> &nbsp; Apply for leave:
 						</div>
-						<form method="post" action="/apply_for_leave">
+						<form method="post" action="/caretaker/apply_for_leave">
 							<div class="card-body"> 
 								<div class="form-group row">
 									<label for="date" class="col-sm-3 col-form-label"><b>Date:</b></label>
@@ -252,7 +252,7 @@
 							<i class="fas fa-paw"></i> &nbsp; Add the type of pet that you can care for:
 						</div>
 
-						<form method="post" action="/add_caretaker_type_of_pet">
+						<form method="post" action="/caretaker/add_caretaker_type_of_pet">
 							<div class="card-body">
 								<!-- Type of pet -->
 								<div class="form-group row">
@@ -283,7 +283,7 @@
 							<i class="fas fa-cat"></i> &nbsp; Edit the price of pet you can care for
 						</div>
 
-						<form method="post" action="/edit_caretaker_price_of_pet">
+						<form method="post" action="/caretaker/edit_caretaker_price_of_pet">
 							<div class="card-body">
 								<!-- Type of pet -->
 								<div class="form-group row">
