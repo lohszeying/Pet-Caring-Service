@@ -3,7 +3,9 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const adminController = require('../controllers/admin');
 const bidsController = require('../controllers/bids');
-
+const caretaker = require('./caretaker');
+const managepet = require('./managepet');
+const dashboard = require('./dashboard');
 // Postgre SQL Connection
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -20,11 +22,17 @@ function initRouter(app) {
 	//app.get('/search', search);
 
 	/* PROTECTED GET */
-	app.get('/dashboard', passport.authMiddleware(), require('./dashboard').dashboard);
+	app.get('/dashboard', passport.authMiddleware(), dashboard.dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
+<<<<<<< HEAD
+	app.get('/managepet', passport.authMiddleware(), managepet.managepet);
+	app.get('/caretaker', passport.authMiddleware(), caretaker.caretaker);
+	app.get('/bids', passport.authMiddleware(), bids);
+=======
 	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), require('./caretaker').caretaker);
+>>>>>>> upstream/master
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 	//app.get('/makebid',passport.authMiddleware(), makebid);
 
@@ -32,11 +40,31 @@ function initRouter(app) {
 	app.get('/password' , passport.antiMiddleware(), retrieve );
 
 	/* PROTECTED POST */
-	app.post('/update_info', passport.authMiddleware(), require('./dashboard').update_info);
-	app.post('/update_pass', passport.authMiddleware(), require('./dashboard').update_pass);
-	app.post('/update_credcard', passport.authMiddleware(), require('./dashboard').update_credcard);
+	//dashboard
+	app.post('/update_info', passport.authMiddleware(), dashboard.update_info);
+	app.post('/add_caretaker', passport.authMiddleware(), dashboard.update_caretaker_status);
+	app.post('/update_pass', passport.authMiddleware(), dashboard.update_pass);
+	app.post('/update_credcard', passport.authMiddleware(), dashboard.update_credcard);
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
+<<<<<<< HEAD
+	
+	//managepet/
+	app.post('/add_pet', passport.authMiddleware(), managepet.add_pet);
+	app.post('/update_pet', passport.authMiddleware(), managepet.update_pet);
+	app.post('/change_pet_status', passport.authMiddleware(), managepet.change_pet_status);
+	app.post('/add_req', passport.authMiddleware(), managepet.add_req);
+	
+	//caretaker
+	app.post('/add_availability', passport.authMiddleware(), caretaker.add_availability);
+	app.post('/apply_for_leave', passport.authMiddleware(), caretaker.apply_for_leave);
+	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), caretaker.add_caretaker_type_of_pet);
+	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), caretaker.edit_caretaker_price_of_pet);
+	app.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker.caretaker_accept_bid);
+	app.post('/caretaker_reject_bid', passport.authMiddleware(), caretaker.caretaker_reject_bid);
+	app.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker.caretaker_complete_bid);
+	app.post('/make_bid', passport.authMiddleware(), make_bid);
+=======
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
 	app.post('/update_pet', passport.authMiddleware(), update_pet);
 	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
@@ -50,6 +78,7 @@ function initRouter(app) {
 	app.post('/caretaker_reject_bid', passport.authMiddleware(), require('./caretaker').caretaker_reject_bid);
 	app.post('/caretaker_complete_bid', passport.authMiddleware(), require('./caretaker').caretaker_complete_bid);
 	//app.post('/search_avail', passport.authMiddleware(), search_avail);
+>>>>>>> upstream/master
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
 	/* LOGIN */
@@ -220,149 +249,6 @@ function bid(req, res, next){
 function rating_review(req, res, next){
 	basic(req, res, 'rating_review', { page: 'rating_review', auth: true });
 }
-
-// PET OWNER'S MANAGE PET
-function managepet(req, res, next) {
-	var pet_ctx = 0;
-	var pettype_tbl;
-	var pet_tbl;
-	var allspecreq_tbl;
-	var listspecreq_tbl;
-	var owner_username = req.user.username;
-
-	pool.query(sql_query.query.all_pet_types, (err, data) => {
-		if (err || !data.rows || data.rows.length == 0) {
-			pet_ctx = 0;
-			pettype_tbl = [];
-		} else {
-			pet_ctx = data.rows.length;
-			pettype_tbl = data.rows;
-		}
-
-		pool.query(sql_query.query.list_of_pets, [owner_username], (err, data) => {
-			if (err) {
-				pet_tbl = [];
-			} else {
-				pet_tbl = data.rows;
-			}
-
-			pool.query(sql_query.query.all_specreq, (err, data) => {
-				if (err) {
-					allspecreq_tbl = [];
-				} else {
-					allspecreq_tbl = data.rows;
-				}
-
-				pool.query(sql_query.query.list_of_specreq, [owner_username], (err, data) => {
-					if (err) {
-						listspecreq_tbl = [];
-					} else {
-						listspecreq_tbl = data.rows;
-					}
-
-					basic(req, res, 'managepet', {
-						pettype_tbl: pettype_tbl, pet_tbl: pet_tbl,
-						specreq_tbl: allspecreq_tbl, listspecreq_tbl: listspecreq_tbl,
-						addpet_msg: msg(req, 'add_pet', 'Pet added successfully', 'Cannot add this pet'),
-						updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
-						addreq_msg: msg(req, 'add_req', 'Requirement added successfully', 'Cannot add this requirement'),
-						updatestat_msg: msg(req, 'change_pet_status', 'Status changed successfully', 'Cannot change status'),
-						auth: true
-					});
-
-				});
-			});
-		});
-
-	});
-
-}
-
-function add_pet(req, res, next) {
-	var pet_name = req.body.petname;
-	var pet_type =req.body.type;
-	//var specreq = req.body.specreqtype;
-	var owner_username = req.user.username;
-
-	// console.log(pet_name);
-	// console.log(pet_type);
-	// console.log(owner_username);
-
-	pool.query(sql_query.query.add_pet, [pet_name, pet_type, owner_username], (err, data) => {
-		if (err) {
-			console.error("Error in adding pet");
-			res.redirect('/managepet?add_pet=fail');
-		} else {
-			// pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
-			// 	if (err) {
-			// 		console.error("Error in adding pet");
-			// 		res.redirect('/managepet?add_pet=fail');
-			// 	} else {
-					res.redirect('/managepet?add_pet=pass');
-			// 	}
-			// });
-
-		}
-	});
-
-}
-
-function update_pet(req, res, next) {
-	var old_name = req.body.currname;
-	var new_name = req.body.newname;
-	var owner_username = req.user.username;
-
-	pool.query(sql_query.query.update_pet, [old_name, new_name, owner_username], (err, data) => {
-		if (err) {
-			console.error("Error in updating pet");
-			res.redirect('/managepet?update_pet=fail');
-		} else {
-			res.redirect('/managepet?update_pet=pass');
-		}
-	});
-
-}
-
-function add_req(req, res, next) {
-
-	var pet_name = req.body.name;
-	var specreq = req.body.specreqtype;
-	var owner_username = req.user.username;
-
-	pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
-		if (err) {
-			console.error("Error in adding requirement");
-			res.redirect('/managepet?add_req=fail');
-		} else {
-			res.redirect('/managepet?add_req=pass');
-		}
-	});
-
-}
-
-function change_pet_status(req, res, next) {
-	var pet_name = req.body.name;
-	var status = req.body.status;
-	var owner_username = req.user.username;
-	var isEnabled = true;
-
-	if (status === 'enabled') {
-		isEnabled = true;
-	} else {
-		isEnabled = false;
-	}
-
-	pool.query(sql_query.query.update_pet_status, [owner_username, pet_name, isEnabled], (err, data) => {
-		if (err) {
-			console.error("Error in updating pet status");
-			res.redirect('/managepet?change_pet_status=fail');
-		} else {
-			res.redirect('/managepet?change_pet_status=pass');
-		}
-	});
-}
-
-
 
 /*function games(req, res, next) {
 	var ctx = 0, avg = 0, tbl;
