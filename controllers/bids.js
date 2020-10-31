@@ -19,6 +19,11 @@ router.get('/search-availability', passport.authMiddleware(), function (req, res
         auth: true,
         caretakers: [],
         pet_tbl: [],
+        additionalInfo: {
+            start_date: '',
+            end_date: '',
+            pet_type: ''
+        }
     };
 
     pool.query(sql_query.query.list_of_pets, [req.user.username],(err, data) => {
@@ -42,7 +47,11 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
         auth: true,
         caretakers: [],
         pet_tbl: [],
-
+        additionalInfo: {
+            start_date: req.body.start_date,
+            end_date: req.body.end_date,
+            pet_type: req.body.type
+        }
     };
 
     pool.query(sql_query.query.list_of_pets,[req.user.username], (err, data) => {
