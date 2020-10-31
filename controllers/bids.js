@@ -8,6 +8,57 @@ const pool = new Pool({
 const sql_query = require('../sql');
 const passport = require('passport');
 
+router.get('/', passport.authMiddleware(), function bids(req, res, next) {
+    const owner_username = req.user.username;
+
+    const info = {
+        page: 'bids',
+        user: req.user.username,
+        name: req.user.name,
+        area: req.user.area,
+        enabled: req.user.enabled,
+        auth: true,
+        pastbids_tbl: [],
+        acceptedbids_tbl: [],
+        pendingbids_tbl: [],
+        rejectedbids_tbl: []
+    };
+
+    pool.query(sql_query.query.get_all_completed_bids, [owner_username], (err, data) => {
+        if (err || !data.rows || data.rows.length == 0) {
+            console.error("Error in retrieving past bid");
+        } else {
+            info.pastbids_tbl = data.rows;
+        }
+
+        pool.query(sql_query.query.get_all_accepted_bids, [owner_username], (err, data) => {
+            if (err || !data.rows || data.rows.length == 0) {
+                console.error("Error in retrieving accepted bid");
+            } else {
+                info.acceptedbids_tbl = data.rows;
+            }
+
+            pool.query(sql_query.query.get_all_pending_bids, [owner_username], (err, data) => {
+                if (err || !data.rows || data.rows.length == 0) {
+                    console.error("Error in retrieving pending bid");
+                } else {
+                    info.pendingbids_tbl = data.rows;
+                }
+
+                pool.query(sql_query.query.get_all_rejected_bids, [owner_username], (err, data) => {
+                    if (err || !data.rows || data.rows.length == 0) {
+                        console.error("Error in retrieving rejected bid");
+                    } else {
+                        info.rejectedbids_tbl = data.rows;
+                    }
+                });
+
+                return res.render("bids", info);
+            });
+        });
+    });
+});
+
 router.get('/search-availability', passport.authMiddleware(), function (req, res, next) {
    
     const info = {

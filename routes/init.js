@@ -32,7 +32,6 @@ function initRouter(app) {
 
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
-	//app.get('/bids', passport.antiMiddleware(), bid)
 	/* PROTECTED POST */
 	//dashboard
 	app.post('/update_info', passport.authMiddleware(), dashboard.update_info);
