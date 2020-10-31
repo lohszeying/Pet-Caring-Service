@@ -9,7 +9,7 @@ const sql_query = require('../sql');
 const passport = require('passport');
 
 router.get('/search-availability', passport.authMiddleware(), function (req, res, next) {
-
+   
     const info = {
         page: 'bids/search-availability',
         user: req.user.username,
@@ -19,9 +19,14 @@ router.get('/search-availability', passport.authMiddleware(), function (req, res
         auth: true,
         caretakers: [],
         pet_tbl: [],
+        additionalInfo: {
+            start_date: '',
+            end_date: '',
+            pet_type: ''
+        }
     };
 
-    pool.query(sql_query.query.all_pet_types, (err, data) => {
+    pool.query(sql_query.query.list_of_pets, [req.user.username],(err, data) => {
         if (err) {
             console.error(err);
         } else {
@@ -42,24 +47,27 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
         auth: true,
         caretakers: [],
         pet_tbl: [],
-
+        additionalInfo: {
+            start_date: req.body.start_date,
+            end_date: req.body.end_date,
+            pet_type: req.body.type
+        }
     };
 
-    pool.query(sql_query.query.all_pet_types, (err, data) => {
+    pool.query(sql_query.query.list_of_pets,[req.user.username], (err, data) => {
         if (err) {
             console.error(err);
         } else {
             info.pet_tbl = data.rows;
         }
 
-        pool.query(sql_query.query.get_top_available_caretaker, [req.body.start_date, req.body.end_date, req.body.type], (err2, data2) => {
+        //inputs: 1. startdate, 2. enddate, 3.petowner, 4. petname
+        pool.query(sql_query.query.get_top_available_caretaker, [req.body.start_date, req.body.end_date, req.user.username, req.body.type], (err2, data2) => {
             if (err2) {
                 console.error(err2);
             } else {
                 info.caretakers = data2.rows;
-            }
-            
-
+            } 
 
             res.render("bids/search-availability", info);
         });
