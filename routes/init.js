@@ -24,9 +24,8 @@ function initRouter(app) {
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
-	app.get('/caretaker', passport.authMiddleware(), caretaker);
-	app.get('/current_bids',passport.authMiddleware(), current_bids);
-	app.get('/past_bids', passport.authMiddleware(), past_bids);
+	app.get('/caretaker', passport.authMiddleware(), require('./caretaker').caretaker);
+	app.get('/bids', passport.authMiddleware(), bids);
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 
 	app.get('/register' , passport.antiMiddleware(), register );
@@ -124,22 +123,57 @@ function search(req, res, next) {
 
 
 //BID FUNCTION 
-function current_bids(req, res, next){
-	basic(req, res, 'current_bids',
-		{
-			page: current_bids,
-			auth: true
+
+function bids(req, res, next) {
+	var pastbids_tbl;
+	var acceptedbids_tbl;
+	var pendingbids_tbl;
+	var rejectedbids_tbl;
+	var owner_username = req.user.username;
+
+	pool.query(sql_query.query.get_all_completed_bids, [owner_username], (err, data) => {
+		if (err || !data.rows || data.rows.length == 0) {
+			console.error("Error in retrieving past bid");
+			pastbids_tbl = [];
+		} else {
+			pastbids_tbl = data.rows;
+		}
+
+		pool.query(sql_query.query.get_all_accepted_bids, [owner_username], (err, data) => {
+			if (err || !data.rows || data.rows.length == 0) {
+				console.error("Error in retrieving accepted bid");
+				acceptedbids_tbl = [];
+			} else {
+				acceptedbids_tbl = data.rows;
+			}
+
+			pool.query(sql_query.query.get_all_pending_bids, [owner_username], (err, data) => {
+				if (err || !data.rows || data.rows.length == 0) {
+					console.error("Error in retrieving pending bid");
+					pendingbids_tbl = [];
+				} else {
+					pendingbids_tbl = data.rows;
+				}
+
+				pool.query(sql_query.query.get_all_rejected_bids, [owner_username], (err, data) => {
+					if (err || !data.rows || data.rows.length == 0) {
+						console.error("Error in retrieving rejected bid");
+						rejectedbids_tbl = [];
+					} else {
+						rejectedbids_tbl = data.rows;
+					}
+				});		
+				
+				basic(req, res, 'bids',
+					{ page: bids, pastbids_tbl: pastbids_tbl, acceptedbids_tbl: acceptedbids_tbl, 
+						pendingbids_tbl: pendingbids_tbl, rejectedbids_tbl: rejectedbids_tbl, auth: true }
+				);
+
+			});
 		});
+	});
 	
-}
-
-function past_bids(req, res, next) {
-	basic(req, res, 'past_bids',
-		{
-			page: past_bids,
-			auth: true
-		});
-
+	
 }
 
 
