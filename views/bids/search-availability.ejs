@@ -48,7 +48,7 @@
                         <label for="username" class="col-sm-2 col-form-label"><b> Pet name:</b></label>
                         <div class="col-sm-4">
                             <select name="type" class="custom-select">
-                                <% for(var i = 0; i < pet_tbl.length; i++) { %>
+                                <% for(let i = 0; i < pet_tbl.length; i++) { %>
                                     <option>
                                         <%= pet_tbl[i].pet_name %>
                                     </option>
@@ -66,10 +66,10 @@
                     <div class="form-group row">
                         <label for="ct" class="col-sm-2 col-form-label"><b>Select caretakers:</b></label>
                         <div class="col-sm-4">
-                            <select name="type" class="custom-select">
-                                <% for(var i = 0; i < caretakers.length; i++) { %>
-                                    <option>
-                                        <%= caretakers[i].username %>
+                            <select name="caretaker_username" class="custom-select">
+                                <% for(let i = 0; i < caretakers.length; i++) { %>
+                                    <option value="<%= caretakers[i].caretaker_username %>">
+                                        <%= caretakers[i].caretaker_username %>(<%= caretakers[i].rate %>)
                                     </option>
                                 <% } %>
                             </select>
