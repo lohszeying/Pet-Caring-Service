@@ -32,7 +32,7 @@ function initRouter(app) {
 
 	app.get('/register' , passport.antiMiddleware(), register );
 	app.get('/password' , passport.antiMiddleware(), retrieve );
-
+	app.get('/bids', passport.antiMiddleware(), bid)
 	/* PROTECTED POST */
 	//dashboard
 	app.post('/update_info', passport.authMiddleware(), dashboard.update_info);
@@ -56,11 +56,6 @@ function initRouter(app) {
 	app.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker.caretaker_accept_bid);
 	app.post('/caretaker_reject_bid', passport.authMiddleware(), caretaker.caretaker_reject_bid);
 	app.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker.caretaker_complete_bid);
-	app.post('/make_bid', passport.authMiddleware(), make_bid);
-	app.post('/add_pet', passport.authMiddleware(), add_pet);
-	app.post('/update_pet', passport.authMiddleware(), update_pet);
-	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
-	app.post('/add_req', passport.authMiddleware(), add_req);
 
 	//app.post('/search_avail', passport.authMiddleware(), search_avail);
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
