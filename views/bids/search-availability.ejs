@@ -23,14 +23,15 @@
     <%- include ../sidebar.ejs %>
 
     <div id="content-wrapper">
-        <form method="post" action="/bids/search-availability">
+
         <div class="container-fluid">
+            <form method="post" action="/bids/search-availability">
                 <div class="card-body">
                     <div class="form-group row">
                         <label for="date" class="col-sm-3 col-form-label"><b>Start Date:</b></label>
                         <div class="col-sm-9">
                             <input required="required" class="form-control" id="date" placeholder="2020-01-01"
-                                   name="start_date" value="" type="date">
+                                   name="start_date" value="<%= additionalInfo.start_date %>" type="date">
                         </div>
                     </div>
                 </div>
@@ -39,7 +40,7 @@
                         <label for="date2" class="col-sm-3 col-form-label"><b>End Date:</b></label>
                         <div class="col-sm-9">
                             <input required="required" class="form-control" id="date2" placeholder="2020-01-01"
-                                   name="end_date" value="" type="date">
+                                   name="end_date" value="<%= additionalInfo.end_date %>" type="date">
                         </div>
                     </div>
                 </div>
@@ -60,24 +61,32 @@
                 <div class="card-footer small text-muted">
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
-            
-            <div class="container-fluid"> 
-                <div class="card-body">
-                    <div class="form-group row">
-                        <label for="ct" class="col-sm-2 col-form-label"><b>Select caretakers:</b></label>
-                        <div class="col-sm-4">
-                            <select name="caretaker_username" class="custom-select">
-                                <% for(let i = 0; i < caretakers.length; i++) { %>
-                                    <option value="<%= caretakers[i].caretaker_username %>">
-                                        <%= caretakers[i].caretaker_username %>(<%= caretakers[i].rate %>)
-                                    </option>
-                                <% } %>
-                            </select>
+            </form>
+            <form method="post" action="/bids/submit-bid">
+                <input type="hidden" name="start_date" value="<%= additionalInfo.start_date %>"/>
+                <input type="hidden" name="end_date" value="<%= additionalInfo.end_date %>"/>
+                <input type="hidden" name="pet_type" value="<%= additionalInfo.pet_type %>"/>
+                <div class="container-fluid">
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label for="caretaker_username" class="col-sm-2 col-form-label"><b>Select
+                                    caretakers:</b></label>
+                            <div class="col-sm-4">
+                                <select id="caretaker_username" name="caretaker_username" class="custom-select">
+                                    <% for(let i = 0; i < caretakers.length; i++) { %>
+                                        <option value="<%= caretakers[i].caretaker_username %>">
+                                            <%= caretakers[i].caretaker_username %>(<%= caretakers[i].rate %>)
+                                        </option>
+                                    <% } %>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>   
-            </div>
+                    <div class="card-footer small text-muted">
+                        <button type="submit" class="btn btn-secondary">Submit Bid</button>
+                    </div>
+                </div>
+            </form>
         </div>
-        </form>
     </div>
 </div>
