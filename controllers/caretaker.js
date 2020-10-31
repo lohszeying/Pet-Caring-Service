@@ -1,3 +1,6 @@
+require('dotenv').load();
+const express = require('express');
+const router = express.Router();
 const sql_query = require('../sql');
 const passport = require('passport');
 const { Pool } = require('pg');
@@ -18,6 +21,15 @@ const { msg2 } = require('./basic');
 const basic = require('./basic').basic;
 const query = require('./basic').query;
 const msg = require('./basic').msg;
+
+router.get('/', passport.authMiddleware(), caretaker);
+router.post('/add_availability', passport.authMiddleware(), add_availability);
+router.post('/apply_for_leave', passport.authMiddleware(), apply_for_leave);
+router.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
+router.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
+router.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker_accept_bid);
+router.post('/caretaker_reject_bid', passport.authMiddleware(), caretaker_reject_bid);
+router.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker_complete_bid);
 
 function getDateString(da) {
 	var m = moment(da, 'ddd MMM DD YYYY hh:mm:ss [GMT]ZZ').format('MM-DD-YYYY');
@@ -261,11 +273,4 @@ function caretaker_complete_bid(req, res, next) {
 }
 
 
-module.exports = {caretaker : caretaker,
-add_availability: add_availability,
-apply_for_leave: apply_for_leave,
-add_caretaker_type_of_pet: add_caretaker_type_of_pet,
-edit_caretaker_price_of_pet: edit_caretaker_price_of_pet,
-caretaker_accept_bid: caretaker_accept_bid,
-caretaker_complete_bid: caretaker_complete_bid,
-caretaker_reject_bid: caretaker_reject_bid};
+module.exports = router;

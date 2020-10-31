@@ -3,9 +3,9 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const adminController = require('../controllers/admin');
 const bidsController = require('../controllers/bids');
-const caretaker = require('./caretaker');
-const managepet = require('./managepet');
-const dashboard = require('./dashboard');
+const caretakerController = require('../controllers/caretaker');
+const managepetController = require('../controllers/managepet');
+const dashboardController = require('../controllers/dashboard');
 // Postgre SQL Connection
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -22,11 +22,11 @@ function initRouter(app) {
 	//app.get('/search', search);
 
 	/* PROTECTED GET */
-	app.get('/dashboard', passport.authMiddleware(), dashboard.dashboard);
+	//app.get('/dashboard', passport.authMiddleware(), dashboard.dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
-	app.get('/managepet', passport.authMiddleware(), managepet.managepet);
-	app.get('/caretaker', passport.authMiddleware(), caretaker.caretaker);
+	//app.get('/managepet', passport.authMiddleware(), managepet.managepet);
+	//app.get('/caretaker', passport.authMiddleware(), caretaker.caretaker);
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 	//app.get('/makebid',passport.authMiddleware(), makebid);
 
@@ -34,20 +34,24 @@ function initRouter(app) {
 	app.get('/password' , passport.antiMiddleware(), retrieve );
 	/* PROTECTED POST */
 	//dashboard
+	/*
 	app.post('/update_info', passport.authMiddleware(), dashboard.update_info);
 	app.post('/add_caretaker', passport.authMiddleware(), dashboard.update_caretaker_status);
 	app.post('/update_pass', passport.authMiddleware(), dashboard.update_pass);
 	app.post('/update_credcard', passport.authMiddleware(), dashboard.update_credcard);
+	*/
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
 	
 	//managepet/
+	/*
 	app.post('/add_pet', passport.authMiddleware(), managepet.add_pet);
 	app.post('/update_pet', passport.authMiddleware(), managepet.update_pet);
 	app.post('/change_pet_status', passport.authMiddleware(), managepet.change_pet_status);
 	app.post('/add_req', passport.authMiddleware(), managepet.add_req);
-	
+	*/
 	//caretaker
+	/*
 	app.post('/add_availability', passport.authMiddleware(), caretaker.add_availability);
 	app.post('/apply_for_leave', passport.authMiddleware(), caretaker.apply_for_leave);
 	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), caretaker.add_caretaker_type_of_pet);
@@ -55,7 +59,7 @@ function initRouter(app) {
 	app.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker.caretaker_accept_bid);
 	app.post('/caretaker_reject_bid', passport.authMiddleware(), caretaker.caretaker_reject_bid);
 	app.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker.caretaker_complete_bid);
-
+	*/
 	//app.post('/search_avail', passport.authMiddleware(), search_avail);
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
@@ -65,8 +69,10 @@ function initRouter(app) {
 		failureRedirect: '/'
 	}));
 
+	app.use('/dashboard', dashboardController)
+	app.use('/managepet', managepetController);
 	app.use('/bids', bidsController);
-
+	app.use('/caretaker', caretakerController)
 	// TODO: create separate admin passport strategy
 	app.use('/admin', adminController);
 

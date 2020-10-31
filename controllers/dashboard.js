@@ -1,3 +1,6 @@
+require('dotenv').load();
+const express = require('express');
+const router = express.Router();
 const sql_query = require('../sql');
 const passport = require('passport');
 const { Pool } = require('pg');
@@ -12,6 +15,12 @@ const salt  = bcrypt.genSaltSync(round);
 const basic = require('./basic').basic;
 const query = require('./basic').query;
 const msg = require('./basic').msg;
+
+router.get('/', passport.authMiddleware(), dashboard);
+router.post('/update_info', passport.authMiddleware(), update_info);
+router.post('/add_caretaker', passport.authMiddleware(), update_caretaker_status);
+router.post('/update_pass', passport.authMiddleware(), update_pass);
+router.post('/update_credcard', passport.authMiddleware(), update_credcard);
 
 function dashboard(req, res, next) {
 	basic(req, res, 'dashboard', {
@@ -76,9 +85,4 @@ function update_pass(req, res, next) {
 	});
 }
 
-module.exports = {dashboard: dashboard,
-                update_info: update_info,
-                update_credcard: update_credcard,
-                update_caretaker_status: update_caretaker_status,
-                update_pass: update_pass,
-};
+module.exports = router;

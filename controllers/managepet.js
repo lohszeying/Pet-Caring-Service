@@ -1,3 +1,7 @@
+
+require('dotenv').load();
+const express = require('express');
+const router = express.Router();
 const sql_query = require('../sql');
 const passport = require('passport');
 const { Pool } = require('pg');
@@ -18,6 +22,11 @@ const basic = require('./basic').basic;
 const query = require('./basic').query;
 const msg = require('./basic').msg;
 
+router.get('/', passport.authMiddleware(), managepet);
+router.post('/add_pet', passport.authMiddleware(), add_pet);
+router.post('/update_pet', passport.authMiddleware(), update_pet);
+router.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
+router.post('/add_req', passport.authMiddleware(), add_req);
 // PET OWNER'S MANAGE PET
 async function managepet(req, res, next) {
 	var pet_ctx = 0;
@@ -145,10 +154,4 @@ function change_pet_status(req, res, next) {
 	});
 }
 
-module.exports = {
-    managepet: managepet,
-    add_pet: add_pet,
-    update_pet: update_pet,
-    add_req: add_req,
-    change_pet_status: change_pet_status
-};
+module.exports = router;
