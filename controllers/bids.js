@@ -9,7 +9,7 @@ const sql_query = require('../sql');
 const passport = require('passport');
 
 router.get('/search-availability', passport.authMiddleware(), function (req, res, next) {
-
+   
     const info = {
         page: 'bids/search-availability',
         user: req.user.username,
@@ -21,7 +21,7 @@ router.get('/search-availability', passport.authMiddleware(), function (req, res
         pet_tbl: [],
     };
 
-    pool.query(sql_query.query.all_pet_types, (err, data) => {
+    pool.query(sql_query.query.list_of_pets, [req.user.username],(err, data) => {
         if (err) {
             console.error(err);
         } else {
@@ -45,11 +45,12 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
 
     };
 
-    pool.query(sql_query.query.all_pet_types, (err, data) => {
+    pool.query(sql_query.query.list_of_pets,[req.user.username], (err, data) => {
         if (err) {
             console.error(err);
         } else {
             info.pet_tbl = data.rows;
+            console.log(data.rows);
         }
 
         pool.query(sql_query.query.get_top_available_caretaker, [req.body.start_date, req.body.end_date, req.body.type], (err2, data2) => {
@@ -57,9 +58,7 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
                 console.error(err2);
             } else {
                 info.caretakers = data2.rows;
-            }
-            
-
+            } 
 
             res.render("bids/search-availability", info);
         });

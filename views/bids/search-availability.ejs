@@ -45,12 +45,12 @@
                 </div>
                 <div class="card-body">
                     <div class="form-group row">
-                        <label for="username" class="col-sm-2 col-form-label"><b>Type of pet:</b></label>
+                        <label for="username" class="col-sm-2 col-form-label"><b> Pet name:</b></label>
                         <div class="col-sm-4">
                             <select name="type" class="custom-select">
                                 <% for(var i = 0; i < pet_tbl.length; i++) { %>
                                     <option>
-                                        <%= pet_tbl[i].pet_type %>
+                                        <%= pet_tbl[i].pet_name %>
                                     </option>
                                 <% } %>
                             </select>
