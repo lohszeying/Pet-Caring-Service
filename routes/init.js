@@ -25,14 +25,8 @@ function initRouter(app) {
 	app.get('/dashboard', passport.authMiddleware(), dashboard.dashboard);
 	/*app.get('/games'    , passport.authMiddleware(), games    );
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
-<<<<<<< HEAD
 	app.get('/managepet', passport.authMiddleware(), managepet.managepet);
 	app.get('/caretaker', passport.authMiddleware(), caretaker.caretaker);
-	app.get('/bids', passport.authMiddleware(), bids);
-=======
-	app.get('/managepet', passport.authMiddleware(), managepet);
-	app.get('/caretaker', passport.authMiddleware(), require('./caretaker').caretaker);
->>>>>>> upstream/master
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 	//app.get('/makebid',passport.authMiddleware(), makebid);
 
@@ -47,7 +41,6 @@ function initRouter(app) {
 	app.post('/update_credcard', passport.authMiddleware(), dashboard.update_credcard);
 	//app.post('/add_game'   , passport.authMiddleware(), add_game   );
 	//app.post('/add_play'   , passport.authMiddleware(), add_play   );
-<<<<<<< HEAD
 	
 	//managepet/
 	app.post('/add_pet', passport.authMiddleware(), managepet.add_pet);
@@ -64,21 +57,12 @@ function initRouter(app) {
 	app.post('/caretaker_reject_bid', passport.authMiddleware(), caretaker.caretaker_reject_bid);
 	app.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker.caretaker_complete_bid);
 	app.post('/make_bid', passport.authMiddleware(), make_bid);
-=======
 	app.post('/add_pet', passport.authMiddleware(), add_pet);
 	app.post('/update_pet', passport.authMiddleware(), update_pet);
 	app.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
 	app.post('/add_req', passport.authMiddleware(), add_req);
-	app.post('/add_availability', passport.authMiddleware(), require('./caretaker').add_availability);
-	app.post('/apply_for_leave', passport.authMiddleware(), require('./caretaker').apply_for_leave);
-	app.post('/add_caretaker_type_of_pet', passport.authMiddleware(), require('./caretaker').add_caretaker_type_of_pet);
-	app.post('/add_caretaker', passport.authMiddleware(), require('./dashboard').update_caretaker_status);
-	app.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), require('./caretaker').edit_caretaker_price_of_pet);
-	app.post('/caretaker_accept_bid', passport.authMiddleware(), require('./caretaker').caretaker_accept_bid);
-	app.post('/caretaker_reject_bid', passport.authMiddleware(), require('./caretaker').caretaker_reject_bid);
-	app.post('/caretaker_complete_bid', passport.authMiddleware(), require('./caretaker').caretaker_complete_bid);
+
 	//app.post('/search_avail', passport.authMiddleware(), search_avail);
->>>>>>> upstream/master
 	app.post('/reg_user'   , passport.antiMiddleware(), reg_user   );
 
 	/* LOGIN */
