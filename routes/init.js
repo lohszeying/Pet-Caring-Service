@@ -25,7 +25,7 @@ function initRouter(app) {
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), require('./caretaker').caretaker);
-	app.get('/bids', passport.authMiddleware(), bids);
+	//app.get('/bids', passport.authMiddleware(), bids);
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 	//app.get('/makebid',passport.authMiddleware(), makebid);
 
