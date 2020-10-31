@@ -26,7 +26,7 @@ router.get('/', passport.authMiddleware(), managepet);
 router.post('/add_pet', passport.authMiddleware(), add_pet);
 router.post('/update_pet', passport.authMiddleware(), update_pet);
 router.post('/change_pet_status', passport.authMiddleware(), change_pet_status);
-router.post('/add_req', passport.authMiddleware(), add_req);
+router.post('/edit_req', passport.authMiddleware(), edit_req);
 // PET OWNER'S MANAGE PET
 async function managepet(req, res, next) {
 	var pet_ctx = 0;
@@ -53,18 +53,35 @@ async function managepet(req, res, next) {
 		data = await pool.query(sql_query.query.list_of_specreq, [owner_username]);
 		listspecreq_tbl = data.rows;
 
-        addpet_msg = req.query['add_pet'] =='pass'? 'You have successfully added a new '+ req.query['pet_type'] + ' named ' + req.query['pet_name']
-                    : msg2(req, 'add_pet', {
+        addpet_msg = msg2(req, 'add_pet', {
+						'pass': `You have successfully added a new  ${req.query['pet_type']} named  ${req.query['pet_name']}`,
                         'duplicate': 'You already have a pet with the same name!',
                         'fail': 'Error in adding pet'
-                    });
+					});
+		
 		basic(req, res, 'managepet', {
 				pettype_tbl: pettype_tbl, pet_tbl: pet_tbl,
 				specreq_tbl: allspecreq_tbl, listspecreq_tbl: listspecreq_tbl,
 				addpet_msg: addpet_msg,
-				updatepet_msg: msg(req, 'update_pet', 'Pet updated successfully', 'Cannot update pet'),
-				addreq_msg: msg(req, 'add_req', 'Requirement added successfully', 'Cannot add this requirement'),
-				updatestat_msg: msg(req, 'change_pet_status', 'Status changed successfully', 'Cannot change status'),
+				updatepet_msg: msg2(req, 'update_pet', {
+					'duplicate' :`You already have a pet named ${req.query['new_name']}!`,
+					'fail' :'Failure in editing name!',
+					'pass': `${req.query['old_name']} is now named as ${req.query['new_name']}!`
+				}),
+				addreq_msg: msg2(req, 'edit_req', {
+					'add_pass':`${req.query['pet_name']} now has special requirement of ${req.query['specreq']}`,
+					'add_duplicate': `${req.query['pet_name']} already has special requirement of ${req.query['specreq']}`,
+					'add_fk': `${req.query['pet_name']} or ${req.query['specreq']} does not exist`,
+					'add_fail': 'Failed to add special requirement',
+					'remove_pass' : `Successfully removed special requirement of ${req.query['specreq']} from ${req.query['pet_name']}`,
+					'remove_none': `${req.query['pet_name']} does not have special requirement of ${req.query['specreq']}`,
+					'remove_fail': 'Failed to remove special requirement'
+				}),
+				updatestat_msg: msg2(req, 'change_pet_status', {
+					'fail': 'Failed to update status',
+					'nochange' : `${req.query['pet_name']} is already ${req.query['new_status']}!`,
+					'pass': `${req.query['pet_name']} has been ${req.query['new_status']}`
+				}),
 				auth: true
 			});
     } catch (e) {
@@ -105,30 +122,63 @@ function update_pet(req, res, next) {
 	var owner_username = req.user.username;
 
 	pool.query(sql_query.query.update_pet, [old_name, new_name, owner_username], (err, data) => {
+		var update_pet;
 		if (err) {
+			err = wrapError(err);
+			if (err instanceof UniqueViolationError) {
+				update_pet = 'duplicate';
+			} else {
+				update_pet = 'fail';
+			}
 			console.error("Error in updating pet");
-			res.redirect('/managepet?update_pet=fail');
 		} else {
-			res.redirect('/managepet?update_pet=pass');
+			update_pet = 'pass';
 		}
+		res.redirect(`/managepet?update_pet=${update_pet}&old_name=${old_name}&new_name=${new_name}`);
 	});
 
 }
 
-function add_req(req, res, next) {
+function edit_req(req, res, next) {
 
 	var pet_name = req.body.name;
 	var specreq = req.body.specreqtype;
 	var owner_username = req.user.username;
+	if (req.body.addorremove == "add") {
 
-	pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
-		if (err) {
-			console.error("Error in adding requirement");
-			res.redirect('/managepet?add_req=fail');
-		} else {
-			res.redirect('/managepet?add_req=pass');
-		}
-	});
+		pool.query(sql_query.query.add_specreq, [owner_username, pet_name, specreq], (err, data) => {
+			var edit_req;
+			if (err) {
+				err = wrapError(err);
+				if (err instanceof UniqueViolationError){
+					edit_req = 'add_duplicate';
+				} else if (err instanceof ForeignKeyViolationError) {
+					edit_req = 'add_fk';
+				} else {
+					edit_req = 'add_fail';
+				}
+			} else {
+				edit_req = 'add_pass';
+			}
+			res.redirect(`/managepet?edit_req=${edit_req}&pet_name=${pet_name}&specreq=${specreq}`);
+		});
+		
+	} else {
+		pool.query(sql_query.query.delete_specreq, [owner_username, pet_name, specreq], (err, data) => {
+			var edit_req;
+			console.log(data);
+			if (err) {
+				edit_req = 'remove_fail';
+			} else {
+				if (data.rowCount == 0)	{
+					edit_req = 'remove_none';
+				} else {
+					edit_req = 'remove_pass';
+				}
+			}
+			res.redirect(`/managepet?edit_req=${edit_req}&pet_name=${pet_name}&specreq=${specreq}`);
+		});
+	}
 
 }
 
@@ -137,20 +187,27 @@ function change_pet_status(req, res, next) {
 	var status = req.body.status;
 	var owner_username = req.user.username;
 	var isEnabled = true;
-
+	var newStatus;
 	if (status === 'enabled') {
 		isEnabled = true;
+		new_status = 'enabled';
 	} else {
 		isEnabled = false;
+		new_status = 'disabled';
 	}
 
 	pool.query(sql_query.query.update_pet_status, [owner_username, pet_name, isEnabled], (err, data) => {
+		var pet_status;
 		if (err) {
-			console.error("Error in updating pet status");
-			res.redirect('/managepet?change_pet_status=fail');
+			pet_status = 'fail';
 		} else {
-			res.redirect('/managepet?change_pet_status=pass');
+			if (data.rowCount == 0) {
+				pet_status = 'nochange';
+			} else {
+				pet_status = 'pass';
+			}
 		}
+		res.redirect(`/managepet?change_pet_status=${pet_status}&pet_name=${pet_name}&new_status=${new_status}`);
 	});
 }
 
