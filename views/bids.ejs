@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=yes">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Your Bids</title>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template-->
+    <link href="stylesheets/index.css" rel="stylesheet">
+</head>
+
+<body id="page-top">
+    <%- include navbar.ejs %>
+
+    <div id="wrapper">
+        <%- include sidebar.ejs %>
+
+        <div id="content-wrapper">
+            <div class="container-fluid">
+                <%- include name.ejs %>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-address-card"></i> &nbsp; Profile
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group row">
+                            <label for="username" class="col-sm-2 col-form-label"><b>User ID:</b></label>
+                            <div class="col-sm-4">
+                                <input type="text" required="required" readonly class="form-control-plaintext"
+                                    id="username" value="<%= user %>" name="username">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="username" class="col-sm-2 col-form-label"><b>Name:</b></label>
+                            <div class="col-sm-4">
+                                <input type="text" required="required" readonly class="form-control-plaintext" id="name"
+                                    value="<%= name %>" name="name">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-paw"></i> &nbsp; All accepted bids
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>Transfer Method</th>
+                                        <th>Payment Type</th>
+                                        <th>Caretaker username</th>
+                                        <th>Pet name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for(var i=0; i<acceptedbids_tbl.length; i++) { %>
+                                    <tr>
+                                        <td><%= acceptedbids_tbl[i].status %></td>
+                                        <td><%= acceptedbids_tbl[i].total_price %></td>
+                                        <td><%= acceptedbids_tbl[i].transfer_method %></td>
+                                        <td><%= acceptedbids_tbl[i].payment_type %></td>
+                                        <td><%= acceptedbids_tbl[i].caretaker_username %></td>
+                                        <td><%= acceptedbids_tbl[i].pet_name %></td>
+                                        <td><%= acceptedbids_tbl[i].start_date %></td>
+                                        <td><%= acceptedbids_tbl[i].end_date %></td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-paw"></i> &nbsp; All pending bids
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>Transfer Method</th>
+                                        <th>Payment Type</th>
+                                        <th>Caretaker username</th>
+                                        <th>Pet name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for(var i=0; i<pendingbids_tbl.length; i++) { %>
+                                    <tr>
+                                        <td><%= pendingbids_tbl[i].status %></td>
+                                        <td><%= pendingbids_tbl[i].total_price %></td>
+                                        <td><%= pendingbids_tbl[i].transfer_method %></td>
+                                        <td><%= pendingbids_tbl[i].payment_type %></td>
+                                        <td><%= pendingbids_tbl[i].caretaker_username %></td>
+                                        <td><%= pendingbids_tbl[i].pet_name %></td>
+                                        <td><%= pendingbids_tbl[i].start_date %></td>
+                                        <td><%= pendingbids_tbl[i].end_date %></td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-paw"></i> &nbsp; All rejected bids
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>Transfer Method</th>
+                                        <th>Payment Type</th>
+                                        <th>Caretaker username</th>
+                                        <th>Pet name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for(var i=0; i<pendingbids_tbl.length; i++) { %>
+                                    <tr>
+                                        <td><%= rejectedbids_tbl[i].status %></td>
+                                        <td><%= rejectedbids_tbl[i].total_price %></td>
+                                        <td><%= rejectedbids_tbl[i].transfer_method %></td>
+                                        <td><%= rejectedbids_tbl[i].payment_type %></td>
+                                        <td><%= rejectedbids_tbl[i].caretaker_username %></td>
+                                        <td><%= rejectedbids_tbl[i].pet_name %></td>
+                                        <td><%= rejectedbids_tbl[i].start_date %></td>
+                                        <td><%= rejectedbids_tbl[i].end_date %></td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <i class="fas fa-paw"></i> &nbsp; All completed bids
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>Total Price</th>
+                                        <th>Transfer Method</th>
+                                        <th>Payment Type</th>
+                                        <th>Caretaker username</th>
+                                        <th>Pet name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% for(var i=0; i<pastbids_tbl.length; i++) { %>
+                                    <tr>
+                                        <td><%= pastbids_tbl[i].status %></td>
+                                        <td><%= pastbids_tbl[i].total_price %></td>
+                                        <td><%= pastbids_tbl[i].transfer_method %></td>
+                                        <td><%= pastbids_tbl[i].payment_type %></td>
+                                        <td><%= pastbids_tbl[i].caretaker_username %></td>
+                                        <td><%= pastbids_tbl[i].pet_name %></td>
+                                        <td><%= pastbids_tbl[i].start_date %></td>
+                                        <td><%= pastbids_tbl[i].end_date %></td>
+                                    </tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <%- include bottomscript.ejs %>
+</body>
+
+
+</html>

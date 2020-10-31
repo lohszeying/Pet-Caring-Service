@@ -25,7 +25,7 @@ function initRouter(app) {
 	app.get('/plays'    , passport.authMiddleware(), plays    );*/
 	app.get('/managepet', passport.authMiddleware(), managepet);
 	app.get('/caretaker', passport.authMiddleware(), require('./caretaker').caretaker);
-	app.get('/bid',passport.authMiddleware(), bid);
+	app.get('/bids', passport.authMiddleware(), bids);
 	app.get('/rating_review',passport.authMiddleware(), rating_review);
 
 	app.get('/register' , passport.antiMiddleware(), register );
@@ -123,50 +123,58 @@ function search(req, res, next) {
 
 
 //BID FUNCTION 
-function bid(req, res, next){
-	var pet_ctx = 0, pet_tbl;
-	var caretaker_tbl; tm_tb1; pt_tb1;
 
-		pool.query(sql_query.query.all_pet_types, (err, data) => {
-						if (err || !data.rows || data.rows.length == 0) {
-							pet_ctx = 0;
-							pet_tbl = [];
-						} else {
-							pet_ctx = data.rows.length;
-							pet_tbl = data.rows;
-						}
+function bids(req, res, next) {
+	var pastbids_tbl;
+	var acceptedbids_tbl;
+	var pendingbids_tbl;
+	var rejectedbids_tbl;
+	var owner_username = req.user.username;
 
-						pool.query(sql_query.query.all_caretaker, (err, data) => {
-							if (err || !data.rows || data.rows.length == 0) {
-								caretaker_tbl = [];
-							} else {
-								caretaker_tbl = data.rows;
-							}
+	pool.query(sql_query.query.get_all_completed_bids, [owner_username], (err, data) => {
+		if (err || !data.rows || data.rows.length == 0) {
+			console.error("Error in retrieving past bid");
+			pastbids_tbl = [];
+		} else {
+			pastbids_tbl = data.rows;
+		}
 
-							pool.query(sql_query.query.all_transfer_methods, (err, data) => {
-								if (err || !data.rows || data.rows.length == 0) {
-									tm_tb1 = [];
-								} else {
-									tm_tb1 = data.rows;
-								}
-								pool.query(sql_query.query.all_payment_types, (err, data) => {
-									if (err || !data.rows || data.rows.length == 0) {
-										pt_tb1 = [];
-									} else {
-										pt_tb1 = data.rows;
-									}
+		pool.query(sql_query.query.get_all_accepted_bids, [owner_username], (err, data) => {
+			if (err || !data.rows || data.rows.length == 0) {
+				console.error("Error in retrieving accepted bid");
+				acceptedbids_tbl = [];
+			} else {
+				acceptedbids_tbl = data.rows;
+			}
 
-								basic(req, res, 'bid',
-									{ pet_ctx: pet_ctx, pet_tbl: pet_tbl,
-										caretaker_tbl: caretaker_tbl, tm_tb1:tm_tb1 , pt_tb1:pt_tb1,
-										makebid_msg: msg(req, 'make_bid', 'Pending Bid made successfully ', 'Bid is not made'),
-										auth: true });
-								});
-							});
+			pool.query(sql_query.query.get_all_pending_bids, [owner_username], (err, data) => {
+				if (err || !data.rows || data.rows.length == 0) {
+					console.error("Error in retrieving pending bid");
+					pendingbids_tbl = [];
+				} else {
+					pendingbids_tbl = data.rows;
+				}
 
-						});
-					});
-	}
+				pool.query(sql_query.query.get_all_rejected_bids, [owner_username], (err, data) => {
+					if (err || !data.rows || data.rows.length == 0) {
+						console.error("Error in retrieving rejected bid");
+						rejectedbids_tbl = [];
+					} else {
+						rejectedbids_tbl = data.rows;
+					}
+				});		
+				
+				basic(req, res, 'bids',
+					{ page: bids, pastbids_tbl: pastbids_tbl, acceptedbids_tbl: acceptedbids_tbl, 
+						pendingbids_tbl: pendingbids_tbl, rejectedbids_tbl: rejectedbids_tbl, auth: true }
+				);
+
+			});
+		});
+	});
+	
+	
+}
 
 
 function make_bid(req, res, next){

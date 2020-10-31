@@ -47,9 +47,10 @@ sql.query = {
 
 	
 	get_all_bids: 'SELECT * FROM Bids',
-	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
-	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\'',
-	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\'',
+	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\' AND owner_username = $1',
+	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\' AND owner_username = $1',
+	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\' AND owner_username = $1',
+	get_all_completed_bids: 'SELECT * FROM Bids WHERE status = \'COMPLETED\' AND owner_username = $1',
 
 	//get top available caretaker
 	//may be buggy
