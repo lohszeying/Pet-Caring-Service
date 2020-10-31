@@ -50,10 +50,10 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
             console.error(err);
         } else {
             info.pet_tbl = data.rows;
-            console.log(data.rows);
         }
 
-        pool.query(sql_query.query.get_top_available_caretaker, [req.body.start_date, req.body.end_date, req.body.type], (err2, data2) => {
+        //inputs: 1. startdate, 2. enddate, 3.petowner, 4. petname
+        pool.query(sql_query.query.get_top_available_caretaker, [req.body.start_date, req.body.end_date, req.user.username, req.body.type], (err2, data2) => {
             if (err2) {
                 console.error(err2);
             } else {
