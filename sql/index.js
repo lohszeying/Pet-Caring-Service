@@ -52,10 +52,6 @@ sql.query = {
 	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\' AND owner_username = $1',
 	get_all_completed_bids: 'SELECT * FROM Bids WHERE status = \'COMPLETED\' AND owner_username = $1',
 
-	//get top available caretaker
-	//may be buggy
-	get_top_available_caretaker: 'SELECT cp.username, GET_RATING(cp.username) FROM caretakerpricing cp LEFT OUTER JOIN caretakeravailability ca on cp.username = ca.username WHERE ca.date BETWEEN $1 AND $2 AND cp.pet_type=$3 GROUP BY cp.username ORDER BY GET_RATING(cp.username) DESC, cp.username LIMIT 10', 
-
 	//inputs: 1. startdate, 2. enddate, 3.petowner, 4. petname
 	get_top_available_caretaker: 'SELECT caretaker_username, rate FROM ALLAVAILABLE($1, $2, $3, $4)',
 
