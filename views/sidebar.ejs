@@ -13,7 +13,7 @@
 	</li> -->
 	<li class="nav-item <%= page==="managepet" ? "active" : "" %>">
 		<a class="nav-link <%= page==="managepet" ? "active" : "" %>" href="<%= page==="managepet" ? "#" : "/managepet" %>">
-			<i class="fas fa-fw fa-trophy"></i>
+			<i class="fas fa-paw"></i>
 			<span>Manage your pets</span></a>
 	</li>
 	
@@ -22,12 +22,20 @@
 			<i class="fas fa-fw fa-trophy"></i>
 			<span>Take care of other pets</span></a>
 	</li>
-	<li class="nav-item">
+	<li class="nav-item <%= page==="bids/search-availability" ? "active" : "" %>" >
 		<a class="nav-link <%= page==="bids/search-availability" ? "active" : "" %>" href="<%= page==="bids/search-availability" ? "#" : "/bids/search-availability" %>">
 			<i class="fas fa-file-signature"></i>
 			<span>Make a bid </span></a>
-    </li>	
-	<li class="nav-item">
+	</li>	
+	
+
+	<li class="nav-item <%= page==="bids" ? "active" : "" %>">
+		<a class="nav-link <%= page==="bids" ? "active" : "" %>" href="<%= page==="bids" ? "#" : "/bids" %>">
+			<i class="fas fa-file-signature"></i>
+			<span>Your bids </span></a>
+	</li>
+
+	<li class="nav-item <%= page==="rating_review" ? "active" : "" %>">
 	<a class="nav-link <%= page==="rating_review" ? "active" : "" %>" href="<%= page==="rating_review" ? "#" : "/rating_review" %>">
 		<i class="fas fa-fw fa-trophy"></i>
 		<span>Rating & Review</span></a>

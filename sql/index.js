@@ -47,9 +47,10 @@ sql.query = {
 
 	
 	get_all_bids: 'SELECT * FROM Bids',
-	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\'',
-	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\'',
-	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\'',
+	get_all_pending_bids: 'SELECT * FROM Bids WHERE status = \'PENDING\' AND owner_username = $1',
+	get_all_accepted_bids: 'SELECT * FROM Bids WHERE status = \'ACCEPTED\' AND owner_username = $1',
+	get_all_rejected_bids: 'SELECT * FROM Bids WHERE status = \'REJECTED\' AND owner_username = $1',
+	get_all_completed_bids: 'SELECT * FROM Bids WHERE status = \'COMPLETED\' AND owner_username = $1',
 
 	//get top available caretaker
 	//may be buggy
@@ -104,6 +105,24 @@ sql.admin = {
 		'WHERE status = \'ACCEPTED\' ' +
 		'  AND start_date BETWEEN cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\')) as date) ' +
 		'    AND (cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\'))  + interval \'1 month\' as date));',
+	month_highest_jobs: 'SELECT TO_CHAR(b.month :: DATE, \'Mon yyyy\') AS month, b.count ' +
+		'FROM (SELECT COUNT(*), cast(date_trunc(\'month\', Bids.start_date) as date) AS month ' +
+		'      FROM Bids ' +
+		'      WHERE status = \'ACCEPTED\' ' +
+		'        AND start_date BETWEEN cast( ' +
+		'              date_trunc(\'year\', to_date($1, \'YYYY-MM-DD\')) as date) ' +
+		'          AND (cast(date_trunc(\'year\', to_date($1, \'YYYY-MM-DD\')) + ' +
+		'                    interval \'1 year\' as date)) ' +
+		'      GROUP BY month) AS b ' +
+		'WHERE b.count = (SELECT max(b2.count) ' +
+		'                 FROM (SELECT COUNT(*) ' +
+		'                       FROM Bids ' +
+		'                       WHERE status = \'ACCEPTED\' ' +
+		'                         AND start_date BETWEEN cast( ' +
+		'                               date_trunc(\'year\', to_date($1, \'YYYY-MM-DD\')) as date) ' +
+		'                           AND (cast(date_trunc(\'year\', to_date($1, \'YYYY-MM-DD\')) + ' +
+		'                                     interval \'1 year\' as date)) ' +
+		'                       GROUP BY cast(date_trunc(\'month\', Bids.start_date) as date)) AS b2)',
 	//get all ratings: (caretaker_username, rating)
 	get_rating_for_all_caretakers: 'SELECT * FROM GETALLRATINGS()'
 }
