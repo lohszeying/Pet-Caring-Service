@@ -144,4 +144,23 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
     });
 });
 
+router.get('/submit-bid', passport.authMiddleware(), function (req, res, next) {
+    return res.redirect('/bids/search-availability');
+});
+
+router.post('/submit-bid', passport.authMiddleware(), function (req, res, next) {
+    
+    pool.query(sql_query.query.make_bid, [req.user.username, req.body.pet_type, req.body.caretaker_username, req.body.start_date, req.body.end_date, req.body.tm, req.body.pt], (err5, data5) => {
+        if (err5) {
+            console.error(err5);
+        } else {
+            console.log("success");
+            return res.redirect('/bids/search-availability');
+
+        }  
+    });
+
+
+});
+
 module.exports = router
