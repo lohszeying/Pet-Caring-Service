@@ -1,3 +1,6 @@
+require('dotenv').load();
+const express = require('express');
+const router = express.Router();
 const sql_query = require('../sql');
 const passport = require('passport');
 const { Pool } = require('pg');
@@ -18,6 +21,15 @@ const { msg2 } = require('./basic');
 const basic = require('./basic').basic;
 const query = require('./basic').query;
 const msg = require('./basic').msg;
+
+router.get('/', passport.authMiddleware(), caretaker);
+router.post('/add_availability', passport.authMiddleware(), add_availability);
+router.post('/apply_for_leave', passport.authMiddleware(), apply_for_leave);
+router.post('/add_caretaker_type_of_pet', passport.authMiddleware(), add_caretaker_type_of_pet);
+router.post('/edit_caretaker_price_of_pet', passport.authMiddleware(), edit_caretaker_price_of_pet);
+router.post('/caretaker_accept_bid', passport.authMiddleware(), caretaker_accept_bid);
+router.post('/caretaker_reject_bid', passport.authMiddleware(), caretaker_reject_bid);
+router.post('/caretaker_complete_bid', passport.authMiddleware(), caretaker_complete_bid);
 
 function getDateString(da) {
 	var m = moment(da, 'ddd MMM DD YYYY hh:mm:ss [GMT]ZZ').format('MM-DD-YYYY');
@@ -99,25 +111,25 @@ async function caretaker(req, res, next) {
 			reject_bid_msg: msg(req, 'reject-bid', 'Bid rejected successfully', 'Error in rejecting bid'),
             complete_bid_msg: msg(req, 'complete-bid', 'Bid completed successfully', 'Error in completing bid'),
 	        date_msg: msg2(req, 'add-availability', {
-				'pass': 'Date added successfully',
-				'duplicate': 'You are already available on this date!',
+				'pass': 'You are now available on ' + req.query['date'],
+				'duplicate': 'You are already available on ' + req.query['date'],
 				'fail': 'Error. Cannot add this date to availability'
 			}),
 	        caretaker_pet_type_msg: msg2(req, 'add-pet_type', {
-				'pass' : 'Type of pet added successfully',
-				'duplicate' : 'You are already caring for this pet',
+				'pass' : 'You can now care for ' + req.query['pet_type'],
+				'duplicate' : 'You can already care for ' + req.query['pet_type'],
 				'non_exist': 'This pet does not exist',
 				'fail': 'Unknown error. Failed to add pet'
 			}),
 	        caretaker_pet_price_msg: msg2(req, 'edit-pet_price', {
-				'pass': 'Pet price edited successfully!',
+				'pass': req.query['type']+' price changed to $'+req.query['price']+' successfully!',
 				'fulltimer' : 'Fulltimers cannot change prices!',
 				'fail' : 'Failed in editing pet price'
 			}),			
 			caretaker_apply_leave_msg: msg2(req, 'apply-leave', {
-				'pass' : 'Successfully applied for leave',
-				'have_bid': 'You already have a bid here',
-				'no_availability': 'You are already not available!'
+				'pass' : 'Successfully applied for leave on ' + req.query['date'],
+				'have_bid': 'You already have a bid on ' + req.query['date'],
+				'no_availability': 'You are already not available on '+req.query['date']
 			}),
 			auth: true,
 			all_salary_tbl: all_salary_tbl,
@@ -137,13 +149,13 @@ function add_availability(req, res, next) {
             err = wrapError(err);
             if (err instanceof UniqueViolationError) {
 				console.error("You are already available on this date!")
-				res.redirect('/caretaker?add-availability=duplicate');
+				res.redirect('/caretaker?add-availability=duplicate&date='+date);
             } else {
 				console.error("Error in adding availability, ERROR: " + err);
 				res.redirect('/caretaker?add-availability=fail');
             }
 		} else {
-			res.redirect('/caretaker?add-availability=pass');
+			res.redirect('/caretaker?add-availability=pass&date='+date);
 		}
 	});
 }
@@ -155,13 +167,13 @@ async function apply_for_leave(req, res, next) {
 		console.log(result);
 		if (err) {
 			console.log(wrapError(err).nativeError);
-			res.redirect('/caretaker?apply-leave=have_bid');
+			res.redirect('/caretaker?apply-leave=have_bid&date='+date);
 		} else if (result.rowCount ==0 ){
 			console.log('You do not have an availability here!')
-			res.redirect('/caretaker?apply-leave=no_availability');
+			res.redirect('/caretaker?apply-leave=no_availability&date='+date);
 		} else{
 
-			res.redirect('/caretaker?apply-leave=pass');
+			res.redirect('/caretaker?apply-leave=pass&date='+date);
 		}
 	});
 }
@@ -172,12 +184,12 @@ async function add_caretaker_type_of_pet(req, res, next) {
 	var type = req.body.type;
     try {
         await pool.query(sql_query.query.add_caretaker_type_of_pet, [username, type]);
-        res.redirect('/caretaker?add-pet_type=pass');
+        res.redirect('/caretaker?add-pet_type=pass&pet_type=' + type);
     }  catch (err) {
         err = wrapError(err);
         if (err instanceof UniqueViolationError) {
 			console.error("You can take care of this pet!");
-			res.redirect('/caretaker?add-pet_type=duplicate');
+			res.redirect('/caretaker?add-pet_type=duplicate&pet_type=' + type);
         } else if (err instanceof ForeignKeyViolationError) {
 			console.error("No such pet");
 			res.redirect('/caretaker?add-pet_type=non_exist');
@@ -201,7 +213,7 @@ async function edit_caretaker_price_of_pet(req, res, next) {
 			res.redirect('/caretaker?edit-pet_price=fulltimer');
         } else {
             pool.query(sql_query.query.update_caretaker_pettype_price, [username, type, price]);
-            res.redirect('/caretaker?edit-pet_price=pass');
+            res.redirect('/caretaker?edit-pet_price=pass&price='+price+'&type='+type);
         }
     } catch (err) {
         console.error("Error in updating pet type + price, ERROR: " + err);
@@ -261,11 +273,4 @@ function caretaker_complete_bid(req, res, next) {
 }
 
 
-module.exports = {caretaker : caretaker,
-add_availability: add_availability,
-apply_for_leave: apply_for_leave,
-add_caretaker_type_of_pet: add_caretaker_type_of_pet,
-edit_caretaker_price_of_pet: edit_caretaker_price_of_pet,
-caretaker_accept_bid: caretaker_accept_bid,
-caretaker_complete_bid: caretaker_complete_bid,
-caretaker_reject_bid: caretaker_reject_bid};
+module.exports = router;

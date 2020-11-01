@@ -26,6 +26,7 @@ function msg2(req, fld, messages) {
 	return info && (info in messages) ? (messages[info]) : '';
 }
 
+
 module.exports = {basic: basic,
                 query: query,
 				msg: msg,
