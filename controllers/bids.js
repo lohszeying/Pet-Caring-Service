@@ -19,6 +19,8 @@ router.get('/search-availability', passport.authMiddleware(), function (req, res
         auth: true,
         caretakers: [],
         pet_tbl: [],
+        tm_tb1:[],
+        pt_tb1:[],
         additionalInfo: {
             start_date: '',
             end_date: '',
@@ -47,6 +49,8 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
         auth: true,
         caretakers: [],
         pet_tbl: [],
+        tm_tb1:[],
+        pt_tb1:[],
         additionalInfo: {
             start_date: req.body.start_date,
             end_date: req.body.end_date,
@@ -67,9 +71,24 @@ router.post('/search-availability', passport.authMiddleware(), function (req, re
                 console.error(err2);
             } else {
                 info.caretakers = data2.rows;
-            } 
-
-            res.render("bids/search-availability", info);
+            }  
+            pool.query(sql_query.query.all_transfer_methods, (err3, data3) => {
+                if (err3) {
+                    console.error(err3);
+                } else {
+                    info.tm_tb1 = data3.rows;
+                    console.log(data3.rows);
+                    }
+                pool.query(sql_query.query.all_payment_types, (err4, data4) => {
+                    if (err4) {
+                        console.error(err4);
+                    } else {
+                         info.pt_tb1 = data4.rows;
+                        }       
+                    res.render("bids/search-availability", info);
+                });
+            });
+            
         });
     });
 });
