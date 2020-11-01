@@ -80,8 +80,37 @@
                                     <% } %>
                                 </select>
                             </div>
+                            
                         </div>
                     </div>
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="tm" class="col-sm-2 col-form-label"><b>Select transfer methods:</b></label>
+                        <div class="col-sm-4">
+                            <select name="tm" class="custom-select">
+                                <% for(var i = 0; i < tm_tb1.length; i++) { %>
+                                    <option>
+                                        <%= tm_tb1[i].value %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>   
+                <div class="card-body">
+                    <div class="form-group row">
+                        <label for="pt" class="col-sm-2 col-form-label"><b>Select payment types:</b></label>
+                        <div class="col-sm-4">
+                            <select name="pt" class="custom-select">
+                                <% for(var i = 0; i < pt_tb1.length; i++) { %>
+                                    <option>
+                                        <%= pt_tb1[i].value %>
+                                    </option>
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>   
                     <div class="card-footer small text-muted">
                         <button type="submit" class="btn btn-secondary">Submit Bid</button>
                     </div>
