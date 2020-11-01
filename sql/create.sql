@@ -6,7 +6,15 @@ DO $$
             insert into Users (username, name, password) values(r, 'John', '$2b$10$gbBSQv0Zl2BouA8kehfu/.ErlOvFitj.BPs0gbPoT3gE3gXicx0CW');
         end loop;
     END;
-$$; 
+$$;
+
+--insert admin
+DO $$
+    BEGIN
+        -- password is '123'
+        insert into pcsadmin (username, password) values('admin', '$2b$10$7zODNHnlLLf7S.26UQB2m.o3cnCpuG6s7Z3qevCPO3vTYkt1/bgEK');
+    END;
+$$;
 
 --generate dummy caretakers
 DO $$
