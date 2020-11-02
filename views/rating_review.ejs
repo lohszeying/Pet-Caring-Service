@@ -23,29 +23,63 @@
 			
 			<div id="content-wrapper">
 				<div class="container-fluid">
-					<%- include name.ejs %>
+					<ol class="breadcrumb">
+						<li class="breadcrumb-item">
+							
+							Review Your Completed Bids! You have <%=info.bid_tbl.length%> unrated bids!
+						</li>
+					</ol>
+					<% for(var i=0; i<info.bid_tbl.length; i++) { %>
 					<div class="card mb-3">
 						<div class="card-header">
-							<i class="fas fa-address-card"></i> &nbsp; Rate and Review your Caretaker
+							<i class="fas fa-address-card"></i> &nbsp; Rate and Review your Caretaker - <%=info.bid_tbl[i].caretaker_username%>
 						</div>
 						<div class="card-body">
 							<div class="form-group row">
-								<label for="username" class="col-sm-2 col-form-label"><b>Rating:</b></label>
-								<div class="col-sm-4">
-									<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-										value="<%= user %>" name="username">
+								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+									<thead>
+										<tr>
+											<th>Caretaker</th>
+											<th>Pet name</th>
+											<th>Start Date</th>
+											<th>End date</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td><%= info.bid_tbl[i].caretaker_username %></td>
+											<td><%= info.bid_tbl[i].pet_name %></td>
+											<td><%= info.bid_tbl[i].start_date %></td>
+											<td><%= info.bid_tbl[i].end_date %></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<form method="post" action="/rating_review/submit_review">
+								<div class="form-group row">
+								<label for="username" class="col-sm-2 col-form-label"><b>Give a Rating:</b></label>
+								<label class="radio-inline"><input type="radio" name="rating" value=1 > 1 </label>
+								<label class="radio-inline"><input type="radio" name="rating" value=2> 2 </label>
+								<label class="radio-inline"><input type="radio" name="rating" value=3 checked> 3 </label>
+								<label class="radio-inline"><input type="radio" name="rating" value=4> 4 </label>
+								<label class="radio-inline"><input type="radio" name="rating" value=5> 5 </label>
 								</div>
+								<div class="form-group row">
+								<label for="username" class="col-sm-2 col-form-label"><b>Leave a Review:</b></label>
+								<textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name = "review"></textarea>
 							</div>
 							<div class="form-group row">
-								<label for="username" class="col-sm-2 col-form-label"><b>Leave a Review:</b></label>
-								<div class="col-sm-4">
-									<input type="text" required="required" readonly class="form-control-plaintext" id="name"
-										value="<%= name %>" name="name">
-								</div>
+							<button type="submit" class="btn btn-secondary">Complete</button>
+							<input type="hidden" id=<%="caretaker_username" + i%> name="caretaker_username" value=<%= info.bid_tbl[i].caretaker_username %>>
+							<input type="hidden" id=<%="pet_name" + i%> name="pet_name" value=<%= info.bid_tbl[i].pet_name %>>
+							<input type="hidden" id=<%="start_date"  + i%> name="start_date" value=<%= info.getDateString(info.bid_tbl[i].start_date) %>>
+							<input type="hidden" id=<%="end_date"  + i%> name="end_date" value=<%= info.getDateString(info.bid_tbl[i].end_date) %>>
 							</div>
+							</form>
 						</div>
 						
 					</div>
+					<%}%>
 					
 
 
