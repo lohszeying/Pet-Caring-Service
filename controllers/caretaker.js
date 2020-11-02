@@ -230,6 +230,8 @@ function caretaker_accept_bid(req, res, next) {
 	var end_date = req.body.end_date;
 
 	pool.query(sql_query.query.update_caretaker_accepted_bid, [username, owner_username, pet_name, start_date, end_date], (err, data) => {
+		console.log(data);
+		console.log(err);
 		if (err) {
 			console.error("Error in accepting bid, ERROR: " + err);
 			res.redirect('/caretaker?accept-bid=fail');

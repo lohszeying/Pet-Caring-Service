@@ -63,6 +63,7 @@ sql.query = {
 
 	//get all accepted bid for caretaker
 	get_all_completed_bids_for_caretaker: 'SELECT * FROM Bids WHERE status = \'COMPLETED\' AND caretaker_username = $1',
+	get_all_completed_unrated_bids: 'SELECT * FROM Bids WHERE status = \'COMPLETED\' AND rating is NULL AND owner_username = $1 ORDER BY end_date DESC, pet_name ASC',
 
 	//delete availability for caretaker
 	//inputs: 1. username, 2. date
@@ -84,8 +85,10 @@ sql.query = {
 	find_caretaker: 'SELECT * FROM CareTaker WHERE username=$1',
 	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
+	submit_review: 'UPDATE Bids SET (rating, review) = ($1,$2) WHERE owner_username = $3 AND pet_name = $4 AND caretaker_username = $5 AND start_date = $6 AND end_date = $7',
 	//get salary with 1. caretaker username 2. year(INTEGER) 3. month(INTEGER)
 	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)',
+
 	//get all months salary
 	get_salary_record: 'SELECT YR.y, MTH.m, GET_SALARY($1, YR.y, MTH.m) FROM generate_series(2020, 2020) as YR(y),  generate_series(1,12) as MTH(m) ORDER BY Mth.m ASC'
 }
