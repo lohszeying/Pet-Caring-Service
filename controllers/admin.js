@@ -200,4 +200,70 @@ router.post('/job-stats', admin_auth(), (req, res) => {
     });
 });
 
+router.get('/manage-caretaker', admin_auth(), (req, res) => {
+    const info = {
+        user: req.user.username,
+        auth: true,
+        error: null,
+        success: null
+    };
+
+    return res.render('admin/manage-caretaker', info);
+});
+
+router.post('/manage-caretaker', admin_auth(), (req, res) => {
+    const fullTimeStatus = 'ft';
+
+    const info = {
+        user: req.user.username,
+        auth: true,
+        error: null,
+        success: null
+    };
+
+    const newStatus = req.body.status === fullTimeStatus;
+
+    pool.query(sql_query.admin.get_caretaker_ft_status, [req.body.username], (err, data) => {
+        if (err) {
+            console.error(err);
+        } else {
+            if (data.rows.length === 1) {
+                const currentStatus = data.rows[0].is_fulltime;
+
+                if (currentStatus && newStatus) {
+                    info.error = 'Status is already full-time.';
+                }
+
+                if (!currentStatus && !newStatus) {
+                    info.error = 'Status is already part-time';
+                }
+
+                if (info.error != null) {
+                    pool.query(sql_query.admin.update_caretaker_ft_status, [req.body.username, newStatus], (err2, data2) => {
+                        if (err2) {
+                            console.error(err2);
+                        } else {
+                            if (newStatus) {
+                                info.success = 'Status updated to full-time.';
+                            }
+
+                            if (!newStatus) {
+                                info.success = 'Status updated to part-time';
+                            }
+
+                            return res.render('admin/manage-caretaker', info);
+                        }
+                    });
+                }
+
+                return res.render('admin/manage-caretaker', info);
+            } else {
+                info.error = 'Caretaker with this username could not be found.';
+
+                return res.render('admin/manage-caretaker', info);
+            }
+        }
+    });
+});
+
 module.exports = router

@@ -122,6 +122,8 @@ sql.admin = {
 		'                           AND (cast(date_trunc(\'year\', to_date($1, \'YYYY-MM-DD\')) + ' +
 		'                                     interval \'1 year\' as date)) ' +
 		'                       GROUP BY cast(date_trunc(\'month\', Bids.start_date) as date)) AS b2)',
+	get_caretaker_ft_status: 'SELECT is_fulltime FROM Caretaker WHERE username=$1',
+	update_caretaker_ft_status: 'UPDATE Caretaker SET is_fulltime=$2 WHERE username=$1',
 	//get all ratings: (caretaker_username, rating)
 	get_rating_for_all_caretakers: 'SELECT * FROM GETALLRATINGS()'
 }
