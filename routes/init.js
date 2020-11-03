@@ -35,6 +35,7 @@ function initRouter(app) {
 		successRedirect: '/dashboard',
 		failureRedirect: '/'
 	}));
+	app.post('/search', passport.antiMiddleware(), search);
 	app.use('/rating_review', rating_reviewController)
 	app.use('/dashboard', dashboardController)
 	app.use('/managepet', managepetController);
@@ -80,10 +81,11 @@ function index(req, res, next) {
 			basic(req, res, 'index', { page: '', auth: true});
 	}
 }
-/*
+
 function search(req, res, next) {
 	var ctx  = 0, avg = 0, tbl;
 	var game = "%" + req.query.gamename.toLowerCase() + "%";
+	console.error("lol");
 	pool.query(sql_query.query.search_game, [game], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
 			ctx = 0;
@@ -92,14 +94,10 @@ function search(req, res, next) {
 			ctx = data.rows.length;
 			tbl = data.rows;
 		}
-		if(!req.isAuthenticated()) {
-			res.render('search', { page: 'search', auth: false, tbl: tbl, ctx: ctx });
-		} else {
-			basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl, ctx: ctx });
-		}
+
+		basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl, ctx: ctx });
 	});
 }
-*/
 
 
 
