@@ -100,8 +100,15 @@ async function search(req, res, next) {
 		data = await pool.query(sql_query.query.get_rating, [username]);
 		rating_tbl = data.rows;
 
-		basic(req, res, 'search', { page: 'search', auth: true,
-			user_tbl: user_tbl, caretaker_tbl, rating_tbl});
+		if(!req.isAuthenticated()) {
+			res.render('search', { page: 'search', auth: false, user_tbl: user_tbl, caretaker_tbl: caretaker_tbl,
+				rating_tbl: rating_tbl});
+		} else {
+			basic(req, res, 'search', { page: 'search', auth: true,
+				user_tbl: user_tbl, caretaker_tbl, rating_tbl});
+		}
+
+
 	} catch (e) {
 		console.log(e);
 	}
