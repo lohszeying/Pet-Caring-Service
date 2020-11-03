@@ -85,6 +85,7 @@ sql.query = {
 	find_caretaker: 'SELECT * FROM CareTaker WHERE username=$1',
 	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
+	find_user: 'SELECT * FROM Users WHERE username=$1',
 	submit_review: 'UPDATE Bids SET (rating, review) = ($1,$2) WHERE owner_username = $3 AND pet_name = $4 AND caretaker_username = $5 AND start_date = $6 AND end_date = $7',
 	//get salary with 1. caretaker username 2. year(INTEGER) 3. month(INTEGER)
 	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)',

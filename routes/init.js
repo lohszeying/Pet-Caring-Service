@@ -20,7 +20,7 @@ const salt  = bcrypt.genSaltSync(round);
 function initRouter(app) {
 	/* GET */
 	app.get('/'      , index );
-
+	app.get('/search', search);
 	/* PROTECTED GET */
 
 
@@ -35,7 +35,6 @@ function initRouter(app) {
 		successRedirect: '/dashboard',
 		failureRedirect: '/'
 	}));
-	app.post('/search', passport.antiMiddleware(), search);
 	app.use('/rating_review', rating_reviewController)
 	app.use('/dashboard', dashboardController)
 	app.use('/managepet', managepetController);
@@ -82,21 +81,41 @@ function index(req, res, next) {
 	}
 }
 
-function search(req, res, next) {
-	var ctx  = 0, avg = 0, tbl;
-	var game = "%" + req.query.gamename.toLowerCase() + "%";
-	console.error("lol");
-	pool.query(sql_query.query.search_game, [game], (err, data) => {
+async function search(req, res, next) {
+	var username = req.query.username;
+	var user_tbl;
+	var caretaker_tbl;
+	var rating_tbl;
+	var data;
+
+	try {
+		data = await pool.query(sql_query.query.find_user, [username]);
+		user_tbl = data.rows;
+
+		data = await pool.query(sql_query.query.find_caretaker, [username]);
+		caretaker_tbl = data.rows;
+
+		console.error(caretaker_tbl);
+
+		data = await pool.query(sql_query.query.get_rating, [username]);
+		rating_tbl = data.rows;
+
+		basic(req, res, 'search', { page: 'search', auth: true,
+			user_tbl: user_tbl, caretaker_tbl, rating_tbl});
+	} catch (e) {
+		console.log(e);
+	}
+
+	/*pool.query(sql_query.query.find_user, [username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
-			ctx = 0;
 			tbl = [];
 		} else {
-			ctx = data.rows.length;
 			tbl = data.rows;
 		}
+		console.error(tbl);
 
-		basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl, ctx: ctx });
-	});
+		basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl});
+	}); */
 }
 
 
