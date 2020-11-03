@@ -7,7 +7,7 @@
 		<meta name="description" content="">
 		<meta name="author" content="">
 
-		<title>Meeple World</title>
+		<title>Search</title>
 
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 		<link href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css" rel="stylesheet">
@@ -24,39 +24,116 @@
 			<% } else { %>
 				<%- include sidebar.ejs %>
 			<% } %>
-			
-			<div id="content-wrapper">
-				<div class="container-fluid">
-					<div class="card mb-3">
-						<div class="card-header">
-							<i class="fas fa-dice"></i> &nbsp; All Games @ Meeple World
-						</div>
-						<div class="card-body">
-							<div class="table-responsive">
-								<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-									<thead>
-										<tr>
-											<th>Rank</th>
-											<th>Game Name</th>
-											<th>Rating</th>
-										</tr>
-									</thead>
-									<tbody>
-										<% for(var i=0; i<tbl.length; i++) { %>
-										<tr>
-											<td><%= tbl[i].ranking%></td>
-											<td><%= tbl[i].gamename%></td>
-											<td><%= tbl[i].rating%></td>
-										</tr>
-										<% } %>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="card-footer small text-muted">CS2102 Database Project</div>
-					</div>
+
+			<% if (user_tbl == '') { %>
+			<div class="card-body">
+				<div class="form-group row">
+					<label for="username" class="col-sm-6 col-form-label">Username does not exist. Searching of username is case-sensitive.</label>
 				</div>
 			</div>
+			<% } else { %>
+			<div class="card-body">
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>User ID:</b></label>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="username" value="<%= user_tbl[0].username %>" name="username">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>Name:</b></label>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="name" value="<%= user_tbl[0].name %>" name="name">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>Area:</b></label>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="area" value="<%= user_tbl[0].area %>" name="area">
+					</div>
+				</div>
+				<% if (caretaker_tbl == '') { %>
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>Is caretaker:</b></label>
+						<div class="col-sm-4">
+							<input type="text" required="required" readonly class="form-control-plaintext" id="caretaker" value="No" name="caretaker">
+						</div>
+				</div>
+				<% } else { %>
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>Is caretaker:</b></label>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="caretaker" value="Yes" name="caretaker">
+					</div>
+				</div>
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>Status:</b></label>
+					<% if (caretaker_tbl[0].is_fulltime) { %>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="status" value="Full-timer" name="status">
+					</div>
+					<% } else { %>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="status" value="Part-timer" name="status">
+					</div>
+					<% } %>
+				</div>
+				<div class="form-group row">
+					<label for="username" class="col-sm-2 col-form-label"><b>Rating:</b></label>
+					<div class="col-sm-4">
+						<input type="text" required="required" readonly class="form-control-plaintext" id="rating" value="<%= rating_tbl[0].get_rating %>" name="rating">
+					</div>
+				</div>
+
+
+
+				<div class="card mb-3">
+					<div class="card-header">
+						<i class="fas fa-paw"></i> &nbsp; All reviews
+					</div>
+					<% if (completed_bids_tbl.length > 0) { %>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+								<thead>
+								<tr>
+									<th>Owner username</th>
+									<th>Pet name</th>
+									<th>Start Date</th>
+									<th>End Date</th>
+									<th>Rating</th>
+									<th>Review</th>
+								</tr>
+								</thead>
+								<tfoot>
+								<th colspan="2">Total: <i><%= total_completed_bids %></i></th>
+								</tfoot>
+								<tbody>
+								<% for(var i=0; i<completed_bids_tbl.length; i++) { %>
+									<tr>
+										<td><%= completed_bids_tbl[i].owner_username %></td>
+										<td><%= completed_bids_tbl[i].pet_name %></td>
+										<td><%= completed_bids_tbl[i].start_date %></td>
+										<td><%= completed_bids_tbl[i].end_date %></td>
+										<td><%= completed_bids_tbl[i].rating %></td>
+										<td><%= completed_bids_tbl[i].review %></td>
+									</tr>
+								<% } %>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<% } else { %>
+						<div class="col-sm-4">
+							<input type="text" required="required" readonly class="form-control-plaintext" id="rating" value="No one left a review." name="rating">
+						</div>
+					<% } %>
+				</div>
+
+
+
+				<% } %>
+
+			<% } %>
 		</div>
 		
 		<%- include bottomscript.ejs %>
