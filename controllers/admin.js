@@ -238,7 +238,7 @@ router.post('/manage-caretaker', admin_auth(), (req, res) => {
                     info.error = 'Status is already part-time';
                 }
 
-                if (info.error != null) {
+                if (info.error == null) {
                     pool.query(sql_query.admin.update_caretaker_ft_status, [req.body.username, newStatus], (err2, data2) => {
                         if (err2) {
                             console.error(err2);
@@ -254,9 +254,9 @@ router.post('/manage-caretaker', admin_auth(), (req, res) => {
                             return res.render('admin/manage-caretaker', info);
                         }
                     });
+                } else {
+                    return res.render('admin/manage-caretaker', info);
                 }
-
-                return res.render('admin/manage-caretaker', info);
             } else {
                 info.error = 'Caretaker with this username could not be found.';
 
