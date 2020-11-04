@@ -168,7 +168,7 @@ async function search(req, res, next) {
 		data = await pool.query(sql_query.query.find_caretaker, [username]);
 		caretaker_tbl = data.rows;
 
-		console.error("caretaker: " + caretaker_tbl[0].username);
+		//console.error("caretaker: " + caretaker_tbl[0].username);
 
 		data = await pool.query(sql_query.query.get_rating, [username]);
 		rating_tbl = data.rows;
@@ -179,6 +179,10 @@ async function search(req, res, next) {
 
 		data = await pool.query(sql_query.query.list_of_enabled_pets, [username]);
 		pets_tbl = data.rows;
+		if (!data.rows || data.rows.length == 0)  {
+			pets_tbl = [];
+		}
+
 
 		//console.error(completed_bids_tbl);
 
