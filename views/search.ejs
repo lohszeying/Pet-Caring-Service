@@ -91,13 +91,13 @@
 
 					<div class="card-body">
 						<% for(var i=0; i<pets_tbl.length; i++) { %>
-							<form method="get" action="/viewpet">
+							<form method="post" action="/viewpet">
 								<div class="col-sm-4">
-									<input type="hidden" class="form-control" id="petname" name="petname" value = <%= pets_tbl[i].pet_name %>>
+									<input type="text" style="display:none" required="required" class="form-control" id="petname" name="petname" value = "<%= pets_tbl[i].pet_name %>" >
 								</div>
 
 								<div class="col-sm-4">
-									<input type="hidden" class="form-control" id="username" name="username" value=<%= username %>>
+									<input type="text" style="display:none" required="required" class="form-control" id="username" name="username" value=<%= username %>>
 								</div>
 
 								<div class="">
@@ -105,10 +105,7 @@
 								</div>
 							</form>
 
-							
-							<div class="col-sm-4">
-								<%= pets_tbl[i].pet_name %>
-							</div>
+							<br>
 						
 						<% } %>
 						

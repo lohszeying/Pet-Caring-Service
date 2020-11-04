@@ -21,7 +21,7 @@ function initRouter(app) {
 	/* GET */
 	app.get('/'      , index );
 	app.get('/search', search);
-	app.get('/viewpet', viewpet);
+	app.post('/viewpet', viewpet);
 	/* PROTECTED GET */
 
 
@@ -83,38 +83,41 @@ function index(req, res, next) {
 }
 
 function viewpet(req, res, next) {
-	var username = req.query.username;
-	var petname = req.query.petname;
+	var username = req.body.username;
+	var petname = req.body.petname;
 	var pet_tbl;
 	var petreq_tbl;
 	//var data;
 
-	console.log("user: " + username);
-	console.log("pet: " + petname);
+	console.error("user: " + username);
+	console.error("pet: " + petname);
 
 	pool.query(sql_query.query.find_pet, [username, petname], (err, data) => {
 
 		if (err || !data.rows || data.rows.length == 0) {
 			console.error("Error in finding pet");
+			pet_tbl = [];
 		} else {
 			pet_tbl = data.rows;
+			
 		}
 		
 		pool.query(sql_query.query.find_pet_req, [username, petname], (err, data) => {
 
 			if (err || !data.rows || data.rows.length == 0) {
 				console.error("Error in finding pet req");
+				petreq_tbl = [];
 			} else {
 				petreq_tbl = data.rows;
 			}
 
 			if (!req.isAuthenticated()) {
 				res.render('viewpet', {
-					page: 'viewpet', auth: false, pet_tbl: pet_tbl, petreq_tbl: petreq_tbl, user_name: username
+					page: 'viewpet', auth: false, pet_tbl: pet_tbl, petreq_tbl: petreq_tbl, username: username
 				});
 			} else {
 				basic(req, res, 'viewpet', {
-					page: 'viewpet', auth: true, pet_tbl: pet_tbl, petreq_tbl: petreq_tbl, user_name: username
+					page: 'viewpet', auth: true, pet_tbl: pet_tbl, petreq_tbl: petreq_tbl, username: username
 				});
 			}
 		});
@@ -165,7 +168,7 @@ async function search(req, res, next) {
 		data = await pool.query(sql_query.query.find_caretaker, [username]);
 		caretaker_tbl = data.rows;
 
-		console.log("caretaker: " + caretaker_tbl.username);
+		console.error("caretaker: " + caretaker_tbl[0].username);
 
 		data = await pool.query(sql_query.query.get_rating, [username]);
 		rating_tbl = data.rows;
@@ -182,7 +185,7 @@ async function search(req, res, next) {
 		if(!req.isAuthenticated()) {
 			res.render('search', { page: 'search', auth: false, user_tbl: user_tbl, caretaker_tbl: caretaker_tbl,
 				rating_tbl: rating_tbl, completed_bids_tbl: completed_bids_tbl, total_completed_bids: total_completed_bids,
-				pets_tbl: pets_tbl, user_name: username});
+				pets_tbl: pets_tbl, username: username});
 		} else {
 			basic(req, res, 'search', { page: 'search', auth: true,
 				user_tbl: user_tbl, caretaker_tbl, rating_tbl, completed_bids_tbl: completed_bids_tbl,
