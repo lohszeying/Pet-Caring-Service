@@ -265,6 +265,10 @@ CREATE TRIGGER FillAvailability AFTER INSERT ON CareTaker
     WHEN (NEW.is_fulltime = TRUE)
     EXECUTE PROCEDURE FillUpAvailability();
 
+CREATE TRIGGER FillAviail AFTER UPDATE ON CareTaker
+    FOR EACH ROW 
+    WHEN (NEW.is_fulltime = TRUE AND OLD.is_fulltime = FALSE)
+    EXECUTE PROCEDURE FillUPAvailability();
 -----------------------------------------------------------------
 
 -- automaticallly create a pet owner upon account creation
