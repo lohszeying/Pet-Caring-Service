@@ -21,8 +21,8 @@ DO $$
     DECLARE count INTEGER;   
     BEGIN
         count := 400;
-        WHILE count<= 800 LOOP
-            INSERT INTO CareTaker (username, is_fulltime) VALUES(count, mod(count,2) =0);
+        WHILE count<= 600 LOOP
+            INSERT INTO CareTaker (username, is_fulltime) VALUES(count, mod(count,100) =0);
                 count := count + 1;
         END LOOP;
     END;
@@ -85,7 +85,7 @@ DO $$
         count := 1;
         WHILE count<= 50 LOOP
             pet:=1;
-            WHILE pet <=20 LOOP
+            WHILE pet <=10 LOOP
                 INSERT INTO Pet (owner_username, pet_name, pet_type) 
                     VALUES(count, pet,  (list_of_pet_types())[mod(pet, array_length(list_of_pet_types(),1))+1] );
                 INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement)
@@ -104,7 +104,7 @@ DO $$
     DECLARE count INTEGER;
     BEGIN 
         count := 400;
-        WHILE count < 800 LOOP
+        WHILE count < 500 LOOP
             INSERT INTO CareTakerPricing(username, pet_type, price) 
                 VALUES (count, (list_of_pet_types())[mod(count, array_length(list_of_pet_types(),1))+1], count/23);
             count := count +1;
@@ -129,6 +129,7 @@ INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_d
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('4','5','401','2020-08-08', '2020-08-08');
 INSERT INTO Bids(owner_username, pet_name, caretaker_username, start_date, end_date) VALUES ('4','5','401','2020-07-31', '2020-08-01');
 DELETE FROM CARETAKERAVAILABILITY WHERE username = '401' AND date = '2020-08-09';
+
 --suppose to return constrain error
 UPDATE Bids SET status = 'ACCEPTED' WHERE owner_username = '1';
 UPDATE Bids SET (status, rating) = ('COMPLETED',5) WHERE owner_username = '6';

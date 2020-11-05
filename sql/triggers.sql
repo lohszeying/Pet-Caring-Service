@@ -151,8 +151,6 @@ CREATE OR REPLACE FUNCTION CHECKBEFOREINSERTBID()
     RETURN NEW;
 END; $$;
 
-    
-
 CREATE TRIGGER CHECKBID BEFORE INSERT ON Bids
 FOR EACH ROW EXECUTE PROCEDURE CHECKBEFOREINSERTBID();
 
@@ -295,6 +293,13 @@ CREATE OR REPLACE FUNCTION CHECKBEFORELEAVE()
                         WHERE OLD.username = caretaker_username AND (status = 'ACCEPTED' OR status = 'COMPLETED')
                         AND OLD.date >= start_date AND OLD.date <= end_date)) THEN
         RAISE EXCEPTION 'YOU CANNOT APPLY FOR LEAVE! YOU HAVE AN ACCEPTED BID IN THIS DAY!';
+        END IF;
+
+        IF ((SELECT C.is_fulltime FROM CareTaker C WHERE C.username = OLD.username) AND
+            (SELECT COUNT(*) <= 300 AS C FROM CareTakerAvailability A 
+            WHERE A.username = OLD.username AND DATE_PART('year', OLD.date) = DATE_PART('year', A.date))) THEN
+            
+        RAISE EXCEPTION 'YOU CANNOT APPLY FOR ANYMORE LEAVE!';   
         END IF;
         --autoreject bids if you apply for leave
         initial := (SELECT COUNT(*) FROM Bids WHERE status = 'PENDING');

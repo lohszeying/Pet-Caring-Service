@@ -39,7 +39,6 @@ router.get('/', passport.authMiddleware(), async function bids(req, res, next) {
         data = await pool.query(sql_query.query.get_all_rejected_bids, [owner_username]);
 
         info.rejectedbids_tbl = data.rows;
-        console.log(info);
         res.render("bids", info);
 
         } catch (e) {console.log(e);}
