@@ -20,7 +20,7 @@ const salt  = bcrypt.genSaltSync(round);
 function initRouter(app) {
 	/* GET */
 	app.get('/'      , index );
-
+	app.get('/search', search);
 	/* PROTECTED GET */
 
 
@@ -80,26 +80,59 @@ function index(req, res, next) {
 			basic(req, res, 'index', { page: '', auth: true});
 	}
 }
-/*
-function search(req, res, next) {
-	var ctx  = 0, avg = 0, tbl;
-	var game = "%" + req.query.gamename.toLowerCase() + "%";
-	pool.query(sql_query.query.search_game, [game], (err, data) => {
+
+async function search(req, res, next) {
+	var username = req.query.username;
+	var user_tbl;
+	var caretaker_tbl;
+	var rating_tbl; //average rating
+	var completed_bids_tbl;
+	var total_completed_bids;
+	var data;
+
+	try {
+		data = await pool.query(sql_query.query.find_user, [username]);
+		user_tbl = data.rows;
+
+		data = await pool.query(sql_query.query.find_caretaker, [username]);
+		caretaker_tbl = data.rows;
+
+		//console.error(caretaker_tbl);
+
+		data = await pool.query(sql_query.query.get_rating, [username]);
+		rating_tbl = data.rows;
+
+		data = await pool.query(sql_query.query.get_all_completed_bids_for_caretaker, [username]);
+		completed_bids_tbl = data.rows;
+		total_completed_bids = data.rows.length;
+
+		//console.error(completed_bids_tbl);
+
+		if(!req.isAuthenticated()) {
+			res.render('search', { page: 'search', auth: false, user_tbl: user_tbl, caretaker_tbl: caretaker_tbl,
+				rating_tbl: rating_tbl, completed_bids_tbl: completed_bids_tbl, total_completed_bids: total_completed_bids});
+		} else {
+			basic(req, res, 'search', { page: 'search', auth: true,
+				user_tbl: user_tbl, caretaker_tbl, rating_tbl, completed_bids_tbl: completed_bids_tbl,
+				total_completed_bids: total_completed_bids});
+		}
+
+
+	} catch (e) {
+		console.log(e);
+	}
+
+	/*pool.query(sql_query.query.find_user, [username], (err, data) => {
 		if(err || !data.rows || data.rows.length == 0) {
-			ctx = 0;
 			tbl = [];
 		} else {
-			ctx = data.rows.length;
 			tbl = data.rows;
 		}
-		if(!req.isAuthenticated()) {
-			res.render('search', { page: 'search', auth: false, tbl: tbl, ctx: ctx });
-		} else {
-			basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl, ctx: ctx });
-		}
-	});
+		console.error(tbl);
+
+		basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl});
+	}); */
 }
-*/
 
 
 
