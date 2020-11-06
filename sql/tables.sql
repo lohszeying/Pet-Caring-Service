@@ -18,43 +18,34 @@ CREATE TABLE PCSAdmin
     username VARCHAR(64) PRIMARY KEY,
     password VARCHAR NOT NULL
 );
-
 CREATE TABLE Users
 (
     username VARCHAR(64) PRIMARY KEY,
     password VARCHAR     NOT NULL,
     name     VARCHAR(64) NOT NULL,
-    area     VARCHAR(64) NULL
+    area     VARCHAR(64) NOT NULL
 );
-
 CREATE TABLE PetOwner
 (
     username VARCHAR(64) PRIMARY KEY,
     credit_card_number NUMERIC(20) DEFAULT NULL,
     FOREIGN KEY (username) REFERENCES Users (username) ON UPDATE CASCADE
 );
-
-
-
 CREATE TABLE CareTaker
 (
     username    VARCHAR(64) PRIMARY KEY,
     is_fulltime BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (username) REFERENCES Users (username) ON UPDATE CASCADE
 );
-
 CREATE TABLE PetTypes
 (
     pet_type VARCHAR(64) PRIMARY KEY,
     base_price NUMERIC(10,2) NOT NULL
 );
-
-
 CREATE TABLE SpecialRequirements
 (
     special_requirement VARCHAR PRIMARY KEY
 );
-
 CREATE TABLE Pet
 (
     owner_username VARCHAR(64),
@@ -65,7 +56,6 @@ CREATE TABLE Pet
     FOREIGN KEY (owner_username) REFERENCES PetOwner (username) ON UPDATE CASCADE,
     FOREIGN KEY (pet_type) REFERENCES PetTypes (pet_type) ON UPDATE CASCADE
 );
-
 CREATE TABLE PetSpecialRequirements
 (
     owner_username       VARCHAR(64),
@@ -75,7 +65,6 @@ CREATE TABLE PetSpecialRequirements
     FOREIGN KEY (owner_username, pet_name) REFERENCES Pet (owner_username, pet_name) ON UPDATE CASCADE ON DELETE CASCADE,
     FOREIGN KEY (special_requirement) REFERENCES SpecialRequirements (special_requirement) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
 CREATE TABLE CareTakerPricing
 (
     username VARCHAR(64),
@@ -85,7 +74,6 @@ CREATE TABLE CareTakerPricing
     FOREIGN KEY (username) REFERENCES CareTaker (username) ON UPDATE CASCADE,
     FOREIGN KEY (pet_type) REFERENCES PetTypes (pet_type) ON UPDATE CASCADE
 );
-
 CREATE TABLE CareTakerAvailability
 (
     username VARCHAR(64),
@@ -93,12 +81,8 @@ CREATE TABLE CareTakerAvailability
     PRIMARY KEY (username, date),
     FOREIGN KEY (username) REFERENCES CareTaker (username) ON UPDATE CASCADE
 );
-
 CREATE TYPE transfer_methods AS ENUM ('OWNER_DELIVER', 'CARETAKER_PICKUP', 'PCS_BUILDING');
 CREATE TYPE payment_types AS ENUM ('CREDIT_CARD', 'CASH');
-
-
-
 --boolean function to check if a certain caretaker can care for a certain pet
 CREATE OR REPLACE FUNCTION ABLETOCAREFOR(pname VARCHAR, owner_name VARCHAR, caretaker_username VARCHAR) 
     RETURNS BOOLEAN AS 
@@ -123,7 +107,6 @@ CREATE OR REPLACE FUNCTION ONLEAVE(cname VARCHAR, start_date date, end_date date
                         );
         END;
         $$ LANGUAGE plpgsql;
-
 
 CREATE TYPE bidstatus AS ENUM ('ACCEPTED', 'PENDING', 'REJECTED', 'COMPLETED');
 

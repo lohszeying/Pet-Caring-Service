@@ -3,7 +3,7 @@ DO $$
     BEGIN
         for r in 1..1000 loop
         --password is '1'.
-            insert into Users (username, name, password) values(r, 'John', '$2b$10$gbBSQv0Zl2BouA8kehfu/.ErlOvFitj.BPs0gbPoT3gE3gXicx0CW');
+            insert into Users (username, name, password, area) values(r, 'John', '$2b$10$gbBSQv0Zl2BouA8kehfu/.ErlOvFitj.BPs0gbPoT3gE3gXicx0CW', 'Eunos');
         end loop;
     END;
 $$;
