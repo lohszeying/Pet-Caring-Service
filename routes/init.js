@@ -21,6 +21,7 @@ function initRouter(app) {
 	/* GET */
 	app.get('/'      , index );
 	app.get('/search', search);
+	app.post('/viewpet', viewpet);
 	/* PROTECTED GET */
 
 
@@ -81,6 +82,75 @@ function index(req, res, next) {
 	}
 }
 
+function viewpet(req, res, next) {
+	var username = req.body.username;
+	var petname = req.body.petname;
+	var pet_tbl;
+	var petreq_tbl;
+	//var data;
+
+	console.error("user: " + username);
+	console.error("pet: " + petname);
+
+	pool.query(sql_query.query.find_pet, [username, petname], (err, data) => {
+
+		if (err || !data.rows || data.rows.length == 0) {
+			console.error("Error in finding pet");
+			pet_tbl = [];
+		} else {
+			pet_tbl = data.rows;
+			
+		}
+		
+		pool.query(sql_query.query.find_pet_req, [username, petname], (err, data) => {
+
+			if (err || !data.rows || data.rows.length == 0) {
+				console.error("Error in finding pet req");
+				petreq_tbl = [];
+			} else {
+				petreq_tbl = data.rows;
+			}
+
+			if (!req.isAuthenticated()) {
+				res.render('viewpet', {
+					page: 'viewpet', auth: false, pet_tbl: pet_tbl, petreq_tbl: petreq_tbl, username: username
+				});
+			} else {
+				basic(req, res, 'viewpet', {
+					page: 'viewpet', auth: true, pet_tbl: pet_tbl, petreq_tbl: petreq_tbl, username: username
+				});
+			}
+		});
+
+	});
+
+
+	// try {
+	// 	data = await pool.query(sql_query.query.find_pet, [username, petname]);
+	// 	pet_tbl = data.rows;
+
+	// 	console.log("pet table: " + pet_tbl.pet_type);
+
+	// 	data = await pool.query(sql_query.query.find_pet_req, [username, petname]);
+	// 	pet_req_tbl = data.rows;
+
+	// 	if (!req.isAuthenticated()) {
+	// 		res.render('viewpet', {
+	// 			page: 'viewpet', auth: false, pet_tbl: pet_tbl, pet_req_tbl: pet_req_tbl, user_name: username
+	// 		});
+	// 	} else {
+	// 		basic(req, res, 'viewpet', {
+	// 			page: 'viewpet', auth: true, pet_tbl: pet_tbl, pet_req_tbl: pet_req_tbl, user_name: username
+	// 		});
+	// 	}
+
+
+	// } catch (e) {
+	// 	console.log(e);
+	// }
+
+}
+
 async function search(req, res, next) {
 	var username = req.query.username;
 	var user_tbl;
@@ -88,6 +158,7 @@ async function search(req, res, next) {
 	var rating_tbl; //average rating
 	var completed_bids_tbl;
 	var total_completed_bids;
+	var pets_tbl;
 	var data;
 
 	try {
@@ -97,7 +168,7 @@ async function search(req, res, next) {
 		data = await pool.query(sql_query.query.find_caretaker, [username]);
 		caretaker_tbl = data.rows;
 
-		//console.error(caretaker_tbl);
+		//console.error("caretaker: " + caretaker_tbl[0].username);
 
 		data = await pool.query(sql_query.query.get_rating, [username]);
 		rating_tbl = data.rows;
@@ -106,15 +177,23 @@ async function search(req, res, next) {
 		completed_bids_tbl = data.rows;
 		total_completed_bids = data.rows.length;
 
+		data = await pool.query(sql_query.query.list_of_enabled_pets, [username]);
+		pets_tbl = data.rows;
+		if (!data.rows || data.rows.length == 0)  {
+			pets_tbl = [];
+		}
+
+
 		//console.error(completed_bids_tbl);
 
 		if(!req.isAuthenticated()) {
 			res.render('search', { page: 'search', auth: false, user_tbl: user_tbl, caretaker_tbl: caretaker_tbl,
-				rating_tbl: rating_tbl, completed_bids_tbl: completed_bids_tbl, total_completed_bids: total_completed_bids});
+				rating_tbl: rating_tbl, completed_bids_tbl: completed_bids_tbl, total_completed_bids: total_completed_bids,
+				pets_tbl: pets_tbl, username: username});
 		} else {
 			basic(req, res, 'search', { page: 'search', auth: true,
 				user_tbl: user_tbl, caretaker_tbl, rating_tbl, completed_bids_tbl: completed_bids_tbl,
-				total_completed_bids: total_completed_bids});
+				total_completed_bids: total_completed_bids, pets_tbl: pets_tbl, username: username});
 		}
 
 

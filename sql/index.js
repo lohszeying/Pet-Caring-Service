@@ -9,6 +9,7 @@ sql.query = {
 	all_pet_types: 'SELECT * FROM PetTypes ORDER BY pet_type',
 	caretaker_fulltime_parttime: 'SELECT is_fulltime FROM CareTaker WHERE username=$1',
 	list_of_pets: 'SELECT * FROM Pet WHERE owner_username=$1',
+	list_of_enabled_pets: 'SELECT * FROM Pet WHERE owner_username=$1 AND enabled=true',
 	list_of_specreq: 'SELECT * FROM PetSpecialRequirements WHERE owner_username=$1',
 	all_specreq: 'SELECT * FROM SpecialRequirements',
 	all_bid:'SELECT * FROM Bids WHERE username=$1',
@@ -72,6 +73,8 @@ sql.query = {
 	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
 	find_user: 'SELECT * FROM Users WHERE username=$1',
+	find_pet: 'SELECT * FROM Pet WHERE owner_username=$1 AND pet_name=$2',
+	find_pet_req: 'SELECT * FROM PetSpecialRequirements WHERE owner_username=$1 AND pet_name=$2',
 	submit_review: 'UPDATE Bids SET (rating, review) = ($1,$2) WHERE owner_username = $3 AND pet_name = $4 AND caretaker_username = $5 AND start_date = $6 AND end_date = $7',
 	//get salary with 1. caretaker username 2. year(INTEGER) 3. month(INTEGER)
 	get_salary_for_the_month: 'SELECT GET_SALARY($1, $2, $3)',
