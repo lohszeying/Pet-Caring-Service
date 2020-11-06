@@ -349,7 +349,7 @@ BEGIN
             IF (pet_days > 60) THEN
                 extra_pay = extra_pay + var.total_price * 0.8;
             ELSEIF ((pet_days + var.d) > 60) THEN
-                extra_pay = extra_pay + (var.total_price/var.d) * (pet_days + var.d - 60);
+                extra_pay = extra_pay + (var.total_price/var.d) * (pet_days + var.d - 60) * 0.8;
             ELSE
                 extra_pay = extra_pay;
             END IF;
