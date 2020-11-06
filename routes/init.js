@@ -201,16 +201,7 @@ async function search(req, res, next) {
 		console.log(e);
 	}
 
-	/*pool.query(sql_query.query.find_user, [username], (err, data) => {
-		if(err || !data.rows || data.rows.length == 0) {
-			tbl = [];
-		} else {
-			tbl = data.rows;
-		}
-		console.error(tbl);
 
-		basic(req, res, 'search', { page: 'search', auth: true, tbl: tbl});
-	}); */
 }
 
 
