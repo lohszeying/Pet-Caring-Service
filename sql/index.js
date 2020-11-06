@@ -1,17 +1,6 @@
 const sql = {}
 
 sql.query = {
-	// Counting & Average
-	count_play: 'SELECT COUNT(winner) FROM game_plays WHERE user1=$1 OR user2=$1',
-	count_wins: 'SELECT COUNT(winner) FROM game_plays WHERE winner=$1',
-	avg_rating: 'SELECT AVG(rating) FROM user_games INNER JOIN game_list ON user_games.gamename=game_list.gamename WHERE username=$1',
-	
-	// Information
-	page_game: 'SELECT * FROM game_list WHERE ranking >= $1 AND ranking <= $2 ORDER BY ranking ASC',
-	page_lims: 'SELECT * FROM game_list ORDER BY ranking ASC LIMIT 10 OFFSET $1',
-	ctx_games: 'SELECT COUNT(*) FROM game_list',
-	all_games: 'SELECT ranking,game_list.gamename AS game,rating FROM user_games INNER JOIN game_list ON user_games.gamename=game_list.gamename WHERE username=$1 ORDER BY ranking ASC',
-	all_plays: 'SELECT gamename AS game, user1, user2, winner FROM game_plays WHERE user1=$1 OR user2=$1',
 
 
 	//Our queries
@@ -27,8 +16,6 @@ sql.query = {
 	all_payment_types: 'SELECT enum.enumlabel AS value FROM pg_enum AS enum JOIN pg_type AS type ON (type.oid = enum.enumtypid) WHERE type.typname =\'payment_types\' GROUP by type.typname, enum.enumlabel',
 
 	// Insertion
-	add_game: 'INSERT INTO user_games (username, gamename) VALUES($1,$2)',
-	add_play: 'INSERT INTO game_plays (user1, user2, gamename, winner) VALUES($1,$2,$3,$4)',
 	add_user: 'INSERT INTO Users (username, password, name, area) VALUES ($1,$2,$3,$4)',
 	add_pet: 'INSERT INTO Pet (pet_name, pet_type, owner_username) VALUES ($1, $2, $3)',
 	add_specreq: 'INSERT INTO PetSpecialRequirements (owner_username, pet_name, special_requirement) VALUES ($1, $2, $3)',
@@ -81,7 +68,6 @@ sql.query = {
 	//set complete bid params: caretaker_name, owner_name, pet_name start_date, end_date
 	complete_bid: 'Update Bids SET status = \'COMPLETED\' WHERE caretaker_username=$1 AND owner_username=$2 AND pet_name=$3 AND start_date=$4 AND end_date=$5',
 	// Search
-	search_game: 'SELECT * FROM game_list WHERE lower(gamename) LIKE $1',
 	find_caretaker: 'SELECT * FROM CareTaker WHERE username=$1',
 	find_pettypes: 'SELECT * FROM PetTypes WHERE pet_type=$1',
 	find_caretaker_pricing: 'SELECT * FROM CareTakerPricing WHERE username=$1 AND pet_type=$2',
@@ -95,8 +81,8 @@ sql.query = {
 }
 
 sql.admin = {
-	create_admin: 'INSERT INTO PCSAdmin (username, password, enabled) VALUES ($1, $2, true)',
-	login: 'SELECT * FROM PCSAdmin WHERE username=$1 AND enabled=true',
+	create_admin: 'INSERT INTO PCSAdmin (username, password) VALUES ($1, $2)',
+	login: 'SELECT * FROM PCSAdmin WHERE username=$1',
 	get_pet_type_pricing: 'SELECT * FROM PetTypes ORDER BY pet_type',
 	update_pet_type_pricing: 'UPDATE PetTypes SET base_price=$2 WHERE pet_type=$1',
 	month_pets_taken_care: 'SELECT COUNT(*) AS month_pet_count FROM Bids WHERE status=\'ACCEPTED\' AND start_date BETWEEN cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\')) as date) AND (cast(date_trunc(\'month\', to_date($1, \'YYYY-MM-DD\'))  + interval \'1 month\' as date))',

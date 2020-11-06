@@ -16,8 +16,7 @@ DROP TYPE IF EXISTS Bidstatus;
 CREATE TABLE PCSAdmin
 (
     username VARCHAR(64) PRIMARY KEY,
-    password VARCHAR NOT NULL,
-    enabled  BOOLEAN DEFAULT TRUE
+    password VARCHAR NOT NULL
 );
 
 CREATE TABLE Users
@@ -25,8 +24,7 @@ CREATE TABLE Users
     username VARCHAR(64) PRIMARY KEY,
     password VARCHAR     NOT NULL,
     name     VARCHAR(64) NOT NULL,
-    area     VARCHAR(64) NULL,
-    enabled  BOOLEAN DEFAULT TRUE
+    area     VARCHAR(64) NULL
 );
 
 CREATE TABLE PetOwner
